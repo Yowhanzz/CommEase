@@ -1,0 +1,492 @@
+.sidebar {
+  width: 230px !important;
+  height: 100vh;
+  background: #464E2E;
+  color: white;
+  transition: width 0.3s ease;
+  position: fixed;
+  left: 0;
+  top: 0;
+  padding: 15px;
+  overflow: hidden;
+}
+.sidebar:not(.open) {
+  width: 70px !important;
+}
+.top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.logo {
+  display: flex;
+  align-items: center;
+}
+.title-name {
+  font-weight: bold;
+  font-size: 17px;
+}
+.nav-item {
+  margin-left: 20px;
+  font-size: 14px;
+  transition: opacity 0.3s ease;
+}
+ul {
+  list-style: none;
+  padding: 0;
+  margin-top: 40px;
+}
+li {
+  margin: 20px 0;
+}
+a {
+  display: flex;
+  align-items: center;
+  color: white;
+  text-decoration: none;
+  padding: 10px;
+  border-radius: 5px;
+  transition: background 0.3s;
+  cursor: pointer;
+}
+a:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+i {
+  font-size: 24px;
+}
+
+#btn:not(.open) {
+  margin-right: 10%;
+} 
+
+.main-content {
+  margin-left: 230px;
+  transition: margin-left 0.3s ease;
+}
+
+.sidebar:not(.open) ~ .main-content {
+  margin-left: 70px;
+}
+
+
+/* Logout Modal */
+.logout-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.logout-modal {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 20px;
+  border:1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  width: 300px;
+  scale: 1.1;
+}
+
+.logout-modal h2 {
+  margin-bottom: 10px;
+  color: #E9E5D6;
+}
+
+.logout-modal p {
+  color: #E9E5D6;
+}
+
+.logout-modal-buttons {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 15px;
+}
+
+.logout-btn {
+  background: #59692A;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: .15s ease-in-out background-color,
+  .15s ease-in-out color;
+}
+
+.cancel-btn {
+  background: #bdc3c7;
+  color: white;
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: .15s ease-in-out background-color;
+}
+
+.logout-btn:hover {
+  background-color: #E9E5D6;
+  color: #464E2E;
+}
+
+.cancel-btn:hover {
+  background: #95a5a6;
+}
+
+/* NOTIFICATION PANEL */
+.notification-panel {
+	position: fixed;
+	top: 0;
+	left: -300px; /* Initially off-screen to the left */
+	width: 300px;
+	height: 100%;
+	background: #3e2a02;
+	color: white;
+	box-shadow: -4px 0 10px rgba(0, 0, 0, 0.3);
+	z-index: 1000;
+	padding: 15px;
+	display: flex;
+	flex-direction: column;
+	transition: transform 0.3s ease-in-out; /* Smooth glide transition */
+}
+
+/* Close button */
+.notification-panel .close-btn {
+	position: absolute;
+	top: 15px;
+	right: 15px;
+	font-size: 30px;
+	cursor: pointer;
+	color: white;
+	transition: 0.15s ease-in-out opacity;
+}
+
+/* Slide in effect */
+.notification-panel.open {
+	transform: translateX(300px); /* Slides in from the left */
+}
+
+/* Close button hover effect */
+.notification-panel .close-btn:hover {
+	opacity: 0.6;
+}
+
+.notification-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	margin-top: 25px;
+}
+
+.close-btn {
+	font-size: 24px;
+	cursor: pointer;
+}
+
+.notification-list {
+	margin-top: 10px;
+}
+
+.notification-item {
+	background: rgba(255, 255, 255, 0.2);
+	padding: 10px;
+	border-radius: 10px;
+	margin-bottom: 10px;
+	cursor: pointer;
+	transition: 0.15s ease-in-out background-color, 0.15s ease-in-out color;
+}
+
+.notification-item:hover {
+	background-color: #e9e5d6;
+	color: black;
+}
+
+.notification-item:hover .time {
+	color: #313131; /* Change the color of the span.time on hover */
+}
+
+.notification-item h4 {
+	margin: 0;
+	font-size: 14px;
+	font-weight: bold;
+}
+
+.notification-item p {
+	font-size: 12px;
+	margin: 5px 0;
+}
+
+.notification-item .time {
+	font-size: 10px;
+	color: #ccc;
+}
+
+.notification-item .time:hover {
+	color: #313131;
+}
+
+
+/* CREATE EVENT SECTION  */
+
+.event-container {
+  margin-left: 19%;
+  margin-top: 2%;
+}
+
+.create-event-separation {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  place-items: start;
+  row-gap: 25px;
+}
+
+.title-safety {
+  margin-left: 19%;
+  margin-top: 4%;
+  color: #464E2E;
+}
+
+.safety-hr {
+  width: 79%;
+  margin-top: 15px;
+  margin-left: 18%;
+}
+
+.create-event-headers {
+  font-size: 20px;
+  color: #464E2E;
+  font-weight: 700;
+}
+
+.create-event-input {
+  width: 90%;
+  height: 40px;
+  border-radius: 8px;
+  border-style: none;
+  background-color: #E9E5D6;
+  box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.3);
+  padding-left: 20px;
+  transition: 0.15s ease-in-out outline,
+  .15s ease-in-out border-color,
+  .15s ease-in-out box-shadow;
+}
+
+.create-event-input:focus {
+  outline: none;
+  border-color: #E9E5D6;
+  box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.8)
+}
+
+.modal-textarea {
+  width: 90%;
+  height: 200px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  resize: vertical;
+  font-size: 13px;
+  resize: none;
+  margin-top: 5%;
+  background-color: #E9E5D6;
+  transition: 0.15s ease-in-out outline,
+  .15s ease-in-out border-color,
+  .15s ease-in-out box-shadow;
+  box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.3);
+}
+
+.modal-textarea:focus {
+  outline: none;
+  border-color: #E9E5D6;
+  box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.8)
+}
+
+.create-event-title {
+  font-size: 20px;
+  color: #464E2E;
+  font-weight: 700;
+  margin-top: 5%;
+}
+
+.things-needed-container {
+  background-color: #E9E5D6;
+  width: 90%;
+  height: 270px; /* adjust mo dito for laki */
+  padding-bottom: 50px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.3);
+  
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* ito magic neto lods */
+  gap: 20px; /* dagdag breathing space */
+
+  
+}
+
+.things-separation {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 5% 5%;
+  column-gap: 20px;
+  overflow-y: auto; 
+  flex-grow: 1;
+  margin-bottom: 10px;
+}
+
+.things-separation::-webkit-scrollbar {
+  width: 5px;
+}
+
+.things-separation::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 10px;
+}
+
+.things-separation::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+
+.things-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 10px;
+  font-weight: 600;
+  margin-bottom: 5px; /* changed from margin-top to margin-bottom */
+  width: 90%;
+  margin-left: 5%;
+  height: 41px;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: left;
+  border: 1px solid black;
+  color: black;
+  transition: .15s ease-in-out background-color, 
+              .15s ease-in-out color;
+}
+
+.button-things:hover {
+  background-color: #464E2E;
+  color: #E9E5D6;
+}
+
+/* Active (selected) button */
+.active-button {
+  background-color: #E9E5D6 !important;
+  color: black;
+  border: 1px solid black;
+}
+
+.things-input {
+  width: 90%;
+  margin-left: 5%;
+  height: 34px;
+  border-radius: 8px;
+  border-style: none;
+  padding-left: 10px;
+  transition: 0.15s ease-in-out outline,
+  .15s ease-in-out border-color,
+  .15s ease-in-out box-shadow;
+  box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.3);
+}
+
+.things-input:focus {
+  outline: none;
+  border-color: #E9E5D6;
+  box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.5)
+}
+
+.button-container {
+  margin-left: 67%;
+  margin-top: -6%;
+}
+
+.create-cancel, .create-submit {
+  width: 66px;
+  height: 35px;
+  margin-left: 10px;
+  border-radius: 5px;
+  border-style: none;
+  background-color: #59692A;
+  color: #E9E5D6;
+  cursor: pointer;
+  font-weight: 600;
+  transition: .15s ease-in-out background-color, 
+  .15s ease-in-out color;
+}
+
+.create-submit:hover, .create-cancel:hover {
+  background-color: #E9E5D6;
+  color: #464E2E;
+  border: 1px solid #464E2E;
+}
+
+.create-cancel:active, .create-submit:active {
+  opacity: 0.8;
+}
+
+/* GPT */
+
+.things-button {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  padding: 5px 10px;
+  font-weight: 600;
+  margin-top: 10%;
+
+}
+
+.thing-x {
+  margin-left: auto;
+  padding-left: 10px;
+  font-weight: bold;
+  font-size: 16px;
+  transition: .15s ease-in-out margin-left,
+  .15s ease-in-out padding-left,
+  .15s ease-in-out font-weight,
+  .15s ease-in-out font-size;
+}
+
+.thing-x:hover {
+  opacity: 0.6;
+}
+
+.add-inside-button {
+  width: 66px;
+  height: 35px;
+  margin-left: 6%;
+  margin-top: 3%;
+  border-radius: 5px;
+  border-style: none;
+  background-color: #59692A;
+  color: #E9E5D6;
+  cursor: pointer;
+  font-weight: 500;
+  transition: .15s ease-in-out background-color, 
+  .15s ease-in-out color;
+}
+
+.add-inside-button:hover {
+  background-color: #E9E5D6;
+  color: #464E2E;
+  border: 1px solid #464E2E;
+}
+
+.add-inside-button:active {
+  opacity: 0.8;
+}
