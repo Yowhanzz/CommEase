@@ -717,3 +717,12 @@ textarea:focus {
     padding-left: 160px;
   }
 }
+
+
+/* TESTING */
+.custom-event-class {
+  background-color: #4caf50 !important; /* green marker */
+  color: white !important;
+  border-radius: 4px;
+  padding: 2px;
+}

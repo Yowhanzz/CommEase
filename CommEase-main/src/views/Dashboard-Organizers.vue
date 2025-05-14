@@ -14,7 +14,7 @@
 
 			<ul>
 				<li>
-					<router-link to="/dashboard_volunteers">
+					<router-link to="/DashboardOrganizers">
 						<i class="bx bxs-dashboard"></i>
 						<span class="nav-item" v-show="isSidebarOpen"
 							>Dashboard</span
@@ -22,7 +22,7 @@
 					</router-link>
 				</li>
 				<li>
-					<router-link to="/ActivityLogVolunteers">
+					<router-link to="/ActivityLogOrganizers">
 						<i class="bx bx-history"></i>
 						<span class="nav-item" v-show="isSidebarOpen"
 							>Event History</span
@@ -57,32 +57,72 @@
 		</div>
 	</header>
 
-	<div>
-		<!-- SEARCH AND OPTIONS -->
-		<div
-			class="search-options-container"
-			:class="{ 'sidebar-collapsed': !isOpen }"
-		>
-			<div class="dropdown">
-				<button class="dropbtn" @click="toggleDropdown">
-					Options ▼
-				</button>
-				<div class="dropdown-content" :class="{ active: showDropdown }">
-					<a>Show My QR Code</a>
-					<a>Calendar</a>
-				</div>
-			</div>
-			<input
-				v-model="searchQuery"
-				class="input-search-event"
-				type="search"
-				placeholder="Search event..."
-			/>
-		</div>
-		<hr class="search-divider" :class="{ 'sidebar-collapsed-for-divider': isOpen }" />
-	</div>
 
-			<!-- LOGOUT MODAL -->
+<!-- SEARCH AND OPTIONS -->
+  <div class="search-options-container" :class="{ 'sidebar-collapsed': !isOpen }">
+    <div class="dropdown">
+      <button class="dropbtn" @click="toggleDropdown">Options ▼</button>
+      <div class="dropdown-content" :class="{ active: showDropdown }">
+        <a @click="showQRCode = true">Show My QR Scanner</a>
+        <a @click="toggleCalendar">Calendar</a>
+      </div>
+    </div>
+
+    <input
+      v-model="searchQuery"
+      class="input-search-event"
+      type="search"
+      placeholder="Search event..."
+    />
+  </div>
+
+  <hr class="search-divider" :class="{ 'sidebar-collapsed-for-divider': isOpen }" />
+
+  <!-- Modal for QR Code Scanner -->
+  <div v-if="showQRCode" class="qr-modal-overlay">
+    <div class="qr-modal-content">
+      <button class="close-btn" @click="showQRCode = false" v-if="showQRCode">X</button>
+      <h3>Scan QR Code</h3>
+      <qrcode-stream
+  @detect="onDetect"
+  class="scanner-box"
+  :constraints="{
+    video: {
+      facingMode: 'environment',
+      frameRate: { ideal: 60, max: 60 }
+    }
+  }"
+/>
+
+    <p class="or">or</p>
+
+    <div class="input-attendance-volunteer">
+     <input
+      v-model="studentID"
+      class="input-attendance"
+      type="text"
+      placeholder="Input your student ID here..."
+    />
+    <button class="input-submit" @click="submitID">Submit</button>
+    </div>
+
+
+    </div>
+  </div>
+
+
+<!-- CALENDAR MODAL -->
+<div v-if="calendarVisible" class="calendar-modal-overlay">
+  <div class="calendar-modal">
+    <div class="calendar-header">
+      <h3>Event Calendar</h3>
+      <button class="close-btn" @click="calendarVisible = false">✕</button>
+    </div>
+    <vue-cal style="height: 500px" :events="events" @cell-click="onDateClick" />
+  </div>
+</div>
+
+	<!-- LOGOUT MODAL -->
 			<div v-if="showLogoutModal" class="logout-modal-overlay">
 			<div class="logout-modal">
 				<h2>Confirm Logout</h2>
@@ -121,7 +161,7 @@
 		<div class="glasscard-container">
 			<div class="picture-1">
 				<img
-					src="/public/gulapa.jpg"
+					src=""
 					alt="shrek sample pic"
 					class="picture-person"
 				/>
@@ -135,7 +175,7 @@
 		<div class="glasscard-container-1">
 			<div class="picture-1">
 				<img
-					src="/public/gulapa.jpg"
+					src=""
 					alt="shrek sample pic"
 					class="picture-person"
 				/>
@@ -152,9 +192,9 @@
 		<div>
 			<h1 class="lists-events">CREATED EVENTS</h1>
 			<hr class="hr-lists-events" />
-		</div>
+		</div>   
 
-    .
+    <router-link to="/CreateEventOrganizers" class="create-event-button">Create Event</router-link>
 
 		<div class="events-grid">
 			<div
@@ -195,136 +235,204 @@
 </template>
 
 <script>
+import 'vue-cal/dist/vuecal.css';
+import VueCal from 'vue-cal';
+import { QrcodeStream } from 'vue-qrcode-reader';
+
+
 export default {
-	data() {
-		return {
-			searchQuery: "",
-			showDropdown: false,
-			activeContent: null,
-			showNotifications: false,
-			showLogoutModal: false,
-			isSidebarOpen: false, // copy
-			showDropdown: false,
-			isOpen: false, // copy
-			qrData: "sample-qr-data",
-			notifications: [
-				{
-					message: "You completed the 'Update website content' task.",
-					time: "2 hours ago",
-				},
-				{
-					message: "You completed the 'Clean up drive' task.",
-					time: "3 hours ago",
-				},
-				{
-					message:
-						"You completed the 'Meeting with organizers' task.",
-					time: "5 hours ago",
-				},
-			],
-			events: [
-				{
-					start: "2025-04-08T10:00:00",
-					end: "2025-04-08T12:00:00",
-					title: "Clean Up Drive",
-					location: "Barangay East Bajac-Bajac",
-				},
-				{
-					start: "2025-09-10T08:00:00",
-					end: "2025-09-10T10:00:00",
-					title: "Tree Planting",
-					location: "Barangay West Tapinac",
-				},
-				{
-					start: "2025-12-15T14:00:00",
-					end: "2025-12-15T16:00:00",
-					title: "Feeding Program",
-					location: "Barangay Sta. Rita",
-				},
-				{
-					start: "2025-05-20T09:00:00",
-					end: "2025-05-20T11:00:00",
-					title: "Community Painting",
-					location: "Barangay Sta. Rita Gymnasium",
-				},
-				{
-					start: "2025-06-01T13:00:00",
-					end: "2025-06-01T15:00:00",
-					title: "Barangay Forum",
-					location: "Barangay East Tapinac Covered Court",
-				},
-				{
-					start: "2025-07-07T08:30:00",
-					end: "2025-07-07T11:30:00",
-					title: "Blood Donation Drive",
-					location: "Olongapo City Health Office",
-				},
-			],
-			selectedEvent: null,
-		};
-	},
-	computed: {
-		filteredEvents() {
-			return this.events.filter(
-				(event) =>
-					event.title
-						.toLowerCase()
-						.includes(this.searchQuery.toLowerCase()) ||
-					event.location
-						.toLowerCase()
-						.includes(this.searchQuery.toLowerCase())
-			);
-		},
-	},
-	methods: {
-		toggleSidebar() {
-			this.isSidebarOpen = !this.isSidebarOpen;
-			this.isOpen = !this.isOpen; // toggles both  :class="{ 'sidebar-collapsed': !isOpen }"
-		}, // copyy
-		toggleDropdown() {
-			this.showDropdown = !this.showDropdown;
-		},
-		showContent(type) {
-			this.activeContent = type;
-			this.showDropdown = false;
-		},
-		closeModal() {
-			this.activeContent = null;
-		},
-		toggleNotifications() {
-			this.showNotifications = !this.showNotifications;
-		},
-		formatTime(datetime) {
-			return new Date(datetime).toLocaleTimeString([], {
-				hour: "2-digit",
-				minute: "2-digit",
-			});
-		},
-		formatDate(datetime) {
-			return new Date(datetime).toLocaleDateString([], {
-				weekday: "short",
-				year: "numeric",
-				month: "short",
-				day: "numeric",
-			});
-		},
-		onDateClick(date) {
-			const selected = this.events.find((event) => {
-				const eventDate = new Date(event.start).toLocaleDateString();
-				return eventDate === date.toLocaleDateString();
-			});
-			this.selectedEvent = selected || null;
-		},
-		confirmLogout() {
-			// Placeholder for logout logic
-			console.log("Logging out...");
-			this.showLogoutModal = false;
-		},
-		toggleDropdown() {
-			this.showDropdown = !this.showDropdown;
-		},
-	},
+  components: {
+    VueCal,
+    QrcodeStream,
+  },
+  data() {
+    return {
+      searchQuery: "",
+      studentID: "",
+      timedIDs: new Set(),
+      showDropdown: false,
+      showNotifications: false,
+      showLogoutModal: false,
+      isSidebarOpen: false,
+      isOpen: false,
+      qrData: "sample-qr-data",
+      calendarVisible: false, // ✅ for toggling calendar visibility
+      selectedEvent: null,
+      showQRCode: false, // for QR scanner modal visibility
+
+      notifications: [
+        { message: "You completed the 'Update website content' task.", time: "2 hours ago" },
+        { message: "You completed the 'Clean up drive' task.", time: "3 hours ago" },
+        { message: "You completed the 'Meeting with organizers' task.", time: "5 hours ago" },
+      ],
+
+      events: [
+        {
+          start: "2025-04-08T10:00:00",
+          end: "2025-04-08T12:00:00",
+          title: "Clean Up Drive",
+          location: "Barangay East Bajac-Bajac",
+        },
+        {
+          start: "2025-09-10T08:00:00",
+          end: "2025-09-10T10:00:00",
+          title: "Tree Planting",
+          location: "Barangay West Tapinac",
+        },
+				 {
+          start: "2025-09-10T08:00:00",
+          end: "2025-09-10T10:00:00",
+          title: "Tree Planting",
+          location: "Barangay West Tapinac",
+        },
+				 {
+          start: "2025-09-10T08:00:00",
+          end: "2025-09-10T10:00:00",
+          title: "Tree Planting",
+          location: "Barangay West Tapinac",
+        },
+				 {
+          start: "2025-09-10T08:00:00",
+          end: "2025-09-10T10:00:00",
+          title: "Tree Planting",
+          location: "Barangay West Tapinac",
+        },
+				 {
+          start: "2025-09-10T08:00:00",
+          end: "2025-09-10T10:00:00",
+          title: "Tree Planting",
+          location: "Barangay West Tapinac",
+        },
+        // Add other events here...
+      ],
+    };
+  },
+  computed: {
+    filteredEvents() {
+      return this.events.filter((event) =>
+        event.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+        event.location.toLowerCase().includes(this.searchQuery.toLowerCase())
+      );
+    },
+  },
+  methods: {
+    // Toggle Sidebar
+    toggleSidebar() {
+      this.isSidebarOpen = !this.isSidebarOpen;
+      this.isOpen = !this.isOpen;
+    },
+
+    // Dropdown Toggle
+    toggleDropdown() {
+      this.showDropdown = !this.showDropdown;
+    },
+
+    // Calendar Toggle
+    toggleCalendar() {
+      this.calendarVisible = !this.calendarVisible;
+      this.showDropdown = false;
+    },
+
+    submitID() {
+      const id = this.studentID.trim();
+
+      // Check if only numbers
+      if (!/^\d+$/.test(id)) {
+        alert("Student ID must contain only numbers.");
+        return;
+      }
+
+      // Check if it's exactly 9 digits
+      if (id.length !== 9) {
+        alert("Student ID must be exactly 9 digits.");
+        return;
+      }
+
+      // Check if the ID is already in the set (time out scenario)
+      if (this.timedIDs.has(id)) {
+        alert("Time out successfully!");
+        this.timedIDs.delete(id); // Remove from timed-in list
+      } else {
+        alert("Time in successfully!");
+        this.timedIDs.add(id); // Add to timed-in list
+      }
+
+      // Clear the input field after submit
+      this.studentID = "";
+    },
+
+    // QR Scanner Modal Logic
+onDetect(result) {
+  const scannedText = result[0].rawValue;
+  alert(`✅ Scanned Successfully: ${scannedText}`);
+  // this.showQRCode = false; // ❌ Huwag muna i-auto-close, manual na lang
+},
+
+ onInit(error) {
+  if (error) {
+    console.error("🚨 QR Scanner initialization error:", error.name);
+    alert(`❌ Camera access issue: ${error.name}`);
+  } else {
+    console.log("✅ QR Scanner initialized successfully.");
+  }
+},
+
+    // Event Click Logic (for calendar)
+    onDateClick({ date }) {
+      const selected = this.events.find((event) => {
+        const eventDate = new Date(event.start).toLocaleDateString();
+        return eventDate === new Date(date).toLocaleDateString();
+      });
+      this.selectedEvent = selected || null;
+      if (selected) {
+        console.log("Clicked Event:", selected);
+      } else {
+        console.log("No event on selected date.");
+      }
+    },
+
+    // Notification Toggle
+    toggleNotifications() {
+      this.showNotifications = !this.showNotifications;
+    },
+
+    // Format Time
+    formatTime(datetime) {
+      return new Date(datetime).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
+    },
+
+    // Format Date
+    formatDate(datetime) {
+      return new Date(datetime).toLocaleDateString([], {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      });
+    },
+
+    // Logout Logic
+    confirmLogout() {
+      console.log("Logging out...");
+      this.showLogoutModal = false;
+    },
+
+    // Show Content Logic (for modal handling)
+    showContent(type) {
+      this.activeContent = type;
+      this.showDropdown = false;
+    },
+
+    // Close Modal
+    closeModal() {
+      this.activeContent = null;
+    },
+  },
 };
 </script>
+
 
 <style scoped src="/src/assets/CSS Organizers/dashboard.css"></style>

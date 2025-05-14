@@ -191,6 +191,7 @@ input:focus {
 	color: white;
 	margin-top: 5%;
 	margin-bottom: 20px;
+	padding-left: 25px;
 }
 
 .signup-btn {

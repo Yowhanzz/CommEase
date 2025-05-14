@@ -124,8 +124,7 @@
 
   <div class="container-event-objectives" :class="{ 'sidebar-collapsed-right-cont': !isOpen }">
     <h2 class="title-event-objectives">CLEAN UP DRIVE</h2>
-    <p class="p-date"><span>Date Posted: </span>08/04.2005</p>
-    <p class="p-location"><span>Location </span>#25 21st East Bajac-Bajac, Olongapo City</p>
+    <p class="p-date"> <span>Date Posted: </span>{{ new Date(datePosted).toLocaleDateString() }}</p>    <p class="p-location"><span>Location </span>#25 21st East Bajac-Bajac, Olongapo City</p>
     <p class="p-slots"><span>Slots Left: </span>Only <span>25</span> volunteers are in need</p>
 
     <h3 class="title-desc">Description</h3>
@@ -135,84 +134,7 @@
        ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
        ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
        ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-       ipsam nemo dicta, veritati</p>
+       ipsam nemo dicta, veritatiLore</p>
 
     <hr class="hr-task">
     <h3 class="title-task">Task Assignment</h3>
@@ -256,6 +178,9 @@ import { useRouter } from 'vue-router';
 // === Sidebar Toggle ===
 const isSidebarOpen = ref(true);
 const isOpen = ref(false); // Added this based on your request
+const datePosted = ref("2005-08-04"); // format: YYYY-MM-DD
+const eventTitle = ref("CLEAN UP DRIVE");
+
 
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value;
@@ -309,12 +234,39 @@ const toggleItem = (item) => {
   }
 };
 
+const calendarVisible = ref(false);
+const volunteerEvents = ref([]);
+
 const handleAgree = () => {
   if (agreed.value) return;
 
   const confirmed = window.confirm("Are you sure you want to agree?");
   if (confirmed) {
     agreed.value = true;
+
+    const newEvent = {
+  title: eventTitle.value,
+  start: `${datePosted.value}T09:00:00`,
+  end: `${datePosted.value}T11:00:00`,
+  location: "East Bajac-Bajac",
+  class: "custom-event-class" // <== mark this in the calendar
+};
+
+const storedEvents = JSON.parse(localStorage.getItem("volunteerEvents")) || [];
+storedEvents.push(newEvent);
+localStorage.setItem("volunteerEvents", JSON.stringify(storedEvents));
+
+   const loadEvents = () => {
+  const saved = JSON.parse(localStorage.getItem("volunteerEvents")) || [];
+  volunteerEvents.value = saved;
+  
+loadEvents();
+calendarVisible.value = true;
+};
+
+onMounted(() => {
+  loadEvents();
+});
   }
 };
 
@@ -326,8 +278,26 @@ const handleSubmit = () => {
     return;
   }
 
-  // Optional lang ang ideaMessage, so no alert kung empty
-  alert("Form submitted successfully");
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+
+  const isoDate = `${year}-${month}-${day}`; // format: YYYY-MM-DD
+
+  const newEvent = {
+    start: `${isoDate}T09:00:00`,
+    end: `${isoDate}T11:00:00`,
+    title: "Volunteer Registration",
+    location: "Submitted via Registration Form"
+  };
+
+  // Save to localStorage
+  const storedEvents = JSON.parse(localStorage.getItem("volunteerEvents")) || [];
+  storedEvents.push(newEvent);
+  localStorage.setItem("volunteerEvents", JSON.stringify(storedEvents));
+
+  alert("Form submitted successfully!");
   router.push("/dashboard_volunteers");
 };
 
@@ -336,9 +306,5 @@ const resetRegistration = () => {
   selectedItems.value = [];
 };
 </script>
-
-
-
-
 
 <style scoped src="/src/assets/CSS Volunteers/registration.css"></style>

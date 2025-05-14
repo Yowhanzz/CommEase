@@ -2,7 +2,7 @@
   <div>
     <!-- Sidebar -->
     <header>
-  <div :class="['sidebar', { open: isSidebarOpen }]">
+  <div class="sidebar" :class="{ 'open': isSidebarOpen }">
   <div class="top">
     <div class="logo">
       <i class="bx bxl-codeopen"></i>
@@ -77,17 +77,18 @@
     <div class="overlay" v-if="showNotifications" @click="toggleNotifications"></div>
 
     <!-- ACTIVITY LOG HEADER -->
-    <div class="header-container">
-      <h1 class="lists-events">ACTIVITY LOG</h1>
+    <div class="header-container" :class="{ 'sidebar-collapsed': !isOpen }">
+      <h1 class="lists-events"  :class="{ 'header-closed': isOpen }">ACTIVITY LOG</h1>
       <input v-model="searchQuery" class="input-search-event" type="search" placeholder="Search event...">
     </div>
-    <hr class="hr-input">
+    <hr class="hr-input" :class="{ 'sidebar-collapsed-for-divider': isOpen }">
 
     <!-- EVENTS TABLE -->
-    <div class="container-table">
+    <div class="container-table" :class="{ 'sidebar-collapsed': !isOpen }">
       <table class="users-table">
         <thead>
           <tr>
+            <th>No.</th>
             <th>Event Title</th>
             <th>Barangay</th>
             <th>Date</th>
@@ -96,8 +97,9 @@
             <th>Status</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody> 
           <tr v-for="(event, index) in filteredEvents" :key="index">
+            <td>{{ index + 1 }}</td>
             <td>{{ event.title }}</td>
             <td>{{ event.barangay }}</td>
             <td>{{ event.date }}</td>
@@ -111,63 +113,66 @@
   </div>
 </template>
 
-<script setup>
-import { ref, computed } from "vue";
-import { useRouter } from "vue-router";
+<script>
+export default {
+  data() {
+    return {
+      // UI Toggles
+      showNotifications: false,
+      showLogoutModal: false,
+      isOpen: false,
+      isSidebarOpen: false,
 
-// === Sidebar Toggle ===
-const isSidebarOpen = ref(true);
-const toggleSidebar = () => {
-  isSidebarOpen.value = !isSidebarOpen.value;
-};
+      // Search
+      searchQuery: "",
 
-// === Vue Router for navigation ===
-const router = useRouter();
+      // Notifications
+      notifications: [
+        { message: "You completed the 'Update website content' task.", time: "2 hours ago" },
+        { message: "You completed the 'Clean up drive' task.", time: "3 hours ago" },
+        { message: "You completed the 'Meeting with organizers' task.", time: "5 hours ago" }
+      ],
 
-// === Notifications & Modal ===
-const showNotifications = ref(false);
-const showLogoutModal = ref(false);
+      // Events
+      events: [
+        { title: "Clean Up Drive", barangay: "East Bajac - Bajac", date: "08/06/2025", time: "10:00 - 12:00", organizer: "ELITES", status:"Pending" },
+        { title: "Tree Planting", barangay: "West Bajac - Bajac", date: "09/10/2025", time: "8:00 - 10:00", organizer: "GREEN INITIATIVE", status:"Pending" },
+        { title: "Feeding Program", barangay: "North Bajac - Bajac", date: "10/12/2025", time: "2:00 - 4:00", organizer: "HELPING HANDS", status:"Pending"  },
+        { title: "Blood Donation", barangay: "South Bajac - Bajac", date: "12/15/2025", time: "9:00 - 1:00", organizer: "HEALTH TEAM", status:"Pending"  }
+      ]
+    };
+  },
 
-// === Search Query ===
-const searchQuery = ref("");
+  computed: {
+    filteredEvents() {
+      const query = this.searchQuery.toLowerCase();
+      return this.events.filter(event =>
+        event.title.toLowerCase().includes(query) ||
+        event.barangay.toLowerCase().includes(query) ||
+        event.date.toLowerCase().includes(query) ||
+        event.time.toLowerCase().includes(query) ||
+        event.organizer.toLowerCase().includes(query)
+      );
+    }
+  },
 
-// === Notifications Data ===
-const notifications = ref([
-  { message: "You completed the 'Update website content' task.", time: "2 hours ago" },
-  { message: "You completed the 'Clean up drive' task.", time: "3 hours ago" },
-  { message: "You completed the 'Meeting with organizers' task.", time: "5 hours ago" }
-]);
+  methods: {
+    toggleNotifications() {
+      this.showNotifications = !this.showNotifications;
+    },
 
-// === Events Data ===
-const events = ref([
-  { title: "Clean Up Drive", barangay: "East Bajac - Bajac", date: "08/06/2025", time: "10:00 - 12:00", organizer: "ELITES", status: "Completed" },
-  { title: "Tree Planting", barangay: "West Bajac - Bajac", date: "09/10/2025", time: "8:00 - 10:00", organizer: "GREEN INITIATIVE", status: "Pending" },
-  { title: "Feeding Program", barangay: "North Bajac - Bajac", date: "10/12/2025", time: "2:00 - 4:00", organizer: "HELPING HANDS", status: "Cancelled" },
-  { title: "Blood Donation", barangay: "South Bajac - Bajac", date: "12/15/2025", time: "9:00 - 1:00", organizer: "HEALTH TEAM", status: "Ongoing" }
-]);
+    toggleSidebar() {
+      this.isSidebarOpen = !this.isSidebarOpen;
+      this.isOpen = !this.isOpen; // optional if you're toggling extra state
+    },
 
-// === Computed for Filtering Events ===
-const filteredEvents = computed(() => 
-  events.value.filter(event => {
-    const query = searchQuery.value.toLowerCase();
-    return event.title.toLowerCase().includes(query) ||
-           event.barangay.toLowerCase().includes(query) ||
-           event.date.toLowerCase().includes(query) ||
-           event.time.toLowerCase().includes(query) ||
-           event.organizer.toLowerCase().includes(query) ||
-           event.status.toLowerCase().includes(query);
-  })
-);
-
-// === Methods ===
-const toggleNotifications = () => {
-  showNotifications.value = !showNotifications.value;
-};
-
-const confirmLogout = () => {
-  router.push("/LoginVolunteers"); // Update this if your logout logic is different
+    confirmLogout() {
+      this.$router.push("/LoginOrganizers");
+    }
+  }
 };
 </script>
+
 
 
 <style scoped src="/src/assets/CSS Organizers/ActivityLog.css"></style>
