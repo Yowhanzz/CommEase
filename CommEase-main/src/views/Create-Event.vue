@@ -1,7 +1,7 @@
 <template>
   <div>
     <div :class="['sidebar', { open: isSidebarOpen }]">
-  <div class="top">
+   <div class="top">
     <div class="logo">
       <i class="bx bxl-codeopen"></i>
       <span class="title-name" v-show="isSidebarOpen">CommEase</span>
@@ -14,6 +14,12 @@
       <router-link to="/DashboardOrganizers">
         <i class="bx bxs-dashboard"></i>
         <span class="nav-item" v-show="isSidebarOpen">Dashboard</span>
+      </router-link>
+    </li>
+     <li>
+      <router-link to="/ManageEventsOrganizers">
+        <i class='bx  bx-calendar-check'  ></i>  
+        <span class="nav-item" v-show="isSidebarOpen">Manage Events</span>
       </router-link>
     </li>
     <li>
@@ -222,11 +228,30 @@ const saveEvent = () => {
     return;
   }
 
-  // Success
-  alert("Event Created");
+  const storedEvents = JSON.parse(localStorage.getItem('events')) || [];
 
-  // Optional: Reset form
+  const newEvent = {
+    event_id: Date.now(),
+    title: eventTitle.value,
+    barangay: barangay.value,
+    date: date.value,
+    time: time.value,
+    objective: objective.value,
+    description: description.value,
+    thingsNeeded: [...thingsNeeded.value],
+    organizer: "ORGANIZER_NAME",
+    status: "Pending"
+  };
+
+  storedEvents.push(newEvent);
+  localStorage.setItem('events', JSON.stringify(storedEvents));
+
+  alert("Event Created!");
+
   cancelEvent();
+
+  // Redirect to organizer dashboard after saving
+  router.push('/DashboardOrganizers');  // Change this path to your actual dashboard route
 };
 </script>
 

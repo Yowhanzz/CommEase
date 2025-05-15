@@ -3,7 +3,7 @@
     <!-- Sidebar -->
     <header>
   <div class="sidebar" :class="{ 'open': isSidebarOpen }">
-   <div class="top">
+  <div class="top">
     <div class="logo">
       <i class="bx bxl-codeopen"></i>
       <span class="title-name" v-show="isSidebarOpen">CommEase</span>
@@ -84,38 +84,63 @@
 
     <!-- ACTIVITY LOG HEADER -->
     <div class="header-container" :class="{ 'sidebar-collapsed': !isOpen }">
-      <h1 class="lists-events"  :class="{ 'header-closed': isOpen }">EVENT HISTORY</h1>
+      <h1 class="lists-events"  :class="{ 'header-closed': isOpen }">MANAGE EVENTS</h1>
       <input v-model="searchQuery" class="input-search-event" type="search" placeholder="Search event...">
     </div>
     <hr class="hr-input" :class="{ 'sidebar-collapsed-for-divider': isOpen }">
 
+     <router-link to="/CreateEventOrganizers" class="create-event-button">Create Event</router-link>
+
+
     <!-- EVENTS TABLE -->
-    <div class="container-table" :class="{ 'sidebar-collapsed': !isOpen }">
-      <table class="users-table">
-        <thead>
-          <tr>
-            <th>No.</th>
-            <th>Event Title</th>
-            <th>Barangay</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Organizer</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody> 
-          <tr v-for="(event, index) in filteredEvents" :key="index">
-            <td>{{ index + 1 }}</td>
-            <td>{{ event.title }}</td>
-            <td>{{ event.barangay }}</td>
-            <td>{{ event.date }}</td>
-            <td>{{ event.time }}</td>
-            <td>{{ event.organizer }}</td>
-            <td>{{ event.status }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+  <div class="container-table"  :class="{ 'sidebar-collapsed': !isOpen }">
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>No.</th>
+          <th>Event Title</th>
+          <th>Barangay</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Organizer</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Loop through the 'events' array -->
+        <tr v-for="(event, index) in filteredEvents" :key="index">
+          <td data-label="Id">{{ index + 1 }}</td>
+          <td data-label="Event Name">{{ event.title }}</td>
+          <td data-label="Time">{{ event.barangay }}</td>
+          <td data-label="Date">{{ event.date }}</td>
+          <td data-label="Venue">{{ event.time }}</td>
+          <td data-label="Resource Speaker">{{ event.organizer }}</td>
+          <td>
+            <span
+              :class="{
+                'status-pending': event.event_status === 'Pending',
+                'status-active': event.event_status === 'Active',
+                'status-completed': event.event_status === 'Completed',
+              }"
+            >
+              {{ event.status }}
+            </span>
+          </td>
+          <td data-label="Action" class="action-button">
+            <div class="test">
+            <button class="entries-edit" @click="handleEdit(event)">Edit</button>
+            <button class="entries-edit" @click="handleDelete(event.event_id)">Delete</button>
+            </div>
+          </td>
+        </tr>
+        <!-- Show placeholder if 'events' is empty -->
+        <tr v-if="events.length === 0">
+          <td colspan="8" class="no-data">No events available</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
   </div>
 </template>
 
@@ -128,7 +153,6 @@ export default {
       showLogoutModal: false,
       isOpen: false,
       isSidebarOpen: false,
-
       // Search
       searchQuery: "",
 
@@ -141,10 +165,10 @@ export default {
 
       // Events
       events: [
-        { title: "Clean Up Drive", barangay: "East Bajac - Bajac", date: "08/06/2025", time: "10:00 - 12:00", organizer: "ELITES", status:"Pending" },
-        { title: "Tree Planting", barangay: "West Bajac - Bajac", date: "09/10/2025", time: "8:00 - 10:00", organizer: "GREEN INITIATIVE", status:"Pending" },
-        { title: "Feeding Program", barangay: "North Bajac - Bajac", date: "10/12/2025", time: "2:00 - 4:00", organizer: "HELPING HANDS", status:"Pending"  },
-        { title: "Blood Donation", barangay: "South Bajac - Bajac", date: "12/15/2025", time: "9:00 - 1:00", organizer: "HEALTH TEAM", status:"Pending"  }
+        { event_id: 1, title: "Clean Up Drive", barangay: "East Bajac - Bajac", date: "08/06/2025", time: "10:00 - 12:00", organizer: "ELITES", status:"Pending" },
+        { event_id: 2, title: "Tree Planting", barangay: "West Bajac - Bajac", date: "09/10/2025", time: "8:00 - 10:00", organizer: "GREEN INITIATIVE", status:"Pending" },
+        { event_id: 3, title: "Feeding Program", barangay: "North Bajac - Bajac", date: "10/12/2025", time: "2:00 - 4:00", organizer: "HELPING HANDS", status:"Pending"  },
+        { event_id: 4, title: "Blood Donation", barangay: "South Bajac - Bajac", date: "12/15/2025", time: "9:00 - 1:00", organizer: "HEALTH TEAM", status:"Pending"  }
       ]
     };
   },
@@ -174,11 +198,34 @@ export default {
 
     confirmLogout() {
       this.$router.push("/LoginOrganizers");
+    }, 
+
+   handleEdit(event) {
+    this.$router.push({
+      path: '/EditEventOrganizers',
+      query: {
+        title: event.title,
+        barangay: event.barangay,
+        date: event.date,
+        time: event.time,
+        organizer: event.organizer,
+        status: event.status
+      }
+    });
+  },
+
+   handleDelete(eventId) {
+    if (confirm("Are you sure do you want to delete this event?")) {
+      this.events = this.events.filter(event => event.event_id !== eventId);
+      alert("Event deleted successfully!");
     }
+  },
+
+
   }
 };
 </script>
 
 
 
-<style scoped src="/src/assets/CSS Organizers/ActivityLog.css"></style>
+<style scoped src="/src/assets/CSS Organizers/Manage-events.css"></style>

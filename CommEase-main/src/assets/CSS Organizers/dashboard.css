@@ -394,17 +394,7 @@ img {  /* REVISED */
 
 .button {
 	display: flex;
-	justify-content: space-evenly;
-	padding-left: 59%;
-}
-
-.button-edit {
-	padding-left: 20px;
-	cursor: pointer;
-	font-weight: 600;
-	width: 75px;
-	height: 40px;
-	background-color: #41520c;
+	justify-content: flex-end
 }
 
 .button-enter {

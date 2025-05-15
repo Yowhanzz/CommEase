@@ -2,58 +2,52 @@
 	<header>
 		<!-- Sidebar -->
 		<div :class="['sidebar', { open: isSidebarOpen }]">
-			<div class="top">
-				<div class="logo">
-					<i class="bx bxl-codeopen"></i>
-					<span class="title-name" v-show="isSidebarOpen"
-						>CommEase</span
-					>
-				</div>
-				<i class="bx bx-menu" id="btn" @click="toggleSidebar"></i>
-			</div>
+			 <div class="top">
+    <div class="logo">
+      <i class="bx bxl-codeopen"></i>
+      <span class="title-name" v-show="isSidebarOpen">CommEase</span>
+    </div>
+    <i class="bx bx-menu" id="btn" @click="toggleSidebar"></i>
+  </div>
 
-			<ul>
-				<li>
-					<router-link to="/DashboardOrganizers">
-						<i class="bx bxs-dashboard"></i>
-						<span class="nav-item" v-show="isSidebarOpen"
-							>Dashboard</span
-						>
-					</router-link>
-				</li>
-				<li>
-					<router-link to="/ActivityLogOrganizers">
-						<i class="bx bx-history"></i>
-						<span class="nav-item" v-show="isSidebarOpen"
-							>Event History</span
-						>
-					</router-link>
-				</li>
-				<li>
-					<router-link to="safety_protocol">
-						<i class="bx bxs-shield-plus"></i>
-						<span class="nav-item" v-show="isSidebarOpen"
-							>Safety & Protocols</span
-						>
-					</router-link>
-				</li>
-				<li @click="toggleNotifications">
-					<a>
-						<i class="bx bxs-bell"></i>
-						<span class="nav-item" v-show="isSidebarOpen"
-							>Notifications</span
-						>
-					</a>
-				</li>
-				<li @click="showLogoutModal = true">
-					<a>
-						<i class="bx bxs-log-out"></i>
-						<span class="nav-item" v-show="isSidebarOpen"
-							>Logout</span
-						>
-					</a>
-				</li>
-			</ul>
+  <ul>
+    <li>
+      <router-link to="/DashboardOrganizers">
+        <i class="bx bxs-dashboard"></i>
+        <span class="nav-item" v-show="isSidebarOpen">Dashboard</span>
+      </router-link>
+    </li>
+     <li>
+      <router-link to="/ManageEventsOrganizers">
+        <i class='bx  bx-calendar-check'  ></i>  
+        <span class="nav-item" v-show="isSidebarOpen">Manage Events</span>
+      </router-link>
+    </li>
+    <li>
+      <router-link to="/ActivityLogOrganizers">
+        <i class="bx bx-history"></i>
+        <span class="nav-item" v-show="isSidebarOpen">Event History</span>
+      </router-link>
+    </li>
+    <li>
+      <router-link to="SafetyProtocolsOrganizers">
+        <i class="bx bxs-shield-plus"></i>
+        <span class="nav-item" v-show="isSidebarOpen">Safety & Protocols</span>
+      </router-link>
+    </li>
+    <li @click="toggleNotifications">
+      <a>
+        <i class="bx bxs-bell"></i>
+        <span class="nav-item" v-show="isSidebarOpen">Notifications</span>
+      </a>
+    </li>
+    <li @click="showLogoutModal = true">
+      <a>
+        <i class="bx bxs-log-out"></i>
+        <span class="nav-item" v-show="isSidebarOpen">Logout</span>
+      </a>
+    </li>
+  </ul>
 		</div>
 	</header>
 
@@ -194,7 +188,6 @@
 			<hr class="hr-lists-events" />
 		</div>   
 
-    <router-link to="/CreateEventOrganizers" class="create-event-button">Create Event</router-link>
 
 		<div class="events-grid">
 			<div
@@ -217,11 +210,6 @@
 						</h6>
 					</div>
 					<div class="button">
-            <router-link
-							to="/EditEventOrganizers"
-							class="button-edit"
-							>Edit</router-link
-						>
 						<router-link
 							to="/AnalyticsOrganizers"
 							class="button-enter"

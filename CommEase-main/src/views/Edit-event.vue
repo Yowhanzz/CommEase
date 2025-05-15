@@ -2,7 +2,7 @@
   <div>
     <!-- Sidebar -->
     <div :class="['sidebar', { open: isSidebarOpen }]">
-  <div class="top">
+   <div class="top">
     <div class="logo">
       <i class="bx bxl-codeopen"></i>
       <span class="title-name" v-show="isSidebarOpen">CommEase</span>
@@ -15,6 +15,12 @@
       <router-link to="/DashboardOrganizers">
         <i class="bx bxs-dashboard"></i>
         <span class="nav-item" v-show="isSidebarOpen">Dashboard</span>
+      </router-link>
+    </li>
+     <li>
+      <router-link to="/ManageEventsOrganizers">
+        <i class='bx  bx-calendar-check'  ></i>  
+        <span class="nav-item" v-show="isSidebarOpen">Manage Events</span>
       </router-link>
     </li>
     <li>
@@ -79,7 +85,7 @@
   <h1 class="title-safety">Edit Event</h1>
   <hr class="safety-hr">
 
-  <div class="event-container">
+    <div class="event-container">
     <div class="create-event-separation">
       <h2 class="create-event-headers">Event Title</h2>
       <input class="create-event-input" v-model="eventTitle" type="text">
@@ -88,10 +94,10 @@
       <input class="create-event-input" v-model="barangay" type="text">
 
       <h2 class="create-event-headers">Date</h2>
-      <input class="create-event-input" v-model="date" type="date">
+      <input class="create-event-input" v-model="formattedDate" type="date">
 
       <h2 class="create-event-headers">Time</h2>
-      <input class="create-event-input" v-model="time" type="time">
+      <input class="create-event-input" v-model="formattedTime" type="time">
 
       <h2 class="create-event-title">Objective of the event</h2>
       <textarea class="modal-textarea" v-model="objective"></textarea>
@@ -100,7 +106,6 @@
       <textarea class="modal-textarea" v-model="description"></textarea>
 
       <h2 class="create-event-headers">Things needed:</h2>
-
       <div class="things-needed-container">
         <div class="things-separation">
           <button 
@@ -136,49 +141,61 @@
 </template>
 
 <script>
-import { ref } from 'vue';
-
 export default {
   data() {
     return {
+      eventTitle: '',
+      barangay: '',
+      date: '',
+      time: '',
+      objective: '',
+      description: '',
+      organizer: '',
+      status: '',
+
+      thingsNeeded: [],
+      newThing: '',
+
       showNotifications: false,
       showLogoutModal: false,
-      searchQuery: "",
-      eventTitle: "",
-      barangay: "",
-      date: "",
-      time: "",
-      objective: "",
-      description: "",
-      newThing: "",
-      thingsNeeded: [],
-      notifications: [
-        { message: "You completed the 'Update website content' task.", time: "2 hours ago" },
-        { message: "You completed the 'Clean up drive' task.", time: "3 hours ago" },
-        { message: "You completed the 'Meeting with organizers' task.", time: "5 hours ago" }
-      ],
-      events: [
-        { title: "Clean Up Drive", barangay: "East Bajac - Bajac", date: "08/06/2025", time: "10:00 - 12:00", organizer: "ELITES", status: "Completed" },
-        { title: "Tree Planting", barangay: "West Bajac - Bajac", date: "09/10/2025", time: "8:00 - 10:00", organizer: "GREEN INITIATIVE", status: "Pending" },
-        { title: "Feeding Program", barangay: "North Bajac - Bajac", date: "10/12/2025", time: "2:00 - 4:00", organizer: "HELPING HANDS", status: "Cancelled" },
-        { title: "Blood Donation", barangay: "South Bajac - Bajac", date: "12/15/2025", time: "9:00 - 1:00", organizer: "HEALTH TEAM", status: "Ongoing" }
-      ],
-      isSidebarOpen: ref(true) // Sidebar toggle state
+      searchQuery: '',
+
+      isSidebarOpen: true, // Fix here - no ref()
     };
   },
 
   computed: {
-    filteredEvents() {
-      return this.events.filter(event => {
-        const query = this.searchQuery.toLowerCase();
-        return event.title.toLowerCase().includes(query) ||
-               event.barangay.toLowerCase().includes(query) ||
-               event.date.toLowerCase().includes(query) ||
-               event.time.toLowerCase().includes(query) ||
-               event.organizer.toLowerCase().includes(query) ||
-               event.status.toLowerCase().includes(query);
-      });
+    formattedDate: {
+      get() {
+        if (!this.date) return '';
+        const [month, day, year] = this.date.split('/');
+        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+      },
+      set(value) {
+        if (!value) return;
+        const [year, month, day] = value.split('-');
+        this.date = `${month}/${day}/${year}`;
+      }
+    },
+
+    formattedTime: {
+      get() {
+        return this.time ? this.time.split('-')[0]?.trim() : '';
+      },
+      set(value) {
+        this.time = `${value} - ??`;
+      }
     }
+  },
+
+  created() {
+    const query = this.$route.query;
+    this.eventTitle = query.title || '';
+    this.barangay = query.barangay || '';
+    this.date = query.date || '';
+    this.time = query.time || '';
+    this.organizer = query.organizer || '';
+    this.status = query.status || '';
   },
 
   methods: {
@@ -190,8 +207,12 @@ export default {
       this.$router.push("/login");
     },
 
+    toggleSidebar() {
+      this.isSidebarOpen = !this.isSidebarOpen;
+    },
+
     addThing() {
-      if (this.newThing.trim() !== "") {
+      if (this.newThing.trim()) {
         this.thingsNeeded.push(this.newThing.trim());
         this.newThing = "";
       }
@@ -202,37 +223,38 @@ export default {
     },
 
     cancelEvent() {
-      this.eventTitle = "";
-      this.barangay = "";
-      this.date = "";
-      this.time = "";
-      this.objective = "";
-      this.description = "";
-      this.newThing = "";
+      this.eventTitle = '';
+      this.barangay = '';
+      this.date = '';
+      this.time = '';
+      this.objective = '';
+      this.description = '';
+      this.newThing = '';
       this.thingsNeeded = [];
+      this.organizer = '';
+      this.status = '';
     },
 
     saveEvent() {
-      // Validation
-      if (!this.eventTitle || !this.barangay || !this.date || !this.time || !this.objective || !this.description || this.thingsNeeded.length === 0) {
-        alert("You need to fill all the required input");
-        return;
-      }
+  if (!this.eventTitle || !this.barangay || !this.date || !this.time || !this.objective || !this.description || this.thingsNeeded.length === 0) {
+    alert("You need to fill all the required input");
+    return;
+  }
 
-      // Success
-      alert("Event Edited");
+  alert("Event Edited Successfully!");
+  
+  // Optional: Dito mo ilalagay ang logic para i-save sa backend o store
+  
+  this.cancelEvent();
 
-      // Optional: Reset form
-      this.cancelEvent();
-    },
-
-    // === Sidebar Toggle ===
-    toggleSidebar() {
-      this.isSidebarOpen = !this.isSidebarOpen; // Toggle sidebar state
-    }
+  // Navigate to Manage Events page (palitan ang path depende sa route mo)
+  this.$router.push('/ManageEventsOrganizers');
+}
   }
 };
+
 </script>
+
 
 
 <style scoped src="/src/assets/CSS Organizers/create-event.css"></style>
