@@ -261,44 +261,8 @@ export default {
         },
       ],
 
-      events: [
-        {
-          start: "2025-04-08T10:00:00",
-          end: "2025-04-08T12:00:00",
-          title: "Clean Up Drive",
-          location: "Barangay East Bajac-Bajac",
-        },
-        {
-          start: "2025-09-10T08:00:00",
-          end: "2025-09-10T10:00:00",
-          title: "Tree Planting",
-          location: "Barangay West Tapinac",
-        },
-        {
-          start: "2025-12-15T14:00:00",
-          end: "2025-12-15T16:00:00",
-          title: "Feeding Program",
-          location: "Barangay Sta. Rita",
-        },
-        {
-          start: "2025-05-20T09:00:00",
-          end: "2025-05-20T11:00:00",
-          title: "Community Painting",
-          location: "Barangay Sta. Rita Gymnasium",
-        },
-        {
-          start: "2025-06-01T13:00:00",
-          end: "2025-06-01T15:00:00",
-          title: "Barangay Forum",
-          location: "Barangay East Tapinac Covered Court",
-        },
-        {
-          start: "2025-07-07T08:30:00",
-          end: "2025-07-07T11:30:00",
-          title: "Blood Donation Drive",
-          location: "Olongapo City Health Office",
-        },
-      ],
+      // 🔥 Cleared static events – dynamic only!
+      events: [],
     };
   },
   computed: {
@@ -320,12 +284,31 @@ export default {
     this.userEmail = localStorage.getItem("user_email") || "";
     this.userPassword = localStorage.getItem("user_password") || "";
 
-  // Only show QR modal if not yet shown AND both email & password exist
-  if (!qrModalShown && this.userEmail && this.userPassword) {
-    this.showQRCode = true;
-    localStorage.setItem("qrModalShown", "true");
-  }
-    this.showQRCode = false; // Auto-show after login
+    // Show QR modal kung hindi pa nashoshow before at may laman ang credentials
+    if (!qrModalShown && this.userEmail && this.userPassword) {
+      this.showQRCode = true;
+      localStorage.setItem("qrModalShown", "true");
+    }
+
+    // ✅ Load additional events from localStorage (ManageEvents)
+    const storedEvents = JSON.parse(localStorage.getItem("events"));
+    if (storedEvents && storedEvents.length) {
+      const formattedStoredEvents = storedEvents.map((event) => {
+        const [startTime, endTime] = event.time.split(" - ");
+        const startDateTime = `${event.date}T${startTime}`;
+        const endDateTime = `${event.date}T${endTime}`;
+        return {
+          start: startDateTime,
+          end: endDateTime,
+          title: event.title,
+          location: `Barangay ${event.barangay}`,
+          organizer: event.organizer,
+          status: event.status,
+        };
+      });
+
+      this.events = formattedStoredEvents;
+    }
   },
   methods: {
     toggleSidebar() {
@@ -333,15 +316,13 @@ export default {
       this.isOpen = !this.isOpen;
     },
     toggleDropdown() {
-    console.log('Dropdown toggled', this.showDropdown);  // Add logging
-    this.showDropdown = !this.showDropdown;
-     },
-
-    closeQRCode() {
-    this.showQRCode = false;
-    localStorage.setItem("qrModalShown", "true");
+      console.log('Dropdown toggled', this.showDropdown);
+      this.showDropdown = !this.showDropdown;
     },
-
+    closeQRCode() {
+      this.showQRCode = false;
+      localStorage.setItem("qrModalShown", "true");
+    },
     toggleCalendar() {
       this.calendarVisible = !this.calendarVisible;
       this.showDropdown = false;
@@ -385,6 +366,8 @@ export default {
   },
 };
 </script>
+
+
 
 
 

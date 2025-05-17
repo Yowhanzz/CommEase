@@ -86,174 +86,178 @@
   <hr class="safety-hr">
 
     <div class="event-container">
-    <div class="create-event-separation">
-      <h2 class="create-event-headers">Event Title</h2>
-      <input class="create-event-input" v-model="eventTitle" type="text">
+  <div class="create-event-separation">
+    <h2 class="create-event-headers">Event Title</h2>
+    <input class="create-event-input" v-model="title" type="text" placeholder="Title">
 
-      <h2 class="create-event-headers">Barangay</h2>
-      <input class="create-event-input" v-model="barangay" type="text">
+    <h2 class="create-event-headers">Barangay</h2>
+    <input class="create-event-input" v-model="barangay" type="text" placeholder="Barangay">
 
-      <h2 class="create-event-headers">Date</h2>
-      <input class="create-event-input" v-model="formattedDate" type="date">
+    <h2 class="create-event-headers">Date</h2>
+    <input class="create-event-input" v-model="date" type="date">
 
-      <h2 class="create-event-headers">Time</h2>
-      <input class="create-event-input" v-model="formattedTime" type="time">
+    <h2 class="create-event-headers">Time</h2>
+    <input class="create-event-input" v-model="time" type="time">
 
-      <h2 class="create-event-title">Objective of the event</h2>
-      <textarea class="modal-textarea" v-model="objective"></textarea>
+    <h2 class="create-event-title">Objective of the event</h2>
+    <textarea class="modal-textarea" v-model="objective" placeholder="Objective"></textarea>
 
-      <h2 class="create-event-title">Description of the event</h2>
-      <textarea class="modal-textarea" v-model="description"></textarea>
+    <h2 class="create-event-title">Description of the event</h2>
+    <textarea class="modal-textarea" v-model="description" placeholder="Description"></textarea>
 
-      <h2 class="create-event-headers">Things needed:</h2>
-      <div class="things-needed-container">
-        <div class="things-separation">
-          <button 
-            v-for="(item, index) in thingsNeeded" 
-            :key="index"
-            class="things-button"
-            @click="removeThing(index)"
+    <h2 class="create-event-headers">Things needed:</h2>
+    <div class="things-needed-container">
+      <div class="things-separation">
+        <button 
+          v-for="(item, index) in thingsNeeded" 
+          :key="index"
+          class="things-button"
+          @click="removeThing(index)"
+        >
+          <span>{{ item }}</span>
+          <span class="thing-x">✖</span>
+        </button>
+      </div>
+
+      <div class="input-and-buttons">
+        <div class="input-container">
+          <input 
+            v-model="newThing" 
+            class="things-input" 
+            type="text" 
+            placeholder="Things needed"
           >
-            <span>{{ item }}</span>
-            <span class="thing-x">✖</span>
-          </button>
+          <button @click="addThing" class="add-inside-button">Add</button>
         </div>
 
-        <div class="input-and-buttons">
-          <div class="input-container">
-            <input 
-              v-model="newThing" 
-              class="things-input" 
-              type="text" 
-              placeholder="Things needed"
-            >
-            <button @click="addThing" class="add-inside-button">Add</button>
-          </div>
-
-          <div class="button-container">
-            <button @click="cancelEvent" class="create-cancel">Cancel</button>
-            <button @click="saveEvent" class="create-submit">Submit</button>
-          </div>
+        <div class="button-container">
+          <button @click="cancelEvent" class="create-cancel">Cancel</button>
+          <button @click="saveChanges" class="create-submit">Submit</button>
         </div>
       </div>
     </div>
   </div>
+</div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      eventTitle: '',
-      barangay: '',
-      date: '',
-      time: '',
-      objective: '',
-      description: '',
-      organizer: '',
-      status: '',
+<script setup>
+import { ref, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
-      thingsNeeded: [],
-      newThing: '',
+const route = useRoute();
+const router = useRouter();
 
-      showNotifications: false,
-      showLogoutModal: false,
-      searchQuery: '',
+// UI state
+const isSidebarOpen = ref(true);
+const showNotifications = ref(false);
+const showLogoutModal = ref(false);
+const searchQuery = ref('');
 
-      isSidebarOpen: true, // Fix here - no ref()
-    };
-  },
+// Event fields
+const event_id = ref(null);
+const title = ref('');
+const barangay = ref('');
+const date = ref('');
+const time = ref('');
+const organizer = ref('');
+const status = ref('');
+const objective = ref('');
+const description = ref('');
+const thingsNeeded = ref([]);
+const newThing = ref('');
 
-  computed: {
-    formattedDate: {
-      get() {
-        if (!this.date) return '';
-        const [month, day, year] = this.date.split('/');
-        return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-      },
-      set(value) {
-        if (!value) return;
-        const [year, month, day] = value.split('-');
-        this.date = `${month}/${day}/${year}`;
-      }
-    },
+// Fetch full event info on mount
+onMounted(() => {
+  event_id.value = route.query.event_id;
 
-    formattedTime: {
-      get() {
-        return this.time ? this.time.split('-')[0]?.trim() : '';
-      },
-      set(value) {
-        this.time = `${value} - ??`;
-      }
-    }
-  },
+  const events = JSON.parse(localStorage.getItem('events')) || [];
+  const existingEvent = events.find(e => e.event_id == event_id.value);
 
-  created() {
-    const query = this.$route.query;
-    this.eventTitle = query.title || '';
-    this.barangay = query.barangay || '';
-    this.date = query.date || '';
-    this.time = query.time || '';
-    this.organizer = query.organizer || '';
-    this.status = query.status || '';
-  },
+  if (existingEvent) {
+    title.value = existingEvent.title ?? '';
+    barangay.value = existingEvent.barangay ?? '';
+    date.value = existingEvent.date ?? '';
+    time.value = existingEvent.time ?? '';
+    organizer.value = existingEvent.organizer ?? '';
+    status.value = existingEvent.status ?? '';
+    objective.value = existingEvent.objective ?? '';
+    description.value = existingEvent.description ?? '';
+    thingsNeeded.value = existingEvent.thingsNeeded ?? [];
+  } else {
+    alert('Event not found.');
+    router.push('/DashboardOrganizers');
+  }
+});
 
-  methods: {
-    toggleNotifications() {
-      this.showNotifications = !this.showNotifications;
-    },
+// === Methods ===
+const toggleSidebar = () => {
+  isSidebarOpen.value = !isSidebarOpen.value;
+};
 
-    confirmLogout() {
-      this.$router.push("/login");
-    },
+const toggleNotifications = () => {
+  showNotifications.value = !showNotifications.value;
+};
 
-    toggleSidebar() {
-      this.isSidebarOpen = !this.isSidebarOpen;
-    },
+const confirmLogout = () => {
+  router.push("/login");
+};
 
-    addThing() {
-      if (this.newThing.trim()) {
-        this.thingsNeeded.push(this.newThing.trim());
-        this.newThing = "";
-      }
-    },
+const addThing = () => {
+  if (newThing.value.trim()) {
+    thingsNeeded.value.push(newThing.value.trim());
+    newThing.value = '';
+  }
+};
 
-    removeThing(index) {
-      this.thingsNeeded.splice(index, 1);
-    },
+const removeThing = (index) => {
+  thingsNeeded.value.splice(index, 1);
+};
 
-    cancelEvent() {
-      this.eventTitle = '';
-      this.barangay = '';
-      this.date = '';
-      this.time = '';
-      this.objective = '';
-      this.description = '';
-      this.newThing = '';
-      this.thingsNeeded = [];
-      this.organizer = '';
-      this.status = '';
-    },
+const cancelEdit = () => {
+  title.value = '';
+  barangay.value = '';
+  date.value = '';
+  time.value = '';
+  organizer.value = '';
+  status.value = '';
+  objective.value = '';
+  description.value = '';
+  thingsNeeded.value = [];
+  newThing.value = '';
+};
 
-    saveEvent() {
-  if (!this.eventTitle || !this.barangay || !this.date || !this.time || !this.objective || !this.description || this.thingsNeeded.length === 0) {
+const saveChanges = () => {
+  if (!title.value || !barangay.value || !date.value || !time.value || !objective.value || !description.value || thingsNeeded.value.length === 0) {
     alert("You need to fill all the required input");
     return;
   }
 
-  alert("Event Edited Successfully!");
-  
-  // Optional: Dito mo ilalagay ang logic para i-save sa backend o store
-  
-  this.cancelEvent();
+  const events = JSON.parse(localStorage.getItem('events')) || [];
 
-  // Navigate to Manage Events page (palitan ang path depende sa route mo)
-  this.$router.push('/ManageEventsOrganizers');
-}
+  const index = events.findIndex(e => e.event_id == event_id.value);
+  if (index !== -1) {
+    events[index] = {
+      ...events[index],
+      title: title.value,
+      barangay: barangay.value,
+      date: date.value,
+      time: time.value,
+      organizer: organizer.value,
+      status: status.value,
+      objective: objective.value,
+      description: description.value,
+      thingsNeeded: [...thingsNeeded.value]
+    };
+
+    localStorage.setItem('events', JSON.stringify(events));
+    alert('Event updated!');
+    router.push('/DashboardOrganizers');
+  } else {
+    alert('Event not found.');
   }
 };
-
 </script>
+
 
 
 

@@ -161,6 +161,7 @@ const objective = ref("");
 const description = ref("");
 const newThing = ref("");
 const thingsNeeded = ref([]);
+const router = useRouter();
 
 // === Notifications Data ===
 const notifications = ref([
@@ -222,15 +223,13 @@ const cancelEvent = () => {
 };
 
 const saveEvent = () => {
-  // Validation
   if (!eventTitle.value || !barangay.value || !date.value || !time.value || !objective.value || !description.value || thingsNeeded.value.length === 0) {
     alert("You need to fill all the required input");
     return;
   }
-
   const storedEvents = JSON.parse(localStorage.getItem('events')) || [];
-
-  const newEvent = {
+  
+    const newEvent = {
     event_id: Date.now(),
     title: eventTitle.value,
     barangay: barangay.value,
@@ -247,11 +246,12 @@ const saveEvent = () => {
   localStorage.setItem('events', JSON.stringify(storedEvents));
 
   alert("Event Created!");
-
   cancelEvent();
 
-  // Redirect to organizer dashboard after saving
-  router.push('/DashboardOrganizers');  // Change this path to your actual dashboard route
+  // Redirect and reload after slight delay (to allow Manage Events to fetch updated localStorage)
+  setTimeout(() => {
+    router.push('/DashboardOrganizers');
+  }, 300);
 };
 </script>
 

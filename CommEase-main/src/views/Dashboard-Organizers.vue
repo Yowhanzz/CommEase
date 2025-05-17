@@ -227,7 +227,6 @@ import 'vue-cal/dist/vuecal.css';
 import VueCal from 'vue-cal';
 import { QrcodeStream } from 'vue-qrcode-reader';
 
-
 export default {
   components: {
     VueCal,
@@ -244,55 +243,15 @@ export default {
       isSidebarOpen: false,
       isOpen: false,
       qrData: "sample-qr-data",
-      calendarVisible: false, // ✅ for toggling calendar visibility
+      calendarVisible: false,
       selectedEvent: null,
-      showQRCode: false, // for QR scanner modal visibility
-
+      showQRCode: false,
       notifications: [
         { message: "You completed the 'Update website content' task.", time: "2 hours ago" },
         { message: "You completed the 'Clean up drive' task.", time: "3 hours ago" },
         { message: "You completed the 'Meeting with organizers' task.", time: "5 hours ago" },
       ],
-
-      events: [
-        {
-          start: "2025-04-08T10:00:00",
-          end: "2025-04-08T12:00:00",
-          title: "Clean Up Drive",
-          location: "Barangay East Bajac-Bajac",
-        },
-        {
-          start: "2025-09-10T08:00:00",
-          end: "2025-09-10T10:00:00",
-          title: "Tree Planting",
-          location: "Barangay West Tapinac",
-        },
-				 {
-          start: "2025-09-10T08:00:00",
-          end: "2025-09-10T10:00:00",
-          title: "Tree Planting",
-          location: "Barangay West Tapinac",
-        },
-				 {
-          start: "2025-09-10T08:00:00",
-          end: "2025-09-10T10:00:00",
-          title: "Tree Planting",
-          location: "Barangay West Tapinac",
-        },
-				 {
-          start: "2025-09-10T08:00:00",
-          end: "2025-09-10T10:00:00",
-          title: "Tree Planting",
-          location: "Barangay West Tapinac",
-        },
-				 {
-          start: "2025-09-10T08:00:00",
-          end: "2025-09-10T10:00:00",
-          title: "Tree Planting",
-          location: "Barangay West Tapinac",
-        },
-        // Add other events here...
-      ],
+      events: [], // now starts empty, will be filled from localStorage
     };
   },
   computed: {
@@ -303,96 +262,84 @@ export default {
       );
     },
   },
+  mounted() {
+    const storedEvents = JSON.parse(localStorage.getItem('events'));
+    if (storedEvents && storedEvents.length) {
+      this.events = storedEvents.map(event => {
+        const [startTime, endTime] = event.time.split(' - ');
+        const startDateTime = `${event.date}T${startTime}`;
+        const endDateTime = `${event.date}T${endTime}`;
+        return {
+          start: startDateTime,
+          end: endDateTime,
+          title: event.title,
+          location: `Barangay ${event.barangay}`,
+          organizer: event.organizer,
+          status: event.status
+        };
+      });
+    }
+  },
   methods: {
-    // Toggle Sidebar
     toggleSidebar() {
       this.isSidebarOpen = !this.isSidebarOpen;
       this.isOpen = !this.isOpen;
     },
-
-    // Dropdown Toggle
     toggleDropdown() {
       this.showDropdown = !this.showDropdown;
     },
-
-    // Calendar Toggle
     toggleCalendar() {
       this.calendarVisible = !this.calendarVisible;
       this.showDropdown = false;
     },
-
     submitID() {
       const id = this.studentID.trim();
-
-      // Check if only numbers
       if (!/^\d+$/.test(id)) {
         alert("Student ID must contain only numbers.");
         return;
       }
-
-      // Check if it's exactly 9 digits
       if (id.length !== 9) {
         alert("Student ID must be exactly 9 digits.");
         return;
       }
-
-      // Check if the ID is already in the set (time out scenario)
       if (this.timedIDs.has(id)) {
         alert("Time out successfully!");
-        this.timedIDs.delete(id); // Remove from timed-in list
+        this.timedIDs.delete(id);
       } else {
         alert("Time in successfully!");
-        this.timedIDs.add(id); // Add to timed-in list
+        this.timedIDs.add(id);
       }
-
-      // Clear the input field after submit
       this.studentID = "";
     },
-
-    // QR Scanner Modal Logic
-onDetect(result) {
-  const scannedText = result[0].rawValue;
-  alert(`✅ Scanned Successfully: ${scannedText}`);
-  // this.showQRCode = false; // ❌ Huwag muna i-auto-close, manual na lang
-},
-
- onInit(error) {
-  if (error) {
-    console.error("🚨 QR Scanner initialization error:", error.name);
-    alert(`❌ Camera access issue: ${error.name}`);
-  } else {
-    console.log("✅ QR Scanner initialized successfully.");
-  }
-},
-
-    // Event Click Logic (for calendar)
+    onDetect(result) {
+      const scannedText = result[0].rawValue;
+      alert(`✅ Scanned Successfully: ${scannedText}`);
+    },
+    onInit(error) {
+      if (error) {
+        console.error("🚨 QR Scanner initialization error:", error.name);
+        alert(`❌ Camera access issue: ${error.name}`);
+      } else {
+        console.log("✅ QR Scanner initialized successfully.");
+      }
+    },
     onDateClick({ date }) {
       const selected = this.events.find((event) => {
         const eventDate = new Date(event.start).toLocaleDateString();
         return eventDate === new Date(date).toLocaleDateString();
       });
       this.selectedEvent = selected || null;
-      if (selected) {
-        console.log("Clicked Event:", selected);
-      } else {
-        console.log("No event on selected date.");
-      }
+      console.log(selected ? "Clicked Event:" : "No event on selected date.", selected);
     },
-
-    // Notification Toggle
     toggleNotifications() {
       this.showNotifications = !this.showNotifications;
     },
-
-    // Format Time
     formatTime(datetime) {
       return new Date(datetime).toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
       });
     },
-
-    // Format Date
     formatDate(datetime) {
       return new Date(datetime).toLocaleDateString([], {
         weekday: "short",
@@ -401,26 +348,21 @@ onDetect(result) {
         day: "numeric",
       });
     },
-
-    // Logout Logic
     confirmLogout() {
       console.log("Logging out...");
       this.showLogoutModal = false;
     },
-
-    // Show Content Logic (for modal handling)
     showContent(type) {
       this.activeContent = type;
       this.showDropdown = false;
     },
-
-    // Close Modal
     closeModal() {
       this.activeContent = null;
     },
   },
 };
 </script>
+
 
 
 <style scoped src="/src/assets/CSS Organizers/dashboard.css"></style>

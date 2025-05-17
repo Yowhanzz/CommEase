@@ -186,6 +186,18 @@ export default {
     }
   },
 
+  mounted() {
+   const storedEvents = JSON.parse(localStorage.getItem('events'));
+
+  if (storedEvents && storedEvents.length > 0) {
+    // Use existing saved events
+    this.events = storedEvents;
+  } else {
+    // First time: save default events to localStorage
+    localStorage.setItem('events', JSON.stringify(this.events));
+  }
+  },
+
   methods: {
     toggleNotifications() {
       this.showNotifications = !this.showNotifications;
@@ -203,24 +215,61 @@ export default {
    handleEdit(event) {
     this.$router.push({
       path: '/EditEventOrganizers',
-      query: {
-        title: event.title,
-        barangay: event.barangay,
-        date: event.date,
-        time: event.time,
-        organizer: event.organizer,
-        status: event.status
-      }
+     query: {
+  event_id: event.event_id, // ADD THIS LINE ✅
+  title: event.title,
+  barangay: event.barangay,
+  date: event.date,
+  time: event.time,
+  organizer: event.organizer,
+  status: event.status
+}
     });
   },
 
-   handleDelete(eventId) {
+  handleDelete(eventId) {
     if (confirm("Are you sure do you want to delete this event?")) {
       this.events = this.events.filter(event => event.event_id !== eventId);
+      localStorage.setItem('events', JSON.stringify(this.events)); // ✅ Update localStorage
       alert("Event deleted successfully!");
     }
   },
 
+   saveEvent(newEvent) {
+    // If you have logic to add or update events:
+    // For example, newEvent = { event_id, title, barangay, date, time, organizer, status }
+
+    // If updating existing event
+    const index = this.events.findIndex(e => e.event_id === newEvent.event_id);
+    if(index !== -1) {
+      this.events.splice(index, 1, newEvent);
+    } else {
+      // New event, assign a new id:
+      newEvent.event_id = this.events.length ? Math.max(...this.events.map(e => e.event_id)) + 1 : 1;
+      this.events.push(newEvent);
+    }
+
+    // Save updated events array to localStorage
+    localStorage.setItem('events', JSON.stringify(this.events));
+
+    alert("Event saved successfully!");
+  },
+
+   // Example for submitting form
+  onSubmitEvent() {
+    // build your event object from form inputs
+    const newEvent = {
+      event_id: null, // or existing id if editing
+      title: this.title,
+      barangay: this.barangay,
+      date: this.date,  // format: "YYYY-MM-DD"
+      time: this.time,  // format: "HH:mm"
+      organizer: this.organizer,
+      status: "Pending"
+    };
+
+    this.saveEvent(newEvent);
+  }
 
   }
 };
