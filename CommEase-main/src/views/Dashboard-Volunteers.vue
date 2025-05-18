@@ -202,6 +202,8 @@
 						<h6 class="container-event-date">
 							{{ formatDate(event.start) }}
 						</h6>
+
+             <h6 class="container-event-location">{{ event.organizer }}</h6>
 					</div>
 					<div class="button">
 						<router-link

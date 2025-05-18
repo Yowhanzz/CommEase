@@ -89,13 +89,39 @@
       <input class="create-event-input" v-model="eventTitle" type="text">
 
       <h2 class="create-event-headers">Barangay</h2>
-      <input class="create-event-input" v-model="barangay" type="text">
+      <select class="create-event-input" v-model="barangay">
+  <option disabled value="">Select Barangay</option>
+  <option>New Banicain</option>
+  <option>Baretto</option>
+  <option>Mabayuan</option>
+  <option>Kalalake</option>
+  <option>New Ilalim</option>
+  <option>New Kababae</option>
+  <option>New Asinan</option>
+  <option>New Cabalan</option>
+  <option>Kalaklan</option>
+  <option>Pag Asa</option>
+  <option>Gordon Heights</option>
+  <option>East Tapinac</option>
+  <option>West Tapinac</option>
+  <option>Old Cabalan</option>
+  <option>Sta. Rita</option>
+  <option>East Bajac-Bajac</option>
+  <option>West Bajac-Bajac</option>
+</select>
+
+
+      <h2 class="create-event-headers">Organizer</h2>
+      <input class="create-event-input" v-model="organizer" type="text">
 
       <h2 class="create-event-headers">Date</h2>
       <input class="create-event-input" v-model="date" type="date">
 
-      <h2 class="create-event-headers">Time</h2>
-      <input class="create-event-input" v-model="time" type="time">
+      <h2 class="create-event-headers"> Start Time</h2>
+      <input class="create-event-input" v-model="startTime" type="time">
+
+      <h2 class="create-event-headers"> End Time</h2>
+      <input class="create-event-input" v-model="endTime" type="time">
 
       <h2 class="create-event-title">Objective of the event</h2>
       <textarea class="modal-textarea" v-model="objective"></textarea>
@@ -155,8 +181,10 @@ const showLogoutModal = ref(false);
 const searchQuery = ref("");
 const eventTitle = ref("");
 const barangay = ref("");
+const organizer = ref("");
 const date = ref("");
-const time = ref("");
+const startTime = ref("");
+const endTime = ref("");
 const objective = ref("");
 const description = ref("");
 const newThing = ref("");
@@ -215,7 +243,8 @@ const cancelEvent = () => {
   eventTitle.value = "";
   barangay.value = "";
   date.value = "";
-  time.value = "";
+  startTime.value = "";
+endTime.value = "";
   objective.value = "";
   description.value = "";
   newThing.value = "";
@@ -223,22 +252,39 @@ const cancelEvent = () => {
 };
 
 const saveEvent = () => {
-  if (!eventTitle.value || !barangay.value || !date.value || !time.value || !objective.value || !description.value || thingsNeeded.value.length === 0) {
+  if (
+    !eventTitle.value || !barangay.value || !date.value ||
+    !startTime.value || !endTime.value || !objective.value ||
+    !description.value || thingsNeeded.value.length === 0 || !organizer.value
+  ) {
     alert("You need to fill all the required input");
     return;
   }
+
+  // Check if date is in the past
+  const selectedDate = new Date(date.value);
+  const today = new Date();
+
+  // Remove time part of today for comparison
+  today.setHours(0, 0, 0, 0);
+
+  if (selectedDate < today) {
+    alert("Your date is no longer available");
+    return;
+  }
+
   const storedEvents = JSON.parse(localStorage.getItem('events')) || [];
-  
-    const newEvent = {
+
+  const newEvent = {
     event_id: Date.now(),
     title: eventTitle.value,
     barangay: barangay.value,
     date: date.value,
-    time: time.value,
+    time: `${startTime.value} - ${endTime.value}`,
     objective: objective.value,
     description: description.value,
     thingsNeeded: [...thingsNeeded.value],
-    organizer: "ORGANIZER_NAME",
+    organizer: organizer.value,
     status: "Pending"
   };
 
@@ -248,11 +294,12 @@ const saveEvent = () => {
   alert("Event Created!");
   cancelEvent();
 
-  // Redirect and reload after slight delay (to allow Manage Events to fetch updated localStorage)
+  // Redirect and reload after slight delay
   setTimeout(() => {
     router.push('/DashboardOrganizers');
   }, 300);
 };
+
 </script>
 
 

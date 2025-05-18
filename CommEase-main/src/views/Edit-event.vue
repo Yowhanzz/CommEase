@@ -85,59 +85,85 @@
   <h1 class="title-safety">Edit Event</h1>
   <hr class="safety-hr">
 
-    <div class="event-container">
-  <div class="create-event-separation">
-    <h2 class="create-event-headers">Event Title</h2>
-    <input class="create-event-input" v-model="title" type="text" placeholder="Title">
+      <div class="event-container">
+    <div class="create-event-separation">
+      <h2 class="create-event-headers">Event Title</h2>
+      <input class="create-event-input" v-model="title" type="text" placeholder="Title">
 
-    <h2 class="create-event-headers">Barangay</h2>
-    <input class="create-event-input" v-model="barangay" type="text" placeholder="Barangay">
+      <h2 class="create-event-headers">Barangay</h2>
+      <select class="create-event-input" v-model="barangay">
+  <option disabled value="">Select Barangay</option>
+  <option>New Banicain</option>
+  <option>Baretto</option>
+  <option>Mabayuan</option>
+  <option>Kalalake</option>
+  <option>New Ilalim</option>
+  <option>New Kababae</option>
+  <option>New Asinan</option>
+  <option>New Cabalan</option>
+  <option>Kalaklan</option>
+  <option>Pag Asa</option>
+  <option>Gordon Heights</option>
+  <option>East Tapinac</option>
+  <option>West Tapinac</option>
+  <option>Old Cabalan</option>
+  <option>Sta. Rita</option>
+  <option>East Bajac-Bajac</option>
+  <option>West Bajac-Bajac</option>
+</select>
 
-    <h2 class="create-event-headers">Date</h2>
-    <input class="create-event-input" v-model="date" type="date">
 
-    <h2 class="create-event-headers">Time</h2>
-    <input class="create-event-input" v-model="time" type="time">
+      <h2 class="create-event-headers">Organizer</h2>
+      <input class="create-event-input" v-model="organizer" type="text">
 
-    <h2 class="create-event-title">Objective of the event</h2>
-    <textarea class="modal-textarea" v-model="objective" placeholder="Objective"></textarea>
+      <h2 class="create-event-headers">Date</h2>
+      <input class="create-event-input" v-model="date" type="date">
 
-    <h2 class="create-event-title">Description of the event</h2>
-    <textarea class="modal-textarea" v-model="description" placeholder="Description"></textarea>
+      <h2 class="create-event-headers">Start Time</h2>
+      <input class="create-event-input" v-model="startTime" type="time">
 
-    <h2 class="create-event-headers">Things needed:</h2>
-    <div class="things-needed-container">
-      <div class="things-separation">
-        <button 
-          v-for="(item, index) in thingsNeeded" 
-          :key="index"
-          class="things-button"
-          @click="removeThing(index)"
-        >
-          <span>{{ item }}</span>
-          <span class="thing-x">✖</span>
-        </button>
-      </div>
+      <h2 class="create-event-headers">End Time</h2>
+      <input class="create-event-input" v-model="endTime" type="time">
 
-      <div class="input-and-buttons">
-        <div class="input-container">
-          <input 
-            v-model="newThing" 
-            class="things-input" 
-            type="text" 
-            placeholder="Things needed"
+      <h2 class="create-event-title">Objective of the event</h2>
+      <textarea class="modal-textarea" v-model="objective" placeholder="Objective"></textarea>
+
+      <h2 class="create-event-title">Description of the event</h2>
+      <textarea class="modal-textarea" v-model="description" placeholder="Description"></textarea>
+
+      <h2 class="create-event-headers">Things needed:</h2>
+      <div class="things-needed-container">
+        <div class="things-separation">
+          <button 
+            v-for="(item, index) in thingsNeeded" 
+            :key="index"
+            class="things-button"
+            @click="removeThing(index)"
           >
-          <button @click="addThing" class="add-inside-button">Add</button>
+            <span>{{ item }}</span>
+            <span class="thing-x">✖</span>
+          </button>
         </div>
 
-        <div class="button-container">
-          <button @click="cancelEvent" class="create-cancel">Cancel</button>
-          <button @click="saveChanges" class="create-submit">Submit</button>
+        <div class="input-and-buttons">
+          <div class="input-container">
+            <input 
+              v-model="newThing" 
+              class="things-input" 
+              type="text" 
+              placeholder="Things needed"
+            >
+            <button @click="addThing" class="add-inside-button">Add</button>
+          </div>
+
+          <div class="button-container">
+            <button @click="cancelEdit" class="create-cancel">Cancel</button>
+            <button @click="saveChanges" class="create-submit">Submit</button>
+          </div>
         </div>
       </div>
     </div>
   </div>
-</div>
 </template>
 
 <script setup>
@@ -147,18 +173,18 @@ import { useRoute, useRouter } from 'vue-router';
 const route = useRoute();
 const router = useRouter();
 
-// UI state
 const isSidebarOpen = ref(true);
 const showNotifications = ref(false);
 const showLogoutModal = ref(false);
 const searchQuery = ref('');
 
-// Event fields
+// Event form fields (include organizer!)
 const event_id = ref(null);
 const title = ref('');
 const barangay = ref('');
 const date = ref('');
-const time = ref('');
+const startTime = ref('');
+const endTime = ref('');
 const organizer = ref('');
 const status = ref('');
 const objective = ref('');
@@ -166,10 +192,9 @@ const description = ref('');
 const thingsNeeded = ref([]);
 const newThing = ref('');
 
-// Fetch full event info on mount
+// Load event info on mount
 onMounted(() => {
   event_id.value = route.query.event_id;
-
   const events = JSON.parse(localStorage.getItem('events')) || [];
   const existingEvent = events.find(e => e.event_id == event_id.value);
 
@@ -177,7 +202,9 @@ onMounted(() => {
     title.value = existingEvent.title ?? '';
     barangay.value = existingEvent.barangay ?? '';
     date.value = existingEvent.date ?? '';
-    time.value = existingEvent.time ?? '';
+    const [start, end] = (existingEvent.time ?? '').split(' - ');
+    startTime.value = start?.trim() ?? '';
+    endTime.value = end?.trim() ?? '';
     organizer.value = existingEvent.organizer ?? '';
     status.value = existingEvent.status ?? '';
     objective.value = existingEvent.objective ?? '';
@@ -189,7 +216,7 @@ onMounted(() => {
   }
 });
 
-// === Methods ===
+// Methods
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value;
 };
@@ -217,7 +244,8 @@ const cancelEdit = () => {
   title.value = '';
   barangay.value = '';
   date.value = '';
-  time.value = '';
+  startTime.value = '';
+  endTime.value = '';
   organizer.value = '';
   status.value = '';
   objective.value = '';
@@ -227,7 +255,11 @@ const cancelEdit = () => {
 };
 
 const saveChanges = () => {
-  if (!title.value || !barangay.value || !date.value || !time.value || !objective.value || !description.value || thingsNeeded.value.length === 0) {
+  if (
+    !title.value || !barangay.value || !date.value ||
+    !startTime.value || !endTime.value ||
+    !objective.value || !description.value || thingsNeeded.value.length === 0
+  ) {
     alert("You need to fill all the required input");
     return;
   }
@@ -241,12 +273,12 @@ const saveChanges = () => {
       title: title.value,
       barangay: barangay.value,
       date: date.value,
-      time: time.value,
-      organizer: organizer.value,
+      time: `${startTime.value} - ${endTime.value}`,
+      organizer: organizer.value,   // Update organizer here
       status: status.value,
       objective: objective.value,
       description: description.value,
-      thingsNeeded: [...thingsNeeded.value]
+      thingsNeeded: [...thingsNeeded.value],
     };
 
     localStorage.setItem('events', JSON.stringify(events));
@@ -257,8 +289,6 @@ const saveChanges = () => {
   }
 };
 </script>
-
-
 
 
 <style scoped src="/src/assets/CSS Organizers/create-event.css"></style>

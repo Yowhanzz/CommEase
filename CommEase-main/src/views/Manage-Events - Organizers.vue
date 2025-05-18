@@ -114,8 +114,8 @@
           <td data-label="Event Name">{{ event.title }}</td>
           <td data-label="Time">{{ event.barangay }}</td>
           <td data-label="Date">{{ event.date }}</td>
-          <td data-label="Venue">{{ event.time }}</td>
-          <td data-label="Resource Speaker">{{ event.organizer }}</td>
+          <td data-label="Time">{{ event.time }}</td>
+          <td data-label="Organizer">{{ event.organizer }}</td>
           <td>
             <span
               :class="{
@@ -153,6 +153,7 @@ export default {
       showLogoutModal: false,
       isOpen: false,
       isSidebarOpen: false,
+
       // Search
       searchQuery: "",
 
@@ -160,16 +161,16 @@ export default {
       notifications: [
         { message: "You completed the 'Update website content' task.", time: "2 hours ago" },
         { message: "You completed the 'Clean up drive' task.", time: "3 hours ago" },
-        { message: "You completed the 'Meeting with organizers' task.", time: "5 hours ago" }
+        { message: "You completed the 'Meeting with organizers' task.", time: "5 hours ago" },
       ],
 
       // Events
       events: [
-        { event_id: 1, title: "Clean Up Drive", barangay: "East Bajac - Bajac", date: "08/06/2025", time: "10:00 - 12:00", organizer: "ELITES", status:"Pending" },
-        { event_id: 2, title: "Tree Planting", barangay: "West Bajac - Bajac", date: "09/10/2025", time: "8:00 - 10:00", organizer: "GREEN INITIATIVE", status:"Pending" },
-        { event_id: 3, title: "Feeding Program", barangay: "North Bajac - Bajac", date: "10/12/2025", time: "2:00 - 4:00", organizer: "HELPING HANDS", status:"Pending"  },
-        { event_id: 4, title: "Blood Donation", barangay: "South Bajac - Bajac", date: "12/15/2025", time: "9:00 - 1:00", organizer: "HEALTH TEAM", status:"Pending"  }
-      ]
+        { event_id: 1, title: "Clean Up Drive", barangay: "East Bajac - Bajac", date: "08/06/2025", time: "10:00 - 12:00", organizer: "ELITES", status: "Pending" },
+        { event_id: 2, title: "Tree Planting", barangay: "West Bajac - Bajac", date: "09/10/2025", time: "8:00 - 10:00", organizer: "GREEN INITIATIVE", status: "Pending" },
+        { event_id: 3, title: "Feeding Program", barangay: "North Bajac - Bajac", date: "10/12/2025", time: "2:00 - 4:00", organizer: "HELPING HANDS", status: "Pending" },
+        { event_id: 4, title: "Blood Donation", barangay: "South Bajac - Bajac", date: "12/15/2025", time: "9:00 - 1:00", organizer: "HEALTH TEAM", status: "Pending" },
+      ],
     };
   },
 
@@ -181,21 +182,21 @@ export default {
         event.barangay.toLowerCase().includes(query) ||
         event.date.toLowerCase().includes(query) ||
         event.time.toLowerCase().includes(query) ||
-        event.organizer.toLowerCase().includes(query)
+        event.organizer.toLowerCase().includes(query) ||
+        event.status.toLowerCase().includes(query)
       );
-    }
+    },
   },
 
   mounted() {
-   const storedEvents = JSON.parse(localStorage.getItem('events'));
+    const storedEvents = JSON.parse(localStorage.getItem("events"));
 
-  if (storedEvents && storedEvents.length > 0) {
-    // Use existing saved events
-    this.events = storedEvents;
-  } else {
-    // First time: save default events to localStorage
-    localStorage.setItem('events', JSON.stringify(this.events));
-  }
+    if (storedEvents !== null) {
+      this.events = storedEvents;
+    } else {
+      // Only set default events on first load (when there's no events key at all)
+      localStorage.setItem("events", JSON.stringify(this.events));
+    }
   },
 
   methods: {
@@ -205,73 +206,67 @@ export default {
 
     toggleSidebar() {
       this.isSidebarOpen = !this.isSidebarOpen;
-      this.isOpen = !this.isOpen; // optional if you're toggling extra state
+      this.isOpen = !this.isOpen; // optional extra toggle state
     },
 
     confirmLogout() {
       this.$router.push("/LoginOrganizers");
-    }, 
+    },
 
-   handleEdit(event) {
-    this.$router.push({
-      path: '/EditEventOrganizers',
-     query: {
-  event_id: event.event_id, // ADD THIS LINE ✅
-  title: event.title,
-  barangay: event.barangay,
-  date: event.date,
-  time: event.time,
-  organizer: event.organizer,
-  status: event.status
-}
-    });
+    handleEdit(event) {
+      const [startTime, endTime] = event.time.split(" - ");
+      this.$router.push({
+        path: "/EditEventOrganizers",
+        query: {
+          event_id: event.event_id,
+          title: event.title,
+          barangay: event.barangay,
+          date: event.date,
+          startTime,
+          endTime,
+          organizer: event.organizer,
+          status: event.status,
+        },
+      });
+    },
+
+    handleDelete(eventId) {
+      if (confirm("Are you sure you want to delete this event?")) {
+        this.events = this.events.filter((e) => e.event_id !== eventId);
+        localStorage.setItem("events", JSON.stringify(this.events));
+        alert("Event deleted successfully!");
+      }
+    },
+
+    saveEvent(newEvent) {
+      // Check if updating existing event
+      const index = this.events.findIndex((e) => e.event_id === newEvent.event_id);
+      if (index !== -1) {
+        this.events.splice(index, 1, newEvent);
+      } else {
+        // New event, assign new id
+        newEvent.event_id = this.events.length
+          ? Math.max(...this.events.map((e) => e.event_id)) + 1
+          : 1;
+        this.events.push(newEvent);
+      }
+      localStorage.setItem("events", JSON.stringify(this.events));
+      alert("Event saved successfully!");
+    },
+
+    onSubmitEvent() {
+      const newEvent = {
+        event_id: null, // or existing id if editing
+        title: this.title,
+        barangay: this.barangay,
+        date: this.date, // format: YYYY-MM-DD or your format
+        time: `${this.startTime} - ${this.endTime}`,
+        organizer: this.organizer,
+        status: "Pending",
+      };
+      this.saveEvent(newEvent);
+    },
   },
-
-  handleDelete(eventId) {
-    if (confirm("Are you sure do you want to delete this event?")) {
-      this.events = this.events.filter(event => event.event_id !== eventId);
-      localStorage.setItem('events', JSON.stringify(this.events)); // ✅ Update localStorage
-      alert("Event deleted successfully!");
-    }
-  },
-
-   saveEvent(newEvent) {
-    // If you have logic to add or update events:
-    // For example, newEvent = { event_id, title, barangay, date, time, organizer, status }
-
-    // If updating existing event
-    const index = this.events.findIndex(e => e.event_id === newEvent.event_id);
-    if(index !== -1) {
-      this.events.splice(index, 1, newEvent);
-    } else {
-      // New event, assign a new id:
-      newEvent.event_id = this.events.length ? Math.max(...this.events.map(e => e.event_id)) + 1 : 1;
-      this.events.push(newEvent);
-    }
-
-    // Save updated events array to localStorage
-    localStorage.setItem('events', JSON.stringify(this.events));
-
-    alert("Event saved successfully!");
-  },
-
-   // Example for submitting form
-  onSubmitEvent() {
-    // build your event object from form inputs
-    const newEvent = {
-      event_id: null, // or existing id if editing
-      title: this.title,
-      barangay: this.barangay,
-      date: this.date,  // format: "YYYY-MM-DD"
-      time: this.time,  // format: "HH:mm"
-      organizer: this.organizer,
-      status: "Pending"
-    };
-
-    this.saveEvent(newEvent);
-  }
-
-  }
 };
 </script>
 
