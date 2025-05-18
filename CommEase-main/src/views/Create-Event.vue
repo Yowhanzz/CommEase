@@ -114,6 +114,19 @@
       <h2 class="create-event-headers">Organizer</h2>
       <input class="create-event-input" v-model="organizer" type="text">
 
+       <h2 class="create-event-headers">Programs</h2>
+    <div class="create-event-checkbox-group">
+ <label>
+  <input type="checkbox" value="BSIT" v-model="programs" /> BSIT
+</label>
+<label>
+  <input type="checkbox" value="BSCS" v-model="programs" /> BSCS
+</label>
+<label>
+  <input type="checkbox" value="BSEMC" v-model="programs" /> BSEMC
+</label>
+</div>
+
       <h2 class="create-event-headers">Date</h2>
       <input class="create-event-input" v-model="date" type="date">
 
@@ -182,6 +195,8 @@ const searchQuery = ref("");
 const eventTitle = ref("");
 const barangay = ref("");
 const organizer = ref("");
+const programs = ref([]);        // event creation selected programs
+const programFilters = ref([]); // for BSIT, BSCS, BSEMC checkboxes
 const date = ref("");
 const startTime = ref("");
 const endTime = ref("");
@@ -207,16 +222,27 @@ const events = ref([
 ]);
 
 // === Computed Property for Event Filtering ===
-const filteredEvents = computed(() => 
-  events.value.filter(event =>
-    event.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-    event.barangay.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-    event.date.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-    event.time.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-    event.organizer.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-    event.status.toLowerCase().includes(searchQuery.value.toLowerCase())
-  )
-);
+const filteredEvents = computed(() => {
+  const query = searchQuery.value.toLowerCase();
+
+  return events.value.filter(event => {
+    const matchesSearch =
+      event.title.toLowerCase().includes(query) ||
+      event.barangay.toLowerCase().includes(query) ||
+      event.date.toLowerCase().includes(query) ||
+      event.time.toLowerCase().includes(query) ||
+      event.organizer.toLowerCase().includes(query) ||
+      event.status.toLowerCase().includes(query);
+
+    if (programFilters.value.length === 0) return matchesSearch;
+
+    const eventPrograms = event.programs || [];
+
+    const matchesProgram = eventPrograms.some(p => programFilters.value.includes(p));
+
+    return matchesSearch && matchesProgram;
+  });
+});
 
 // === Methods ===
 const toggleNotifications = () => {
@@ -245,21 +271,36 @@ const cancelEvent = () => {
   date.value = "";
   startTime.value = "";
 endTime.value = "";
+organizer.value = "";
   objective.value = "";
   description.value = "";
   newThing.value = "";
+  programs.value = [];
   thingsNeeded.value = [];
 };
 
 const saveEvent = () => {
-  if (
-    !eventTitle.value || !barangay.value || !date.value ||
-    !startTime.value || !endTime.value || !objective.value ||
-    !description.value || thingsNeeded.value.length === 0 || !organizer.value
-  ) {
-    alert("You need to fill all the required input");
-    return;
-  }
+
+  console.log('eventTitle:', eventTitle.value);
+  console.log('barangay:', barangay.value);
+  console.log('date:', date.value);
+  console.log('startTime:', startTime.value);
+  console.log('endTime:', endTime.value);
+  console.log('objective:', objective.value);
+  console.log('description:', description.value);
+  console.log('thingsNeeded:', thingsNeeded.value);
+  console.log('organizer:', organizer.value);
+  console.log('programs:', programs.value);
+
+ if (
+  !eventTitle.value.trim() || !barangay.value.trim() || !date.value.trim() ||
+  !startTime.value.trim() || !endTime.value.trim() || !objective.value.trim() ||
+  !description.value.trim() || thingsNeeded.value.length === 0 || !organizer.value.trim() || programs.value.length === 0
+) {
+  alert("You need to fill all the required input");
+  return;
+}
+
 
   // Check if date is in the past
   const selectedDate = new Date(date.value);
@@ -275,18 +316,19 @@ const saveEvent = () => {
 
   const storedEvents = JSON.parse(localStorage.getItem('events')) || [];
 
-  const newEvent = {
-    event_id: Date.now(),
-    title: eventTitle.value,
-    barangay: barangay.value,
-    date: date.value,
-    time: `${startTime.value} - ${endTime.value}`,
-    objective: objective.value,
-    description: description.value,
-    thingsNeeded: [...thingsNeeded.value],
-    organizer: organizer.value,
-    status: "Pending"
-  };
+const newEvent = {
+  event_id: Date.now(),
+  title: eventTitle.value,
+  barangay: barangay.value,
+  date: date.value,
+  time: `${startTime.value} - ${endTime.value}`,
+  organizer: organizer.value,
+  objective: objective.value,
+  description: description.value,
+  thingsNeeded: [...thingsNeeded.value],
+  programs: [...programs.value], // ✅ Ito na yung selected checkboxes
+  status: "Pending"
+};
 
   storedEvents.push(newEvent);
   localStorage.setItem('events', JSON.stringify(storedEvents));

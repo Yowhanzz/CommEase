@@ -103,6 +103,7 @@
           <th>Date</th>
           <th>Time</th>
           <th>Organizer</th>
+          <th>Programs</th>
           <th>Status</th>
           <th>Action</th>
         </tr>
@@ -116,6 +117,8 @@
           <td data-label="Date">{{ event.date }}</td>
           <td data-label="Time">{{ event.time }}</td>
           <td data-label="Organizer">{{ event.organizer }}</td>
+          <td>{{ (event.programs || []).join(', ') }}</td>
+
           <td>
             <span
               :class="{

@@ -563,3 +563,8 @@ i {
     scale: 0.9;
   }
 }
+
+.entries-edit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

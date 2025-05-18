@@ -241,6 +241,7 @@ i {
 .event-container {
   margin-left: 19%;
   margin-top: 2%;
+  padding-bottom: 40px;
 }
 
 .create-event-separation {
@@ -305,6 +306,37 @@ i {
   outline: none;
   border-color: #E9E5D6;
   box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.8)
+}
+
+/* PROGRAMS CHECKBOX */
+
+.create-event-checkbox-group {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.create-event-checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: #E9E5D6;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.create-event-checkbox-group label:hover {
+  background-color: #f5f5f5;
+}
+
+.create-event-checkbox-group input[type="checkbox"] {
+  accent-color: #464E2E; /* Tailwind blue-500 */
+  width: 16px;
+  height: 16px;
 }
 
 .modal-textarea {
@@ -505,3 +537,4 @@ i {
 .add-inside-button:active {
   opacity: 0.8;
 }
+

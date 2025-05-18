@@ -183,6 +183,13 @@
 			<hr class="hr-lists-events" />
 		</div>
 
+ <select v-model="selectedStatus" class="program-filter-dropdown">
+      <option value="">Status:</option>
+      <option value="Pending">Pending</option>
+      <option value="Active">Active</option>
+      <option value="Completed">Completed</option>
+    </select>
+
 		<div class="events-grid">
 			<div
 				v-for="(event, index) in filteredEvents"
@@ -192,6 +199,7 @@
 				<div class="container-inputs">
 					<div class="container-inputs-info">
 						<h1 class="container-event-title">{{ event.title }}</h1>
+            <h6 class="container-event-location">For {{ (event.programs || []).join(', ') }} only</h6>
 						<h6 class="container-event-location">
 							{{ event.location }}
 						</h6>
@@ -247,6 +255,9 @@ export default {
       isOpen: false,
       calendarVisible: false,
       selectedEvent: null,
+      selectedProgram: '',
+      selectedStatus: '',
+      events: [], // start with empty events
 
       notifications: [
         {
@@ -269,33 +280,28 @@ export default {
   },
   computed: {
     filteredEvents() {
-      return this.events.filter((event) =>
-        event.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-        event.location.toLowerCase().includes(this.searchQuery.toLowerCase())
-      );
-    },
-    qrValue() {
-      return JSON.stringify({
-        email: this.userEmail,
-        password: this.userPassword,
+      return this.events.filter((event) => {
+        const matchesSearch =
+          event.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+          event.location.toLowerCase().includes(this.searchQuery.toLowerCase());
+
+        const matchesProgram = this.selectedProgram
+          ? event.programs.includes(this.selectedProgram)
+          : true;
+
+        const matchesStatus = this.selectedStatus
+          ? event.status === this.selectedStatus
+          : true;
+
+        return matchesSearch && matchesProgram && matchesStatus;
       });
     },
   },
   mounted() {
-    const qrModalShown = localStorage.getItem("qrModalShown");
-    this.userEmail = localStorage.getItem("user_email") || "";
-    this.userPassword = localStorage.getItem("user_password") || "";
-
-    // Show QR modal kung hindi pa nashoshow before at may laman ang credentials
-    if (!qrModalShown && this.userEmail && this.userPassword) {
-      this.showQRCode = true;
-      localStorage.setItem("qrModalShown", "true");
-    }
-
-    // ✅ Load additional events from localStorage (ManageEvents)
+    // ✅ Now it's outside computed!
     const storedEvents = JSON.parse(localStorage.getItem("events"));
     if (storedEvents && storedEvents.length) {
-      const formattedStoredEvents = storedEvents.map((event) => {
+      this.events = storedEvents.map((event) => {
         const [startTime, endTime] = event.time.split(" - ");
         const startDateTime = `${event.date}T${startTime}`;
         const endDateTime = `${event.date}T${endTime}`;
@@ -306,10 +312,9 @@ export default {
           location: `Barangay ${event.barangay}`,
           organizer: event.organizer,
           status: event.status,
+          programs: event.programs || [],
         };
       });
-
-      this.events = formattedStoredEvents;
     }
   },
   methods: {
@@ -367,6 +372,7 @@ export default {
     },
   },
 };
+
 </script>
 
 

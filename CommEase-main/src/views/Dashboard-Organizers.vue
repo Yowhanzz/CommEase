@@ -166,6 +166,25 @@
       <hr class="hr-lists-events" />
     </div>
 
+    
+  <div class="dropdown-separation">
+    <!-- DROPDOWN STATUS -->
+    <select v-model="selectedStatus" class="program-filter-dropdown">
+      <option value="">Status:</option>
+      <option value="Pending">Pending</option>
+      <option value="Active">Active</option>
+      <option value="Completed">Completed</option>
+    </select>
+
+    <!-- DROPDOWN PROGRAM -->
+    <select v-model="selectedProgram" class="program-filter-dropdown">
+      <option value="">All Programs:</option>
+      <option value="BSIT">BSIT</option>
+      <option value="BSCS">BSCS</option>
+      <option value="BSEMC">BSEMC</option>
+    </select>
+  </div>
+   
     <div class="events-grid">
       <div
         v-for="(event, index) in filteredEvents"
@@ -175,6 +194,7 @@
         <div class="container-inputs">
           <div class="container-inputs-info">
             <h1 class="container-event-title">{{ event.title }}</h1>
+            <h6 class="container-event-location">For {{ (event.programs || []).join(', ') }} only</h6>
             <h6 class="container-event-location">{{ event.location }}</h6>
             <h6 class="container-event-date">{{ formatDate(event.start) }}</h6>
             <h6 class="container-event-time">
@@ -204,6 +224,8 @@ export default {
   data() {
     return {
       searchQuery: '',
+      selectedStatus: '',        // ← ADDED
+      selectedProgram: '',       // ← ADDED
       studentID: '',
       timedIDs: new Set(),
       showDropdown: false,
@@ -225,10 +247,19 @@ export default {
   },
   computed: {
     filteredEvents() {
-      return this.events.filter((event) =>
-        event.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-        event.location.toLowerCase().includes(this.searchQuery.toLowerCase())
-      );
+      return this.events.filter((event) => {
+        const matchesSearch =
+          event.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+          event.location.toLowerCase().includes(this.searchQuery.toLowerCase());
+
+        const matchesStatus =
+          this.selectedStatus === '' || event.status === this.selectedStatus;
+
+        const matchesProgram =
+          this.selectedProgram === '' || event.programs.includes(this.selectedProgram);
+
+        return matchesSearch && matchesStatus && matchesProgram;
+      });
     },
   },
   mounted() {
@@ -245,6 +276,7 @@ export default {
           end,
           organizer: event.organizer,
           status: event.status,
+          programs: event.programs || [], // Make sure this is an array
         };
       });
     }
@@ -315,5 +347,6 @@ export default {
   },
 };
 </script>
+
 
 <style scoped src="/src/assets/CSS Organizers/dashboard.css"></style>

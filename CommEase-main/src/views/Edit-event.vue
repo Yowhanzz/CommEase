@@ -116,6 +116,19 @@
       <h2 class="create-event-headers">Organizer</h2>
       <input class="create-event-input" v-model="organizer" type="text">
 
+             <h2 class="create-event-headers">Programs</h2>
+    <div class="create-event-checkbox-group">
+ <label>
+  <input type="checkbox" value="BSIT" v-model="programs" /> BSIT
+</label>
+<label>
+  <input type="checkbox" value="BSCS" v-model="programs" /> BSCS
+</label>
+<label>
+  <input type="checkbox" value="BSEMC" v-model="programs" /> BSEMC
+</label>
+</div>
+
       <h2 class="create-event-headers">Date</h2>
       <input class="create-event-input" v-model="date" type="date">
 
@@ -185,6 +198,8 @@ const barangay = ref('');
 const date = ref('');
 const startTime = ref('');
 const endTime = ref('');
+const programs = ref([]);        // event creation selected programs
+const programFilters = ref([]); // for BSIT, BSCS, BSEMC checkboxes
 const organizer = ref('');
 const status = ref('');
 const objective = ref('');
@@ -210,11 +225,13 @@ onMounted(() => {
     objective.value = existingEvent.objective ?? '';
     description.value = existingEvent.description ?? '';
     thingsNeeded.value = existingEvent.thingsNeeded ?? [];
+    programs.value = existingEvent.programs ?? [];  // ✅ Dito kukunin yung saved programs
   } else {
     alert('Event not found.');
     router.push('/DashboardOrganizers');
   }
 });
+
 
 // Methods
 const toggleSidebar = () => {
@@ -249,6 +266,7 @@ const cancelEdit = () => {
   organizer.value = '';
   status.value = '';
   objective.value = '';
+    programs.value = [];
   description.value = '';
   thingsNeeded.value = [];
   newThing.value = '';
@@ -256,9 +274,9 @@ const cancelEdit = () => {
 
 const saveChanges = () => {
   if (
-    !title.value || !barangay.value || !date.value ||
-    !startTime.value || !endTime.value ||
-    !objective.value || !description.value || thingsNeeded.value.length === 0
+    !title.value.trim() || !barangay.value.trim() || !date.value.trim() ||
+    !startTime.value.trim() || !endTime.value.trim() || !objective.value.trim() ||
+    !description.value.trim() || thingsNeeded.value.length === 0 || !organizer.value.trim() || programs.value.length === 0
   ) {
     alert("You need to fill all the required input");
     return;
@@ -274,10 +292,11 @@ const saveChanges = () => {
       barangay: barangay.value,
       date: date.value,
       time: `${startTime.value} - ${endTime.value}`,
-      organizer: organizer.value,   // Update organizer here
+      organizer: organizer.value,
       status: status.value,
       objective: objective.value,
       description: description.value,
+      programs: [...programs.value], // ✅ Update saved programs here
       thingsNeeded: [...thingsNeeded.value],
     };
 
@@ -288,6 +307,7 @@ const saveChanges = () => {
     alert('Event not found.');
   }
 };
+
 </script>
 
 
