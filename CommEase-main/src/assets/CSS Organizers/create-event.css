@@ -1,8 +1,8 @@
 .sidebar {
   width: 230px !important;
   height: 100vh;
-  background: #464E2E;
-  color: white;
+  background: #436850;
+  color: #DAF1DE;
   transition: width 0.3s ease;
   position: fixed;
   left: 0;
@@ -42,7 +42,7 @@ li {
 a {
   display: flex;
   align-items: center;
-  color: white;
+  color: #DAF1DE;
   text-decoration: none;
   padding: 10px;
   border-radius: 5px;
@@ -150,8 +150,8 @@ i {
 	left: -300px; /* Initially off-screen to the left */
 	width: 300px;
 	height: 100%;
-	background: #3e2a02;
-	color: white;
+	background: #12372A;
+	color: #DAF1DE;
 	box-shadow: -4px 0 10px rgba(0, 0, 0, 0.3);
 	z-index: 1000;
 	padding: 15px;
@@ -273,7 +273,7 @@ i {
 .title-safety {
   margin-left: 19%;
   margin-top: 4%;
-  color: #464E2E;
+  color: #12372A;
 }
 
 .safety-hr {
@@ -284,7 +284,7 @@ i {
 
 .create-event-headers {
   font-size: 20px;
-  color: #464E2E;
+  color: #436850;
   font-weight: 700;
 }
 
@@ -293,7 +293,7 @@ i {
   height: 40px;
   border-radius: 8px;
   border-style: none;
-  background-color: #E9E5D6;
+  background-color: #DAF1DE;
   box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.3);
   padding-left: 20px;
   transition: 0.15s ease-in-out outline,
@@ -304,7 +304,7 @@ i {
 
 .create-event-input:focus {
   outline: none;
-  border-color: #E9E5D6;
+  border-color: #DAF1DE;
   box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.8)
 }
 
@@ -321,7 +321,8 @@ i {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background-color: #E9E5D6;
+  background-color: #DAF1DE;
+  box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.3);
   padding: 0.5rem 1rem;
   border-radius: 8px;
   cursor: pointer;
@@ -334,7 +335,7 @@ i {
 }
 
 .create-event-checkbox-group input[type="checkbox"] {
-  accent-color: #464E2E; /* Tailwind blue-500 */
+  accent-color: #436850; /* Tailwind blue-500 */
   width: 16px;
   height: 16px;
 }
@@ -349,16 +350,16 @@ i {
   font-size: 13px;
   resize: none;
   margin-top: 5%;
-  background-color: #E9E5D6;
+  background-color: #DAF1DE;
+  box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.3);
   transition: 0.15s ease-in-out outline,
   .15s ease-in-out border-color,
   .15s ease-in-out box-shadow;
-  box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.3);
 }
 
 .modal-textarea:focus {
   outline: none;
-  border-color: #E9E5D6;
+  border-color: #DAF1DE;
   box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.8)
 }
 
@@ -370,13 +371,13 @@ i {
 }
 
 .things-needed-container {
-  background-color: #E9E5D6;
+  background-color: #DAF1DE;
+  box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.3);
   width: 90%;
   height: auto;
   padding-bottom: 50px;
   border-radius: 8px;
   border: 1px solid #ccc;
-  box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.3);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -420,14 +421,14 @@ i {
   cursor: pointer;
   text-align: left;
   border: 1px solid black;
-  color: black;
+    color: #DAF1DE;
   transition: .15s ease-in-out background-color, 
               .15s ease-in-out color;
 }
 
 .button-things:hover {
-  background-color: #464E2E;
-  color: #E9E5D6;
+  background-color: #12372A;
+  color: #DAF1DE;
 }
 
 /* Active (selected) button */
@@ -452,7 +453,7 @@ i {
 
 .things-input:focus {
   outline: none;
-  border-color: #E9E5D6;
+  border-color: #DAF1DE;
   box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.5)
 }
 
@@ -467,8 +468,8 @@ i {
   margin-left: 10px;
   border-radius: 5px;
   border-style: none;
-  background-color: #59692A;
-  color: #E9E5D6;
+  background-color: #12372A;
+  color: #DAF1DE;
   cursor: pointer;
   font-weight: 600;
   transition: .15s ease-in-out background-color, 
@@ -476,9 +477,9 @@ i {
 }
 
 .create-submit:hover, .create-cancel:hover {
-  background-color: #E9E5D6;
-  color: #464E2E;
-  border: 1px solid #464E2E;
+  background-color: #DAF1DE;
+  color: #12372A;
+  border: 1px solid #12372A;
 }
 
 .create-cancel:active, .create-submit:active {
@@ -495,6 +496,8 @@ i {
   padding: 5px 10px;
   font-weight: 600;
   margin-top: 10%;
+  background-color: #436850;
+  color: #DAF1DE;
 
 }
 
@@ -520,8 +523,8 @@ i {
   margin-top: 3%;
   border-radius: 5px;
   border-style: none;
-  background-color: #59692A;
-  color: #E9E5D6;
+  background-color: #12372A;
+  color: #DAF1DE;
   cursor: pointer;
   font-weight: 500;
   transition: .15s ease-in-out background-color, 
@@ -529,9 +532,9 @@ i {
 }
 
 .add-inside-button:hover {
-  background-color: #E9E5D6;
-  color: #464E2E;
-  border: 1px solid #464E2E;
+  background-color: #DAF1DE;
+  color: #12372A;
+  border: 1px solid #12372A;
 }
 
 .add-inside-button:active {

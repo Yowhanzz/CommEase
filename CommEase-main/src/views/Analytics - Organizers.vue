@@ -1,52 +1,54 @@
 <template>
   <header>
     <div :class="['sidebar', { open: isSidebarOpen }]">
-       <div class="top">
-    <div class="logo">
-      <i class="bx bxl-codeopen"></i>
-      <span class="title-name" v-show="isSidebarOpen">CommEase</span>
-    </div>
-    <i class="bx bx-menu" id="btn" @click="toggleSidebar"></i>
-  </div>
+      <div class="top">
+        <div class="logo">
+          <i class="bx bxl-codeopen"></i>
+          <span class="title-name" v-show="isSidebarOpen">CommEase</span>
+        </div>
+        <i class="bx bx-menu" id="btn" @click="toggleSidebar"></i>
+      </div>
 
-  <ul>
-    <li>
-      <router-link to="/DashboardOrganizers">
-        <i class="bx bxs-dashboard"></i>
-        <span class="nav-item" v-show="isSidebarOpen">Dashboard</span>
-      </router-link>
-    </li>
-     <li>
-      <router-link to="/ManageEventsOrganizers">
-        <i class='bx  bx-calendar-check'  ></i>  
-        <span class="nav-item" v-show="isSidebarOpen">Manage Events</span>
-      </router-link>
-    </li>
-    <li>
-      <router-link to="/ActivityLogOrganizers">
-        <i class="bx bx-history"></i>
-        <span class="nav-item" v-show="isSidebarOpen">Event History</span>
-      </router-link>
-    </li>
-    <li>
-      <router-link to="SafetyProtocolsOrganizers">
-        <i class="bx bxs-shield-plus"></i>
-        <span class="nav-item" v-show="isSidebarOpen">Safety & Protocols</span>
-      </router-link>
-    </li>
-    <li @click="toggleNotifications">
-      <a>
-        <i class="bx bxs-bell"></i>
-        <span class="nav-item" v-show="isSidebarOpen">Notifications</span>
-      </a>
-    </li>
-    <li @click="showLogoutModal = true">
-      <a>
-        <i class="bx bxs-log-out"></i>
-        <span class="nav-item" v-show="isSidebarOpen">Logout</span>
-      </a>
-    </li>
-  </ul>
+      <ul>
+        <li>
+          <router-link to="/DashboardOrganizers">
+            <i class="bx bxs-dashboard"></i>
+            <span class="nav-item" v-show="isSidebarOpen">Dashboard</span>
+          </router-link>
+        </li>
+        <li>
+          <router-link to="/ManageEventsOrganizers">
+            <i class="bx bx-calendar-check"></i>
+            <span class="nav-item" v-show="isSidebarOpen">Manage Events</span>
+          </router-link>
+        </li>
+        <li>
+          <router-link to="/ActivityLogOrganizers">
+            <i class="bx bx-history"></i>
+            <span class="nav-item" v-show="isSidebarOpen">Event History</span>
+          </router-link>
+        </li>
+        <li>
+          <router-link to="SafetyProtocolsOrganizers">
+            <i class="bx bxs-shield-plus"></i>
+            <span class="nav-item" v-show="isSidebarOpen"
+              >Safety & Protocols</span
+            >
+          </router-link>
+        </li>
+        <li @click="toggleNotifications">
+          <a>
+            <i class="bx bxs-bell"></i>
+            <span class="nav-item" v-show="isSidebarOpen">Notifications</span>
+          </a>
+        </li>
+        <li @click="showLogoutModal = true">
+          <a>
+            <i class="bx bxs-log-out"></i>
+            <span class="nav-item" v-show="isSidebarOpen">Logout</span>
+          </a>
+        </li>
+      </ul>
     </div>
 
     <!-- LOGOUT MODAL -->
@@ -55,21 +57,27 @@
         <h2>Confirm Logout</h2>
         <p>Are you sure you want to log out?</p>
         <div class="logout-modal-buttons">
-          <button @click="showLogoutModal = false" class="cancel-btn">Cancel</button>
+          <button @click="showLogoutModal = false" class="cancel-btn">
+            Cancel
+          </button>
           <button @click="confirmLogout" class="logout-btn">Logout</button>
         </div>
       </div>
     </div>
   </header>
 
-   <!-- NOTIFICATION PANEL -->
-   <div class="notification-panel" :class="{ open: showNotifications }">
+  <!-- NOTIFICATION PANEL -->
+  <div class="notification-panel" :class="{ open: showNotifications }">
     <div class="notification-header">
       <h2>Notifications</h2>
       <i class="bx bx-x close-btn" @click="toggleNotifications"></i>
     </div>
     <div class="notification-list">
-      <div class="notification-item" v-for="(notif, index) in notifications" :key="index">
+      <div
+        class="notification-item"
+        v-for="(notif, index) in notifications"
+        :key="index"
+      >
         <h4>Task Completed</h4>
         <p>{{ notif.message }}</p>
         <span class="time">{{ notif.time }}</span>
@@ -78,7 +86,11 @@
   </div>
 
   <!-- OVERLAY -->
-  <div class="overlay" v-if="showNotifications" @click="toggleNotifications"></div>
+  <div
+    class="overlay"
+    v-if="showNotifications"
+    @click="toggleNotifications"
+  ></div>
 
   <!-- ANALYTICS SECTION -->
   <h1 class="analytics-title">Event Analytics</h1>
@@ -105,6 +117,9 @@
       </div>
     </div>
   </div>
+
+  <!-- registrationForm -->
+  <!-- :registraion="registrationForm" -->
 
   <!-- GRAPH SECTION -->
   <div class="total-graph-container">
@@ -188,7 +203,9 @@
                 <h6 class="date">Feb 21, 2025</h6>
               </div>
               <p class="content">
-                Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text since the 1500s.
+                Lorem Ipsum is simply dummy text of the printing and typesetting
+                industry. Lorem Ipsum has been the industry's standard dummy
+                text since the 1500s.
               </p>
             </div>
           </div>
@@ -205,10 +222,10 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
-import { useRouter } from 'vue-router';
-import BarChart from '@/components/Barchart.vue';
-import PieChart from '@/components/PieChart.vue';
+import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
+import BarChart from "@/components/Barchart.vue";
+import PieChart from "@/components/PieChart.vue";
 
 const isSidebarOpen = ref(true);
 const toggleSidebar = () => {
@@ -221,21 +238,43 @@ const searchQuery = ref("");
 const router = useRouter();
 
 const notifications = ref([
-  { message: "You completed the 'Update website content' task.", time: "2 hours ago" },
+  {
+    message: "You completed the 'Update website content' task.",
+    time: "2 hours ago",
+  },
   { message: "You completed the 'Clean up drive' task.", time: "3 hours ago" },
-  { message: "You completed the 'Meeting with organizers' task.", time: "5 hours ago" }
+  {
+    message: "You completed the 'Meeting with organizers' task.",
+    time: "5 hours ago",
+  },
 ]);
 
 const events = ref([
-  { title: "Clean Up Drive", location: "Barangay East Bajac-Bajac", time: "10:00am - 12:00pm", date: "08/04/2025" },
-  { title: "Tree Planting", location: "Barangay West Tapinac", time: "8:00am - 10:00am", date: "09/10/2025" },
-  { title: "Feeding Program", location: "Barangay Sta. Rita", time: "2:00pm - 4:00pm", date: "12/15/2025" }
+  {
+    title: "Clean Up Drive",
+    location: "Barangay East Bajac-Bajac",
+    time: "10:00am - 12:00pm",
+    date: "08/04/2025",
+  },
+  {
+    title: "Tree Planting",
+    location: "Barangay West Tapinac",
+    time: "8:00am - 10:00am",
+    date: "09/10/2025",
+  },
+  {
+    title: "Feeding Program",
+    location: "Barangay Sta. Rita",
+    time: "2:00pm - 4:00pm",
+    date: "12/15/2025",
+  },
 ]);
 
 const filteredEvents = computed(() =>
-  events.value.filter(event =>
-    event.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-    event.location.toLowerCase().includes(searchQuery.value.toLowerCase())
+  events.value.filter(
+    (event) =>
+      event.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      event.location.toLowerCase().includes(searchQuery.value.toLowerCase())
   )
 );
 

@@ -2,8 +2,8 @@
 	position: fixed;
 	width: 230px;
 	height: 100vh;
-	background: #464e2e;
-	color: white;
+	background: #436850;
+	color: #DAF1DE;
 	transition: width 0.3s ease;
 	left: 0;
 	top: 0;
@@ -165,7 +165,7 @@ i {
 }
 
 .lists-events {
-  color: #464E2E;
+  color: #436850;
   /* margin-left: 15%; */
   /* padding-left: 250px; */
   padding-left: 14px;
@@ -294,8 +294,8 @@ i {
   left: -300px; /* Initially off-screen to the left */
   width: 300px;
   height: 100%;
-  background: #3e2a02;
-  color: white;
+  background: #12372A;
+  color: #DAF1DE;
   box-shadow: -4px 0 10px rgba(0, 0, 0, 0.3);
   z-index: 1000;
   padding: 15px;
@@ -408,24 +408,24 @@ i {
   .users-table thead {
     display: block;
     font-weight: bold;
-    border: 1px solid black;
-    border-radius: 4px;
+    display: none;
+
   }
 
   .users-table tr {
     display: block;
-    margin-bottom: 10px;
+    margin-bottom: 2rem;
     border: 1px solid #ddd;
   }
 
   .users-table td {
     display: block;
-    text-align: right;
+    text-align: left;
     padding: 10px;
     border: 1px solid #ddd;
     border-top: none;
     border: 1px solid black;
-    border-radius: 2px;
+    border-radius: 8px;
     font-size: 14px;
   }
 

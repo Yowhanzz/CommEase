@@ -1,8 +1,8 @@
 .sidebar {
   width: 230px !important;
   height: 100vh;
-  background: #464E2E;
-  color: white;
+  background: #436850;
+  color: #DAF1DE;
   transition: width 0.3s ease;
   position: fixed;
   left: 0;
@@ -43,7 +43,7 @@ li {
 a {
   display: flex;
   align-items: center;
-  color: white;
+  color: #DAF1DE;
   text-decoration: none;
   padding: 10px;
   border-radius: 5px;
@@ -185,7 +185,7 @@ i {
 .title-registration {
 /*   margin-left: 19%; */
 padding-left: 20px;
-  color: #464E2E;
+  color: #12372A;
   animation-name: slideinTop;
   animation-duration:1s;
   animation-timing-function:ease-in-out;
@@ -238,7 +238,7 @@ padding-left: 20px;
 }
 
 .container-things-needed {
-  background-color: #464E2E;
+  background-color: #436850;
   width: 380px;
   /* height: 385px; */
   padding: 15px 25px;
@@ -300,14 +300,14 @@ padding-left: 20px;
   text-align: left;
   padding-left: 20px;
   background-color:transparent;
-  border: 1px solid #E9E5D6;
-  color: #E9E5D6;
+  border: 1px solid #DAF1DE;
+  color: #DAF1DE;
   transition: .15s ease-in-out background-color, 
   .15s ease-in-out color;
 }
 
 .button-things:hover {
-  background-color: #E9E5D6;
+  background-color: #DAF1DE;
   color: black;
 }
 
@@ -329,8 +329,8 @@ padding-left: 20px;
   margin-left: 10px;
   border-radius: 5px;
   border-style: none;
-  background-color: #59692A;
-  color: #E9E5D6;
+  background-color: #12372A;
+  color: #DAF1DE;
   cursor: pointer;
   font-weight: 500;
   transition: .15s ease-in-out background-color, 
@@ -338,8 +338,8 @@ padding-left: 20px;
 }
 
 .button-things-submit:hover, .button-things-back:hover {
-  background-color: #E9E5D6;
-  color: #59692A;
+  background-color: #DAF1DE;
+  color: #12372A;
 }
 
 .button-things-back:active, .button-things-submit:active {
@@ -356,7 +356,7 @@ padding-left: 20px;
 .container-ideas {
   width: 380px;
   height: 100%;
-  background-color: #464E2E;
+  background-color: #436850;
   padding: 30px 30px;
   border-radius: 10px;
 /*   margin-left: 19%; */
@@ -383,12 +383,12 @@ padding-left: 20px;
 
 .title-ideas {
   font-size: 21px;
-  color: #E9E5D6;
+  color: #DAF1DE;
 }
 
 .p-ideas {
   font-size: 12px;
-  color: #E9E5D6;
+  color: #DAF1DE;
   margin-top: 2%;
 }
 textarea {
@@ -402,12 +402,12 @@ textarea {
   resize: none;
   margin-top: 5%;
   background-color: transparent;
-  color: #E9E5D6;
+  color: #DAF1DE;
 }
 
 textarea:focus {
   outline: none;
-  border-color: #E9E5D6;
+  border-color: #DAF1DE;
   box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.8)
 }
 
@@ -418,8 +418,8 @@ textarea:focus {
   margin-top: 10px;
   border-radius: 5px;
   border-style: none;
-  background-color: #59692A;
-  color: #E9E5D6;
+  background-color: #12372A;
+  color: #DAF1DE;
   cursor: pointer;
   font-weight: 500;
   transition: .15s ease-in-out background-color, 
@@ -427,8 +427,8 @@ textarea:focus {
 }
 
 .button-ideas-submit:hover {
-  background-color: #E9E5D6;
-  color: #59692A;
+  background-color: #DAF1DE;
+  color: #12372A;
 }
 
 .button-ideas-submit:active {
@@ -442,7 +442,7 @@ textarea:focus {
 }
 
 .container-event-objectives {
-  background-color: #464E2E;
+  background-color: #436850;
   border-radius: 10px;
   /* margin-left: 45%;
   margin-top: -58%; */
@@ -477,19 +477,19 @@ textarea:focus {
 
 .title-event-objectives {
   font-size: 24px;
-  color: #E9E5D6;
+  color: #DAF1DE;
   margin-bottom: 10px;
 }
 
 .p-date, .p-location, .p-slots {
   font-size: 13px;
   margin-top: 8px;
-  color: #E9E5D6;
+  color: #DAF1DE;
 }
 
 .title-desc {
   font-size: 22px;
-  color: #E9E5D6;
+  color: #DAF1DE;
   margin-top: 30px;
   margin-bottom: 10px;
 }
@@ -502,7 +502,7 @@ textarea:focus {
   height: 150px;
   overflow: auto;
   font-size: 15px;
-  color: #E9E5D6;
+  color: #DAF1DE;
   text-align: justify;
   margin-bottom: 15px;
 }
@@ -517,7 +517,7 @@ textarea:focus {
 
 .title-task {
   font-size: 22px;
-  color: #E9E5D6;
+  color: #DAF1DE;
   margin-top: 20px;
   margin-bottom: 20px;
 }
@@ -530,13 +530,13 @@ textarea:focus {
 }
 
 .p-per-task {
-  color: #E9E5D6;
+  color: #DAF1DE;
   margin-bottom: 5px;
   font-size: 12px;
 }
 
 .task-note, .span-take-note, .i-task-note{
-  color: #E9E5D6;
+  color: #DAF1DE;
   font-size: 12px;
   margin-bottom: 5%;
 }
@@ -558,8 +558,8 @@ textarea:focus {
   left: -300px; /* Initially off-screen to the left */
   width: 300px;
   height: 100%;
-  background: #3e2a02;
-  color: white;
+  background: #12372A;
+  color: #DAF1DE;
   box-shadow: -4px 0 10px rgba(0, 0, 0, 0.3);
   z-index: 1000;
   padding: 15px;

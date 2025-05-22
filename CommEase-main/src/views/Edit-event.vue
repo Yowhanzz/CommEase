@@ -207,6 +207,13 @@ const description = ref('');
 const thingsNeeded = ref([]);
 const newThing = ref('');
 
+// === Notifications Data ===
+const notifications = ref([
+  { message: "You completed the 'Update website content' task.", time: "2 hours ago" },
+  { message: "You completed the 'Clean up drive' task.", time: "3 hours ago" },
+  { message: "You completed the 'Meeting with organizers' task.", time: "5 hours ago" }
+]);
+
 // Load event info on mount
 onMounted(() => {
   event_id.value = route.query.event_id;
@@ -282,6 +289,15 @@ const saveChanges = () => {
     return;
   }
 
+  const today = new Date();
+  const selectedDate = new Date(date.value);
+
+  // Prevent updating if date is in the past
+  if (selectedDate < today.setHours(0, 0, 0, 0)) {
+    alert("Your date is no longer available.");
+    return;
+  }
+
   const events = JSON.parse(localStorage.getItem('events')) || [];
 
   const index = events.findIndex(e => e.event_id == event_id.value);
@@ -296,7 +312,7 @@ const saveChanges = () => {
       status: status.value,
       objective: objective.value,
       description: description.value,
-      programs: [...programs.value], // ✅ Update saved programs here
+      programs: [...programs.value],
       thingsNeeded: [...thingsNeeded.value],
     };
 

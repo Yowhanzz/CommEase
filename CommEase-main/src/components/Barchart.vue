@@ -22,7 +22,7 @@ onMounted(() => {
       datasets: [{
         label: 'Hours Volunteered',
         data: [2, 3.5, 1.75, 2, 3.5, 1.75, 2, 3.5, 1.75],
-        backgroundColor: '#E9E5D6'
+        backgroundColor: '#ADBC9F'
       }]
     },
     options: {

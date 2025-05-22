@@ -192,20 +192,26 @@
         class="container-glasscard-events"
       >
         <div class="container-inputs">
-          <div class="container-inputs-info">
-            <h1 class="container-event-title">{{ event.title }}</h1>
-            <h6 class="container-event-location">For {{ (event.programs || []).join(', ') }} only</h6>
-            <h6 class="container-event-location">{{ event.location }}</h6>
-            <h6 class="container-event-date">{{ formatDate(event.start) }}</h6>
+					<div class="container-inputs-info">
+						<h1 class="container-event-title">{{ event.title }}</h1>
             <h6 class="container-event-time">
-              {{ formatTime(event.start) }} - {{ formatTime(event.end) }}
-            </h6>
-            <h6 class="container-event-location">{{ event.organizer }}</h6>
-          </div>
-          <div class="button">
-            <router-link to="/AnalyticsOrganizers" class="button-enter">Enter</router-link>
-          </div>
-        </div>
+							{{ formatTime(event.start) }} -
+							{{ formatTime(event.end) }} · {{ formatDate(event.start) }}
+						</h6>
+            		<h6 class="container-event-location">
+							{{ event.location }}
+						</h6>
+            <h6 class="container-event-location">For {{ (event.programs || []).join(', ') }} only</h6>
+             <h6 class="container-event-location">{{ event.organizer }}</h6>
+					</div>
+					<div class="button">
+						<router-link
+							to="/RegistrationVolunteers"
+							class="button-enter"
+							>Enter</router-link
+						>
+					</div>
+				</div>
       </div>
     </div>
   </div>

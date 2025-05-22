@@ -2,8 +2,8 @@
 	position: fixed;
 	width: 230px;
 	height: 100vh;
-	background: #464e2e;
-	color: white;
+	background: #436850;
+	color: #DAF1DE;
 	transition: width 0.3s ease;
 	left: 0;
 	top: 0;
@@ -45,7 +45,7 @@ li {
 a {
   display: flex;
   align-items: center;
-  color: white;
+  color: #DAF1DE;
   text-decoration: none;
   padding: 10px;
   border-radius: 5px;
@@ -107,11 +107,11 @@ i {
 
 .logout-modal h2 {
   margin-bottom: 10px;
-  color: #E9E5D6;
+  color: #DAF1DE;
 }
 
 .logout-modal p {
-  color: #E9E5D6;
+  color: #DAF1DE;
 }
 
 .logout-modal-buttons {
@@ -165,7 +165,7 @@ i {
 }
 
 .lists-events {
-  color: #464E2E;
+  color: #12372A;
   /* margin-left: 15%; */
   /* padding-left: 250px; */
   padding-left: 14px;
@@ -244,7 +244,7 @@ i {
 	height: 40px;
 	text-align: center;
 	font-size: 14px;
-	background-color: #41520c;
+	background-color: #12372A;
 	margin-left: 87%;
 	margin-top: 40px;
     animation-name: slideinTopThTd;
@@ -256,9 +256,9 @@ i {
 
 .create-event-button:hover {
 		opacity: 0.9;
-	background-color: #e9e5d6;
+	background-color: #DAF1DE;
 	color: #464e2e;
-	border: 1px solid #464e2e;
+	border: 1px solid #12372A;
 }
 
 .create-event-button:active {
@@ -325,8 +325,8 @@ i {
   text-decoration: none;
   padding: 15px 18px;
   border-radius: 5px;
-  background-color: #464E2E;
-  color: #E7F0DC;
+  background-color: #12372A;
+  color: #DAF1DE;
   font-weight: 500;
   cursor: pointer;
   border: 1px solid transparent; /* Added */
@@ -340,8 +340,8 @@ i {
 .entries-delete {
   padding: 15px 23px;
   border-radius: 5px;
-  background-color: #464e2e;
-  color: #E7F0DC;
+  background-color: #12372A;
+  color: #DAF1DE;
   font-weight: 500;
   cursor: pointer;
   border: 1px solid transparent; /* Added */
@@ -367,8 +367,8 @@ i {
   left: -300px; /* Initially off-screen to the left */
   width: 300px;
   height: 100%;
-  background: #3e2a02;
-  color: white;
+  background: #12372A;
+  color: #DAF1DE;
   box-shadow: -4px 0 10px rgba(0, 0, 0, 0.3);
   z-index: 1000;
   padding: 15px;

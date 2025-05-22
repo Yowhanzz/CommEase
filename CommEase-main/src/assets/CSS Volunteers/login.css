@@ -6,7 +6,7 @@
 }
 
 body {
-	background-color: #e7f0dc;
+	background-color: #DAF1DE;
 }
 
 .whole-container {
@@ -49,7 +49,7 @@ body {
 		radial-gradient(var(--r) at left var(--_g)),
 		radial-gradient(var(--r) at right var(--_g));
 	clip-path: polygon(50% 0, 100% 100%, 0 100%);
-	background: #acb992;
+	background: #436850;
 	margin-left: -62%;
 	margin-top: -23%;
 	transform: rotate(-15deg);
@@ -80,7 +80,7 @@ body {
 		radial-gradient(var(--r) at left var(--_g)),
 		radial-gradient(var(--r) at right var(--_g));
 	clip-path: polygon(50% 0, 100% 100%, 0 100%);
-	background: #464e2e;
+	background: #12372A;
 	margin-left: -64%;
 	margin-top: -40%;
 	transform: rotate(-15deg);
@@ -101,7 +101,7 @@ img {
 /* LOGIN PART */
 
 .login-container {
-	background-color: #e7f0dc;
+	background-color: #DAF1DE;
 	width: 632px;
 	height: 580px;
 	margin-right: 4%;
@@ -124,7 +124,7 @@ img {
 .title {
 	margin-bottom: 10%;
 	font-size: 30px;
-	color: #464e2e;
+	color: #12372A;
 	font-weight: bold;
 }
 
@@ -146,7 +146,7 @@ img {
 
 .input-container input {
 	width: 80%;
-	background-color: #acb992;
+	background-color: #ADBC9F;
 	opacity: 0.6;
 	height: 60px;
 	border: 1px solid #ccc;
@@ -187,11 +187,11 @@ input:focus {
 }
 
 .login-btn {
-	background: #3c3f32;
+	background: #12372A;
 	color: white;
 	margin-top: 5%;
 	margin-bottom: 20px;
-	padding-left: 25px;
+	padding-left: 14px;
 }
 
 .signup-btn {
@@ -202,12 +202,14 @@ input:focus {
 }
 
 .login-btn:hover {
-	background: #2b2d23;
+	background: #DAF1DE;
+	color: #12372A;
+	border: 2px solid #12372A;
 }
 
 .signup-btn:hover {
-	background: #3c3f32;
-	color: white;
+	background: #12372A;
+	color: #DAF1DE;
 }
 
 .action-button {

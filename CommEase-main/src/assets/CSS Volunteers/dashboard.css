@@ -2,8 +2,8 @@
 	position: fixed;
 	width: 230px !important;
 	height: 100vh;
-	background: #464e2e;
-	color: white;
+	background: #436850;
+	color: #e8f4ea;
 	transition: width 0.3s ease;
 	left: 0;
 	top: 0;
@@ -45,7 +45,7 @@ li {
 a {
 	display: flex;
 	align-items: center;
-	color: white;
+	color: #DAF1DE;
 	text-decoration: none;
 	padding: 10px;
 	border-radius: 5px;
@@ -101,17 +101,18 @@ i {
 	border-radius: 10px;
 	text-align: center;
 	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-	width: 300px;
+	width: 350px;
 	scale: 1.1;
 }
 
 .logout-modal h2 {
 	margin-bottom: 10px;
-	color: #e9e5d6;
+	color: #DAF1DE;
 }
 
 .logout-modal p {
-	color: #e9e5d6;
+	color: #DAF1DE;
+	padding-bottom: 10px;
 }
 
 .logout-modal-buttons {
@@ -121,28 +122,30 @@ i {
 }
 
 .logout-btn {
-	background: #59692a;
-	color: white;
+	background: #235347;
+	color: #DAF1DE;
 	padding: 8px 15px;
 	border: none;
 	border-radius: 5px;
 	cursor: pointer;
+	font-weight: 550;
 	transition: 0.15s ease-in-out background-color, 0.15s ease-in-out color;
 }
 
 .cancel-btn {
-	background: #bdc3c7;
-	color: white;
+	background: #DAF1DE;
+	color: #051F20;
 	padding: 8px 15px;
 	border: none;
 	border-radius: 5px;
 	cursor: pointer;
 	transition: 0.15s ease-in-out background-color;
+	font-weight: 550;
 }
 
 .logout-btn:hover {
-	background-color: #e9e5d6;
-	color: #464e2e;
+	background-color: #DAF1DE;
+	color: #235347;
 }
 
 .cancel-btn:hover {
@@ -199,12 +202,11 @@ img {  /* REVISED */
 .glasscard-container, /* REVISED */
 .glasscard-container-1 {
 	display: flex;
-	background: rgba(255, 255, 255, 0.15);
 	backdrop-filter: blur(10px);
-	border: 2px solid #7c7c7c;
 	border-radius: 12px;
 	animation-name: slideinTopGlasscard;
 	animation-duration: 1s;
+	border: 2px solid #051F20;
 	animation-timing-function: ease-in-out;
 	width: 100%;
 	padding: 20px 20px;
@@ -255,7 +257,7 @@ img {  /* REVISED */
 
 .lists-events {
 	font-size: 30px;
-	color: #464e2e;
+	color: #163832;
 	position: relative;
 }
 
@@ -265,7 +267,7 @@ img {  /* REVISED */
 	border: 0;
 	height: 1px;
 	right: 20px;
-	background-color: #aea6a6;
+	background-color: #0B2B26;
 }
 
 .sidebar-collapsed-for-divider { /* REVISED */
@@ -279,22 +281,24 @@ img {  /* REVISED */
 	padding-left: 5px;
 	padding-right: 5px;
   border-radius: 6px;
-  border: 1px solid #ccc;
+  color: #DAF1DE;
+	border: 2px solid #051F20;
+	box-shadow: 0px 3px 5px rgba(168, 213, 186, 0.8);
+	background-color: #436850;
   margin-bottom: 1rem;
 	margin-top: 20px;
-	background-color: #464e2e;
-	color: #e9e5d6;
 	cursor: pointer;
 	font-weight: 550;
 	transition: background-color 0.15s, border-color 0.15s,
 	cursor 0.15s;
-	border-style: none;
 	margin-left: 15px;
 }
 
 .program-filter-dropdown:focus {
-  background-color: #5a6237;
-  border-color: #b2ad8f;
+color: #DAF1DE;
+	border: 2px solid #051F20;
+	box-shadow: 0px 3px 5px rgba(168, 213, 186, 0.8);
+	background-color: #235347;
   cursor: pointer;
 }
 
@@ -355,8 +359,9 @@ img {  /* REVISED */
 	height: 208px;
 	padding: 10px 20px 20px 20px;
 	border-radius: 10px;
-	color: #e9e5d6;
-	background-color: #59692a;
+	color: #FBFADA;
+	box-shadow: 0px 3px 5px rgba(168, 213, 186, 0.8);
+	background-color: #436850;
 	animation: slideintopEvents 0.75s ease-in-out;
 	animation-timeline: view();
 	animation-range: entry 0% cover 25%;
@@ -392,6 +397,7 @@ img {  /* REVISED */
 .container-inputs-info {
 	display: flex;
 	flex-direction: column;
+	justify-content: space-between;
 	flex: 1;
 }
 
@@ -406,14 +412,14 @@ img {  /* REVISED */
 	width: 75px;
 	height: 40px;
 	padding-left: 15px;
-	background-color: #41520c;
+	background-color: #12372A;
 }
 
 .button-enter:hover {
 	opacity: 0.9;
-	background-color: #e9e5d6;
+	background-color: #DAF1DE;
 	color: #464e2e;
-	border: 1px solid #464e2e;
+	border: 1px solid #12372A;
 }
 
 .button-enter:active {
@@ -427,7 +433,7 @@ img {  /* REVISED */
 	left: -300px; /* Initially off-screen to the left */
 	width: 300px;
 	height: 100%;
-	background: #3e2a02;
+	background: #12372A;
 	color: white;
 	box-shadow: -4px 0 10px rgba(0, 0, 0, 0.3);
 	z-index: 1000;
@@ -640,17 +646,17 @@ img {  /* REVISED */
 .dropbtn {
 	padding: 10px 15px;
 	border-radius: 5px;
-	background-color: #464e2e;
-	color: #e9e5d6;
+	background-color: #436850;
+	color: #DAF1DE;
 	border-style: none;
 	cursor: pointer;
 	transition: all 0.15s ease;
 }
 
 .dropbtn:hover {
-	background-color: #e9e5d6;
-	color: #464e2e;
-	border: 1px solid #464e2e;
+	background-color: #DAF1DE;
+	color: #436850;
+	border: 1px solid #12372A;
 }
 
 

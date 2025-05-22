@@ -4,10 +4,10 @@
     <!-- Labels section below the pie chart -->
     <div class="labels-container">
       <div class="label-item">
-        <span class="label-color" style="background-color: #ACB992;"></span> Attended
+        <span class="label-color" style="background-color: #DAF1DE;"></span> Attended
       </div>
       <div class="label-item">
-        <span class="label-color" style="background-color: #E9E5D6;"></span> Did Not Attend
+        <span class="label-color" style="background-color: #235347;"></span> Did Not Attend
       </div>
     </div>
   </div>
@@ -25,7 +25,7 @@ onMounted(() => {
     data: {
       datasets: [{
         data: [50, 10],
-        backgroundColor: ['#ACB992', '#E9E5D6']
+        backgroundColor: ['#235347', '#DAF1DE']
       }]
     },
     options: {
@@ -61,7 +61,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   margin-top: 5%;
-  color: white; /* ← ito ang nadagdag */
+  color: #DAF1DE; /* ← ito ang nadagdag */
 }
 
 

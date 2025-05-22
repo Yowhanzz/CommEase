@@ -45,7 +45,7 @@
 		radial-gradient(var(--r) at left var(--_g)),
 		radial-gradient(var(--r) at right var(--_g));
 	clip-path: polygon(50% 0, 100% 100%, 0 100%);
-	background: #acb992;
+	background: #436850;
 	margin-left: -23%;
 	margin-top: -3%;
 	transform: rotate(-15deg);
@@ -76,7 +76,7 @@
 		radial-gradient(var(--r) at left var(--_g)),
 		radial-gradient(var(--r) at right var(--_g));
 	clip-path: polygon(50% 0, 100% 100%, 0 100%);
-	background: #464e2e;
+	background: #12372A;
 	margin-left: -25%;
 	margin-top: -16%;
 	transform: rotate(-15deg);
@@ -93,7 +93,7 @@ img {
 /* OTP PART */
 
 .OTP-container {
-	background-color: #e7f0dc;
+	background-color: #DAF1DE;
 	width: 632px;
 	height: 545px;
 	margin-right: 5%;
@@ -116,12 +116,12 @@ img {
 .OTP-title {
 	margin-top: 5%;
 	font-size: 30px;
-	color: #464e2e;
+	color: #12372A;
 	margin-bottom: 13px;
 }
 
 .OTP-sentence {
-	color: #464e2e;
+	color: #12372A;
 	font-size: 16px;
 	margin-bottom: 20px;
 }
@@ -157,12 +157,12 @@ img {
 
 .input-otp:hover {
 	outline: none;
-	border-color: #e9e5d6;
+	border-color: #DAF1DE;
 	box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.8);
 }
 
 .input-otp:focus {
-	border-color: #000;
+	border-color: #12372A;
 }
 
 .OTP-submit {
@@ -172,17 +172,17 @@ img {
 	font-size: 16px;
 	border-radius: 5px;
 	border-style: none;
-	background-color: #464e2e;
-	color: #e9e5d6;
+	background-color: #12372A;
+	color: #DAF1DE;
 	cursor: pointer;
 	font-weight: 600;
 	transition: 0.15s ease-in-out background-color, 0.15s ease-in-out color;
 }
 
 .OTP-submit:hover {
-	background-color: #e9e5d6;
-	color: #464e2e;
-	border: 1px solid #464e2e;
+	background-color: #DAF1DE;
+	color: #12372A;
+	border: 1px solid #12372A;
 }
 
 .OTP-submit:active {
@@ -228,8 +228,8 @@ a {
 	justify-content: center;
 	width: 90px;
 	height: 50px;
-	color: #e7f0dc;
-	background-color: #464e2e;
+	color: #DAF1DE;
+	background-color: #12372A;
 	border-radius: 5px;
 	font-size: 14px;
 	font-weight: 500;
@@ -244,9 +244,9 @@ a {
 
 .prev:hover,
 .next:hover {
-	background-color: #e9e5d6;
-	border: 1px solid #464e2e;
-	color: #464e2e;
+	background-color:#DAF1DE;
+	border: 1px solid #12372A;
+	color: #12372A;
 }
 
 .prev:active,

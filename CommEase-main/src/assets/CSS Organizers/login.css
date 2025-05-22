@@ -43,7 +43,7 @@ body {
     radial-gradient(var(--r) at left var(--_g)),
     radial-gradient(var(--r) at right var(--_g));
   clip-path: polygon(50% 0,100% 100%,0 100%);
-  background: #ACB992;
+  background: #436850;
   margin-left: -62%;
   margin-top: -24%;
   transform: rotate(-15deg);
@@ -67,7 +67,7 @@ body {
     radial-gradient(var(--r) at left var(--_g)),
     radial-gradient(var(--r) at right var(--_g));
   clip-path: polygon(50% 0,100% 100%,0 100%);
-  background: #464E2E;
+  background: #12372A;
   margin-left: -64%;
   margin-top: -40%;
   transform: rotate(-15deg);
@@ -89,7 +89,7 @@ img {
 /* LOGIN PART */
 
 .login-container {
-  background-color: #E7F0DC;
+  background-color: #DAF1DE;
   width: 632px;
   height: 560px;
   margin-right: 4%;
@@ -108,7 +108,7 @@ img {
 .title {
   margin-bottom: 10%;
   font-size: 30px;
-  color: #464E2E;
+  color: #12372A;
 }
 
 .input-container {
@@ -129,7 +129,7 @@ img {
 
 .input-container input {
   width: 80%;
-  background-color: #ACB992;
+  background-color: #ADBC9F;
   opacity: 0.6;
   height: 60px;
   border: 1px solid #ccc;
@@ -177,14 +177,16 @@ input:focus {
 }
 
 .login-btn {
-  background: #3C3F32;
-  color: white;
+  background: #12372A;
+  color: #DAF1DE;
   margin-top: 5%;
   margin-bottom: 20px;
 }
 
 .login-btn:hover {
-  background: #2B2D23;
+  background: #DAF1DE;
+  color: #12372A;
+  border: 2px solid #12372A;
 }
 
 /* RESPONSIVE PART */

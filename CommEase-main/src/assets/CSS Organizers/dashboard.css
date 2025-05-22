@@ -2,8 +2,8 @@
 	position: fixed;
 	width: 230px !important;
 	height: 100vh;
-	background: #464e2e;
-	color: white;
+	background: #436850;
+	color: #DAF1DE;
 	transition: width 0.3s ease;
 	left: 0;
 	top: 0;
@@ -45,7 +45,7 @@ li {
 a {
 	display: flex;
 	align-items: center;
-	color: white;
+	color: #DAF1DE;
 	text-decoration: none;
 	padding: 10px;
 	border-radius: 5px;
@@ -201,7 +201,7 @@ img {  /* REVISED */
 	display: flex;
 	background: rgba(255, 255, 255, 0.15);
 	backdrop-filter: blur(10px);
-	border: 2px solid #7c7c7c;
+	border: 2px solid #12372A;
 	border-radius: 12px;
 	animation-name: slideinTopGlasscard;
 	animation-duration: 1s;
@@ -255,7 +255,7 @@ img {  /* REVISED */
 
 .lists-events {
 	font-size: 30px;
-	color: #464e2e;
+	color: #DAF1DE;
 	position: relative;
 	padding-left: 20px;
 }
@@ -289,8 +289,8 @@ img {  /* REVISED */
   border: 1px solid #ccc;
   margin-bottom: 1rem;
 	margin-top: 20px;
-	background-color: #464e2e;
-	color: #e9e5d6;
+	background-color: #436850;
+	color: #DAF1DE;
 	cursor: pointer;
 	font-weight: 550;
 	transition: background-color 0.15s, border-color 0.15s,
@@ -300,35 +300,12 @@ img {  /* REVISED */
 }
 
 .program-filter-dropdown:focus {
-  background-color: #5a6237;
-  border-color: #b2ad8f;
+  background-color: #235347;
+  border-color: #12372A;
   cursor: pointer;
 }
 
 
-.create-event-button {
-	padding-left: 20px;
-	cursor: pointer;
-	font-weight: 500;
-	width: 130px;
-	height: 40px;
-	text-align: center;
-	font-size: 14px;
-	background-color: #41520c;
-	margin-left: 89%;
-	margin-top: 20px;
-}
-
-.create-event-button:hover {
-		opacity: 0.9;
-	background-color: #e9e5d6;
-	color: #464e2e;
-	border: 1px solid #464e2e;
-}
-
-.create-event-button:active {
-	opacity: 0.7;
-}
 .test {
 	padding-bottom: 50px;
 }
@@ -385,8 +362,8 @@ img {  /* REVISED */
 	height: 208px;
 	padding: 10px 20px 20px 20px;
 	border-radius: 10px;
-	color: #e9e5d6;
-	background-color: #59692a;
+	color: #DAF1DE;
+	background-color: #436850;
 	animation: slideintopEvents 0.75s ease-in-out;
 	animation-timeline: view();
 	animation-range: entry 0% cover 25%;
@@ -422,6 +399,7 @@ img {  /* REVISED */
 .container-inputs-info {
 	display: flex;
 	flex-direction: column;
+	justify-content: space-between;
 	flex: 1;
 }
 
@@ -436,15 +414,15 @@ img {  /* REVISED */
 	width: 75px;
 	padding-left: 14px;
 	height: 40px;
-	background-color: #41520c;
+	background-color: #12372A;
 }
 
 .button-enter:hover,
 .button-edit:hover {
 	opacity: 0.9;
-	background-color: #e9e5d6;
+	background-color: #DAF1DE;
 	color: #464e2e;
-	border: 1px solid #464e2e;
+	border: 1px solid #12372A;
 }
 
 .button-enter:active,
@@ -459,8 +437,8 @@ img {  /* REVISED */
 	left: -300px; /* Initially off-screen to the left */
 	width: 300px;
 	height: 100%;
-	background: #3e2a02;
-	color: white;
+	background: #12372A;
+	color: #DAF1DE;
 	box-shadow: -4px 0 10px rgba(0, 0, 0, 0.3);
 	z-index: 1000;
 	padding: 15px;
@@ -476,7 +454,7 @@ img {  /* REVISED */
 	right: 15px;
 	font-size: 30px;
 	cursor: pointer;
-	color: white;
+	color: #DAF1DE;
 	transition: 0.15s ease-in-out opacity;
 }
 
@@ -649,7 +627,7 @@ img {  /* REVISED */
 .input-attendance {
 	width: 90%;
 	border-radius: 5px;
-	border: 1px solid #464e2e ;
+	border: 1px solid #12372A ;
 	height: 30px;
 	padding-left: 15px;
 	margin-bottom: 10px;
@@ -657,9 +635,9 @@ img {  /* REVISED */
 }
 
 .input-attendance:focus {
-  border: 2px solid #9bcf53; /* lighter green border for focus */
+  border: 2px solid #12372A; /* lighter green border for focus */
   outline: none;
-  border-color: #464e2e; /* optional: light background on focus */
+  border-color: #12372A; /* optional: light background on focus */
 }
 
 .input-submit {
@@ -668,8 +646,8 @@ img {  /* REVISED */
 	border-radius: 5px;
 	cursor: pointer;
 	border: none;
-	background-color: #464e2e;
-	color: #E9E5D6;
+	background-color: #12372A;
+	color: #DAF1DE;
 	height: 40px;
 	font-weight: 500;
 	transition: all 0.15s ease-in-out;
@@ -682,9 +660,9 @@ img {  /* REVISED */
 }
 
 .input-submit:hover {
-	background-color: #E9E5D6;
-	color: #464e2e;
-	border: 1px solid #464e2e;
+	background-color: #DAF1DE;
+	color: #12372A;
+	border: 1px solid #12372A;
 }
 
 .input-submit:active {
@@ -743,17 +721,17 @@ img {  /* REVISED */
 .dropbtn {
 	padding: 10px 15px;
 	border-radius: 5px;
-	background-color: #464e2e;
-	color: #e9e5d6;
+	background-color: #12372A;
+	color: #DAF1DE;
 	border-style: none;
 	cursor: pointer;
 	transition: all 0.15s ease;
 }
 
 .dropbtn:hover {
-	background-color: #e9e5d6;
-	color: #464e2e;
-	border: 1px solid #464e2e;
+	background-color: #DAF1DE;
+	color: #12372A;
+	border: 1px solid #12372A;
 }
 
 
