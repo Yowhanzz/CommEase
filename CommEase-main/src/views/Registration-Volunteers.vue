@@ -168,11 +168,9 @@
     >
       <h2 class="title-event-objectives">{{ registration.title }}</h2>
       <p class="p-date"><span>Date Posted: </span>08/04/2005</p>
+      <p class="p-slots"><span>Time: </span>2:00pm - 5:00pm</p>
       <p class="p-location">
         <span>Location </span>#25 21st East Bajac-Bajac, Olongapo City
-      </p>
-      <p class="p-slots">
-        <span>Slots Left: </span>Only <span>25</span> volunteers are in need
       </p>
 
       <h3 class="title-desc">Description</h3>
@@ -238,6 +236,8 @@
       </div>
     </div>
   </div>
+
+  <div class="overlay" v-if="!isMobile && isSidebarOpen"></div>
 </template>
 
 <script setup>
@@ -247,10 +247,18 @@ import { useRouter } from "vue-router";
 // === Sidebar Toggle ===
 const isSidebarOpen = ref(true);
 const isOpen = ref(false); // Added this based on your request
+const isMobile = ref(false);
 
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value;
   isOpen.value = !isOpen.value; // Sync both values
+};
+
+const handleResize = () => {
+  isMobile.value = window.innerWidth <= 928;
+  if (isMobile.value) {
+    isSidebarOpen.value = false;
+  }
 };
 
 // === Notifications ===
@@ -292,7 +300,7 @@ const registrationForm = ref([
   },
   {
     id: 2,
-    title: "Clean u",
+    title: "Clean up shit",
     date_posted: "March 1, 2025",
     location: "Olongapo City",
     description: "lorem*4",

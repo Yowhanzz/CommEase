@@ -134,6 +134,8 @@
       </table>
     </div>
   </div>
+
+  <div class="overlay" v-if="!isMobile && isSidebarOpen"></div>
 </template>
 
 <script>
@@ -148,6 +150,9 @@ export default {
 
       // Search
       searchQuery: "",
+
+      //
+      isMobile: false,
 
       // Notifications
       notifications: [
@@ -220,6 +225,14 @@ export default {
   methods: {
     toggleNotifications() {
       this.showNotifications = !this.showNotifications;
+    },
+
+    handleResize() {
+      /* ADDED */
+      this.isMobile = window.innerWidth <= 928;
+      if (this.isMobile) {
+        this.isSidebarOpen = false;
+      }
     },
 
     toggleSidebar() {

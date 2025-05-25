@@ -92,8 +92,10 @@
   </div>
 
   <!-- CREATE EVENT SECTION -->
-  <h1 class="title-safety">Create Event</h1>
-  <hr class="safety-hr" />
+  <h1 class="title-safety" :class="{ 'sidebar-collapsed': !isOpen }">
+    Create Event
+  </h1>
+  <hr class="safety-hr" :class="{ 'sidebar-collapsed-for-divider': isOpen }" />
 
   <div class="event-container">
     <div class="create-event-separation">
