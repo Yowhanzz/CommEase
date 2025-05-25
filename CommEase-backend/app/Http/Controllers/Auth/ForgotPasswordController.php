@@ -97,7 +97,23 @@ class ForgotPasswordController extends Controller
             return response()->json(['message' => 'Please verify your OTP first'], 422);
         }
 
+        // Check if the new password is the same as the current password
+        if (Hash::check($request->password, $user->password)) {
+            return response()->json([
+                'message' => 'New password cannot be the same as your current password'
+            ], 422);
+        }
+
+        // Check if the new password is the same as the previous password
+        if ($user->previous_password && Hash::check($request->password, $user->previous_password)) {
+            return response()->json([
+                'message' => 'New password cannot be the same as your previous password'
+            ], 422);
+        }
+
+        // Store the current password as previous password before updating
         $user->update([
+            'previous_password' => $user->password,
             'password' => Hash::make($request->password)
         ]);
 

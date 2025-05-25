@@ -182,6 +182,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { authService, eventService } from '../api/services';
 
 const route = useRoute();
 const router = useRouter();
@@ -191,21 +192,22 @@ const showNotifications = ref(false);
 const showLogoutModal = ref(false);
 const searchQuery = ref('');
 
-// Event form fields (include organizer!)
+// Event form fields
 const event_id = ref(null);
 const title = ref('');
 const barangay = ref('');
 const date = ref('');
 const startTime = ref('');
 const endTime = ref('');
-const programs = ref([]);        // event creation selected programs
-const programFilters = ref([]); // for BSIT, BSCS, BSEMC checkboxes
+const programs = ref([]);
 const organizer = ref('');
 const status = ref('');
 const objective = ref('');
 const description = ref('');
 const thingsNeeded = ref([]);
 const newThing = ref('');
+const loading = ref(false);
+const error = ref(null);
 
 // === Notifications Data ===
 const notifications = ref([
@@ -215,30 +217,39 @@ const notifications = ref([
 ]);
 
 // Load event info on mount
-onMounted(() => {
-  event_id.value = route.query.event_id;
-  const events = JSON.parse(localStorage.getItem('events')) || [];
-  const existingEvent = events.find(e => e.event_id == event_id.value);
+onMounted(async () => {
+  try {
+    loading.value = true;
+    error.value = null;
+    
+    const eventId = route.params.id;
+    if (!eventId) {
+      throw new Error('Event ID is required');
+    }
 
-  if (existingEvent) {
-    title.value = existingEvent.title ?? '';
-    barangay.value = existingEvent.barangay ?? '';
-    date.value = existingEvent.date ?? '';
-    const [start, end] = (existingEvent.time ?? '').split(' - ');
-    startTime.value = start?.trim() ?? '';
-    endTime.value = end?.trim() ?? '';
-    organizer.value = existingEvent.organizer ?? '';
-    status.value = existingEvent.status ?? '';
-    objective.value = existingEvent.objective ?? '';
-    description.value = existingEvent.description ?? '';
-    thingsNeeded.value = existingEvent.thingsNeeded ?? [];
-    programs.value = existingEvent.programs ?? [];  // ✅ Dito kukunin yung saved programs
-  } else {
-    alert('Event not found.');
-    router.push('/DashboardOrganizers');
+    const response = await eventService.getEvent(eventId);
+    const event = response.data;
+
+    // Populate form with event data
+    event_id.value = event.id;
+    title.value = event.event_title;
+    barangay.value = event.barangay;
+    date.value = event.date;
+    startTime.value = event.start_time;
+    endTime.value = event.end_time;
+    organizer.value = event.organizer;
+    status.value = event.status;
+    objective.value = event.objective;
+    description.value = event.description;
+    thingsNeeded.value = event.things_needed || [];
+    programs.value = event.programs || [];
+  } catch (err) {
+    error.value = err.response?.data?.message || err.message || 'Failed to load event';
+    router.push('/ManageEventsOrganizers');
+  } finally {
+    loading.value = false;
   }
 });
-
 
 // Methods
 const toggleSidebar = () => {
@@ -249,14 +260,10 @@ const toggleNotifications = () => {
   showNotifications.value = !showNotifications.value;
 };
 
-const confirmLogout = () => {
-  router.push("/login");
-};
-
 const addThing = () => {
   if (newThing.value.trim()) {
     thingsNeeded.value.push(newThing.value.trim());
-    newThing.value = '';
+    newThing.value = "";
   }
 };
 
@@ -265,65 +272,53 @@ const removeThing = (index) => {
 };
 
 const cancelEdit = () => {
-  title.value = '';
-  barangay.value = '';
-  date.value = '';
-  startTime.value = '';
-  endTime.value = '';
-  organizer.value = '';
-  status.value = '';
-  objective.value = '';
-    programs.value = [];
-  description.value = '';
-  thingsNeeded.value = [];
-  newThing.value = '';
+  router.push('/ManageEventsOrganizers');
 };
 
-const saveChanges = () => {
-  if (
-    !title.value.trim() || !barangay.value.trim() || !date.value.trim() ||
-    !startTime.value.trim() || !endTime.value.trim() || !objective.value.trim() ||
-    !description.value.trim() || thingsNeeded.value.length === 0 || !organizer.value.trim() || programs.value.length === 0
-  ) {
-    alert("You need to fill all the required input");
-    return;
-  }
+const saveChanges = async () => {
+  try {
+    loading.value = true;
+    error.value = null;
 
-  const today = new Date();
-  const selectedDate = new Date(date.value);
+    // Validate required fields
+    if (!title.value || !barangay.value || !date.value || !startTime.value || !endTime.value || !objective.value || !description.value) {
+      throw new Error('Please fill in all required fields');
+    }
 
-  // Prevent updating if date is in the past
-  if (selectedDate < today.setHours(0, 0, 0, 0)) {
-    alert("Your date is no longer available.");
-    return;
-  }
+    if (programs.value.length === 0) {
+      throw new Error('Please select at least one program');
+    }
 
-  const events = JSON.parse(localStorage.getItem('events')) || [];
-
-  const index = events.findIndex(e => e.event_id == event_id.value);
-  if (index !== -1) {
-    events[index] = {
-      ...events[index],
-      title: title.value,
+    const eventData = {
+      event_title: title.value,
       barangay: barangay.value,
       date: date.value,
-      time: `${startTime.value} - ${endTime.value}`,
-      organizer: organizer.value,
-      status: status.value,
+      start_time: startTime.value,
+      end_time: endTime.value,
       objective: objective.value,
       description: description.value,
-      programs: [...programs.value],
-      thingsNeeded: [...thingsNeeded.value],
+      programs: programs.value,
+      things_needed: thingsNeeded.value,
+      status: status.value
     };
 
-    localStorage.setItem('events', JSON.stringify(events));
-    alert('Event updated!');
-    router.push('/DashboardOrganizers');
-  } else {
-    alert('Event not found.');
+    await eventService.updateEvent(event_id.value, eventData);
+    router.push('/ManageEventsOrganizers');
+  } catch (err) {
+    error.value = err.response?.data?.message || err.message || 'Failed to update event';
+  } finally {
+    loading.value = false;
   }
 };
 
+const confirmLogout = async () => {
+  try {
+    await authService.logout();
+    router.push('/LoginOrganizers');
+  } catch (error) {
+    console.error('Logout failed:', error);
+  }
+};
 </script>
 
 

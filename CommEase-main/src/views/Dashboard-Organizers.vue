@@ -221,86 +221,70 @@
 import 'vue-cal/dist/vuecal.css';
 import VueCal from 'vue-cal';
 import { QrcodeStream } from 'vue-qrcode-reader';
+import { authService } from '../api/services';
+import { ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
 
 export default {
   components: {
     VueCal,
     QrcodeStream,
   },
-  data() {
-    return {
-      searchQuery: '',
-      selectedStatus: '',        // ← ADDED
-      selectedProgram: '',       // ← ADDED
-      studentID: '',
-      timedIDs: new Set(),
-      showDropdown: false,
-      showNotifications: false,
-      showLogoutModal: false,
-      isSidebarOpen: false,
-      isOpen: false,
-      qrData: 'sample-qr-data',
-      calendarVisible: false,
-      selectedEvent: null,
-      showQRCode: false,
-      notifications: [
-        { message: 'You completed the "Update website content" task.', time: '2 hours ago' },
-        { message: 'You completed the "Clean up drive" task.', time: '3 hours ago' },
-        { message: 'You completed the "Meeting with organizers" task.', time: '5 hours ago' },
-      ],
-      events: [],
-    };
-  },
-  computed: {
-    filteredEvents() {
-      return this.events.filter((event) => {
+  setup() {
+    const router = useRouter();
+    const searchQuery = ref('');
+    const selectedStatus = ref('');
+    const selectedProgram = ref('');
+    const studentID = ref('');
+    const timedIDs = new Set();
+    const showDropdown = ref(false);
+    const showNotifications = ref(false);
+    const showLogoutModal = ref(false);
+    const isSidebarOpen = ref(false);
+    const isOpen = ref(false);
+    const qrData = ref('sample-qr-data');
+    const calendarVisible = ref(false);
+    const selectedEvent = ref(null);
+    const showQRCode = ref(false);
+    const notifications = ref([
+      { message: 'You completed the "Update website content" task.', time: '2 hours ago' },
+      { message: 'You completed the "Clean up drive" task.', time: '3 hours ago' },
+      { message: 'You completed the "Meeting with organizers" task.', time: '5 hours ago' },
+    ]);
+    const events = ref([]);
+
+    const filteredEvents = computed(() => {
+      return events.value.filter((event) => {
         const matchesSearch =
-          event.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-          event.location.toLowerCase().includes(this.searchQuery.toLowerCase());
+          event.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+          event.location.toLowerCase().includes(searchQuery.value.toLowerCase());
 
         const matchesStatus =
-          this.selectedStatus === '' || event.status === this.selectedStatus;
+          selectedStatus.value === '' || event.status === selectedStatus.value;
 
         const matchesProgram =
-          this.selectedProgram === '' || event.programs.includes(this.selectedProgram);
+          selectedProgram.value === '' || event.programs.includes(selectedProgram.value);
 
         return matchesSearch && matchesStatus && matchesProgram;
       });
-    },
-  },
-  mounted() {
-    const storedEvents = JSON.parse(localStorage.getItem('events'));
-    if (storedEvents && storedEvents.length) {
-      this.events = storedEvents.map((event) => {
-        const [startTime, endTime] = event.time.split(' - ');
-        const start = `${event.date}T${startTime}`;
-        const end = `${event.date}T${endTime}`;
-        return {
-          title: event.title,
-          location: `Barangay ${event.barangay}`,
-          start,
-          end,
-          organizer: event.organizer,
-          status: event.status,
-          programs: event.programs || [], // Make sure this is an array
-        };
-      });
-    }
-  },
-  methods: {
-    toggleSidebar() {
-      this.isSidebarOpen = !this.isSidebarOpen;
-      this.isOpen = !this.isOpen;
-    },
-    toggleDropdown() {
-      this.showDropdown = !this.showDropdown;
-    },
-    toggleCalendar() {
-      this.calendarVisible = !this.calendarVisible;
-      this.showDropdown = false;
-    },
-    submitID() {
-      const id = this.studentID.trim();
+    });
+
+    const toggleSidebar = () => {
+      isSidebarOpen.value = !isSidebarOpen.value;
+      isOpen.value = !isOpen.value;
+    };
+
+    const toggleDropdown = () => {
+      showDropdown.value = !showDropdown.value;
+    };
+
+    const toggleCalendar = () => {
+      calendarVisible.value = !calendarVisible.value;
+      showDropdown.value = false;
+    };
+
+    const submitID = () => {
+      const id = studentID.value.trim();
       if (!/^\d+$/.test(id)) {
         alert('Student ID must contain only numbers.');
         return;
@@ -309,47 +293,94 @@ export default {
         alert('Student ID must be exactly 9 digits.');
         return;
       }
-      if (this.timedIDs.has(id)) {
+      if (timedIDs.has(id)) {
         alert('Time out successfully!');
-        this.timedIDs.delete(id);
+        timedIDs.delete(id);
       } else {
         alert('Time in successfully!');
-        this.timedIDs.add(id);
+        timedIDs.add(id);
       }
-      this.studentID = '';
-    },
-    onDetect(result) {
+      studentID.value = '';
+    };
+
+    const onDetect = (result) => {
       const scannedText = result[0].rawValue;
       alert(`✅ Scanned Successfully: ${scannedText}`);
-    },
-    onDateClick({ date }) {
-      const selected = this.events.find(
+    };
+
+    const onDateClick = ({ date }) => {
+      const selected = events.value.find(
         (event) =>
           new Date(event.start).toLocaleDateString() === new Date(date).toLocaleDateString()
       );
-      this.selectedEvent = selected || null;
-    },
-    toggleNotifications() {
-      this.showNotifications = !this.showNotifications;
-    },
-    formatTime(datetime) {
+      selectedEvent.value = selected || null;
+    };
+
+    const toggleNotifications = () => {
+      showNotifications.value = !showNotifications.value;
+    };
+
+    const formatTime = (datetime) => {
       return new Date(datetime).toLocaleTimeString([], {
         hour: '2-digit',
         minute: '2-digit',
       });
-    },
-    formatDate(datetime) {
+    };
+
+    const formatDate = (datetime) => {
       return new Date(datetime).toLocaleDateString([], {
         weekday: 'short',
         year: 'numeric',
         month: 'short',
         day: 'numeric',
       });
-    },
-    confirmLogout() {
-      console.log('Logging out...');
-      this.showLogoutModal = false;
-    },
+    };
+
+    const confirmLogout = () => {
+      showLogoutModal.value = false;
+      authService.logout()
+        .then(() => {
+          // Clear any local storage or state
+          localStorage.clear();
+          // Redirect to login page
+          router.push('/LoginOrganizers');
+        })
+        .catch((error) => {
+          console.error('Logout failed:', error);
+          // Even if the API call fails, we should still redirect to login
+          router.push('/LoginOrganizers');
+        });
+    };
+
+    return {
+      searchQuery,
+      selectedStatus,
+      selectedProgram,
+      studentID,
+      timedIDs,
+      showDropdown,
+      showNotifications,
+      showLogoutModal,
+      isSidebarOpen,
+      isOpen,
+      qrData,
+      calendarVisible,
+      selectedEvent,
+      showQRCode,
+      notifications,
+      events,
+      filteredEvents,
+      toggleSidebar,
+      toggleDropdown,
+      toggleCalendar,
+      submitID,
+      onDetect,
+      onDateClick,
+      toggleNotifications,
+      formatTime,
+      formatDate,
+      confirmLogout,
+    };
   },
 };
 </script>

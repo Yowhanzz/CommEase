@@ -34,21 +34,46 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { authService } from '../api/services'
+import { ensureCsrfToken } from '../api/axios'
 
 const email = ref('')
 const password = ref('')
 const router = useRouter()
+const isLoading = ref(false)
 
-const handleLogin = () => {
-  if (!email.value.trim() || !password.value.trim()) {
-    alert('Please enter both email and password.')
-    return
-  }
+onMounted(async () => {
+    // Ensure CSRF token exists when reaching login page
+    await ensureCsrfToken();
+});
 
-  // All good, proceed to organizer dashboard
-  router.push('/DashboardOrganizers')
+async function handleLogin() {
+	if (!email.value.trim() || !password.value.trim()) {
+		alert('Please fill in both email and password.')
+		return
+	}
+
+	isLoading.value = true
+	try {
+		await authService.login({
+			email: email.value,
+			password: password.value
+		})
+		
+		// Redirect to dashboard
+		router.push('/DashboardOrganizers')
+	} catch (error) {
+		console.error('Login failed:', error)
+		if (error.response?.status === 419) {
+			alert('Session expired. Please try logging in again.')
+		} else {
+			alert('Login failed. Please check your credentials and try again.')
+		}
+	} finally {
+		isLoading.value = false
+	}
 }
 </script>
 

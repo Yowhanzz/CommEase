@@ -114,6 +114,8 @@
 
 <script>
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { authService } from '../api/services';
 
 export default {
   data() {
@@ -154,12 +156,24 @@ export default {
     },
 
     toggleSidebar() {
-			this.isSidebarOpen = !this.isSidebarOpen;
-			this.isOpen = !this.isOpen; 
-		}, 
+      this.isSidebarOpen = !this.isSidebarOpen;
+      this.isOpen = !this.isOpen; 
+    }, 
 
     confirmLogout() {
-      this.$router.push("/login");
+      this.showLogoutModal = false;
+      authService.logout()
+        .then(() => {
+          // Clear any local storage or state
+          localStorage.clear();
+          // Redirect to login page
+          this.$router.push('/LoginVolunteers');
+        })
+        .catch((error) => {
+          console.error('Logout failed:', error);
+          // Even if the API call fails, we should still redirect to login
+          this.$router.push('/LoginVolunteers');
+        });
     }
   }
 };

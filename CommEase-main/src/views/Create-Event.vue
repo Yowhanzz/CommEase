@@ -192,6 +192,7 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
+import { authService, eventService } from '../api/services';
 
 // === Sidebar Toggle ===
 const isSidebarOpen = ref(true);
@@ -206,8 +207,7 @@ const searchQuery = ref("");
 const eventTitle = ref("");
 const barangay = ref("");
 const organizer = ref("");
-const programs = ref([]); // event creation selected programs
-const programFilters = ref([]); // for BSIT, BSCS, BSEMC checkboxes
+const programs = ref([]);
 const date = ref("");
 const startTime = ref("");
 const endTime = ref("");
@@ -216,6 +216,8 @@ const description = ref("");
 const newThing = ref("");
 const thingsNeeded = ref([]);
 const router = useRouter();
+const loading = ref(false);
+const error = ref(null);
 
 // === Notifications Data ===
 const notifications = ref([
@@ -292,17 +294,8 @@ const filteredEvents = computed(() => {
 });
 
 // === Methods ===
-const toggleNotifications = () => {
-  showNotifications.value = !showNotifications.value;
-};
-
-const confirmLogout = () => {
-  const router = useRouter();
-  router.push("/Login"); // Redirect to login page after logout
-};
-
 const addThing = () => {
-  if (newThing.value.trim() !== "") {
+  if (newThing.value.trim()) {
     thingsNeeded.value.push(newThing.value.trim());
     newThing.value = "";
   }
@@ -313,85 +306,69 @@ const removeThing = (index) => {
 };
 
 const cancelEvent = () => {
-  eventTitle.value = "";
-  barangay.value = "";
-  date.value = "";
-  startTime.value = "";
-  endTime.value = "";
-  organizer.value = "";
-  objective.value = "";
-  description.value = "";
-  newThing.value = "";
-  programs.value = [];
-  thingsNeeded.value = [];
+  router.push('/ManageEventsOrganizers');
 };
 
-const saveEvent = () => {
-  console.log("eventTitle:", eventTitle.value);
-  console.log("barangay:", barangay.value);
-  console.log("date:", date.value);
-  console.log("startTime:", startTime.value);
-  console.log("endTime:", endTime.value);
-  console.log("objective:", objective.value);
-  console.log("description:", description.value);
-  console.log("thingsNeeded:", thingsNeeded.value);
-  console.log("organizer:", organizer.value);
-  console.log("programs:", programs.value);
+const saveEvent = async () => {
+  try {
+    loading.value = true;
+    error.value = null;
 
-  if (
-    !eventTitle.value.trim() ||
-    !barangay.value.trim() ||
-    !date.value.trim() ||
-    !startTime.value.trim() ||
-    !endTime.value.trim() ||
-    !objective.value.trim() ||
-    !description.value.trim() ||
-    thingsNeeded.value.length === 0 ||
-    !organizer.value.trim() ||
-    programs.value.length === 0
-  ) {
-    alert("You need to fill all the required input");
-    return;
+    // Validate required fields
+    if (!eventTitle.value || !barangay.value || !date.value || !startTime.value || !endTime.value || !objective.value || !description.value) {
+      throw new Error('Please fill in all required fields');
+    }
+
+    if (programs.value.length === 0) {
+      throw new Error('Please select at least one program');
+    }
+
+    const eventData = {
+      eventTitle: eventTitle.value,
+      barangay: barangay.value,
+      date: date.value,
+      startTime: startTime.value,
+      endTime: endTime.value,
+      objective: objective.value,
+      description: description.value,
+      programs: programs.value,
+      thingsNeeded: thingsNeeded.value
+    };
+
+    const response = await eventService.createEvent(eventData);
+    
+    if (response.status === 201) {
+      router.push('/ManageEventsOrganizers');
+    } else {
+      throw new Error('Failed to create event');
+    }
+  } catch (err) {
+    if (err.response?.status === 401) {
+      error.value = 'Please log in to create an event';
+      router.push('/LoginOrganizers');
+    } else if (err.response?.status === 403) {
+      error.value = 'You do not have permission to create events. Please log in as an organizer.';
+      router.push('/LoginOrganizers');
+    } else {
+      error.value = err.response?.data?.message || err.message || 'Failed to create event';
+    }
+    console.error('Event creation error:', err);
+  } finally {
+    loading.value = false;
   }
+};
 
-  // Check if date is in the past
-  const selectedDate = new Date(date.value);
-  const today = new Date();
-
-  // Remove time part of today for comparison
-  today.setHours(0, 0, 0, 0);
-
-  if (selectedDate < today) {
-    alert("Your date is no longer available");
-    return;
+const confirmLogout = async () => {
+  try {
+    await authService.logout();
+    router.push('/LoginOrganizers');
+  } catch (error) {
+    console.error('Logout failed:', error);
   }
+};
 
-  const storedEvents = JSON.parse(localStorage.getItem("events")) || [];
-
-  const newEvent = {
-    event_id: Date.now(),
-    title: eventTitle.value,
-    barangay: barangay.value,
-    date: date.value,
-    time: `${startTime.value} - ${endTime.value}`,
-    organizer: organizer.value,
-    objective: objective.value,
-    description: description.value,
-    thingsNeeded: [...thingsNeeded.value],
-    programs: [...programs.value], // ✅ Ito na yung selected checkboxes
-    status: "Pending",
-  };
-
-  storedEvents.push(newEvent);
-  localStorage.setItem("events", JSON.stringify(storedEvents));
-
-  alert("Event Created!");
-  cancelEvent();
-
-  // Redirect and reload after slight delay
-  setTimeout(() => {
-    router.push("/DashboardOrganizers");
-  }, 300);
+const toggleNotifications = () => {
+  showNotifications.value = !showNotifications.value;
 };
 </script>
 

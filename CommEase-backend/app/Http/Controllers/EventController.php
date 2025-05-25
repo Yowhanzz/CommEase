@@ -71,6 +71,12 @@ class EventController extends Controller
 
     public function store(Request $request)
     {
+        \Log::info('Create Event Request Data:', [
+            'request_data' => $request->all(),
+            'user' => $request->user(),
+            'headers' => $request->headers->all()
+        ]);
+
         $validator = Validator::make($request->all(), [
             'eventTitle' => ['required', 'string', 'max:255'],
             'barangay' => ['required', 'string'],
@@ -86,37 +92,53 @@ class EventController extends Controller
         ]);
 
         if ($validator->fails()) {
+            \Log::error('Event Creation Validation Failed:', [
+                'errors' => $validator->errors()->toArray()
+            ]);
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $event = Event::create([
-            'event_title' => $request->eventTitle,
-            'barangay' => $request->barangay,
-            'organizer_id' => $request->user()->id,
-            'programs' => $request->programs,
-            'date' => $request->date,
-            'start_time' => $request->startTime,
-            'end_time' => $request->endTime,
-            'objective' => $request->objective,
-            'description' => $request->description,
-            'things_needed' => $request->thingsNeeded,
-        ]);
-
-        // Notify eligible volunteers
-        $eligibleVolunteers = User::whereIn('program', $request->programs)
-            ->where('role', 'volunteer')
-            ->get();
-
-        foreach ($eligibleVolunteers as $volunteer) {
-            Notification::create([
-                'user_id' => $volunteer->id,
-                'event_id' => $event->id,
-                'type' => 'new_event',
-                'message' => "New event available: {$event->event_title}",
+        try {
+            $event = Event::create([
+                'event_title' => $request->eventTitle,
+                'barangay' => $request->barangay,
+                'organizer_id' => $request->user()->id,
+                'programs' => $request->programs,
+                'date' => $request->date,
+                'start_time' => $request->startTime,
+                'end_time' => $request->endTime,
+                'objective' => $request->objective,
+                'description' => $request->description,
+                'things_needed' => $request->thingsNeeded,
             ]);
-        }
 
-        return response()->json($event, 201);
+            \Log::info('Event Created Successfully:', [
+                'event_id' => $event->id,
+                'event_data' => $event->toArray()
+            ]);
+
+            // Notify eligible volunteers
+            $eligibleVolunteers = User::whereIn('program', $request->programs)
+                ->where('role', 'volunteer')
+                ->get();
+
+            foreach ($eligibleVolunteers as $volunteer) {
+                Notification::create([
+                    'user_id' => $volunteer->id,
+                    'event_id' => $event->id,
+                    'type' => 'new_event',
+                    'message' => "New event available: {$event->event_title}",
+                ]);
+            }
+
+            return response()->json($event, 201);
+        } catch (\Exception $e) {
+            \Log::error('Event Creation Failed:', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+            return response()->json(['message' => 'Failed to create event', 'error' => $e->getMessage()], 500);
+        }
     }
 
     public function show(Event $event)
