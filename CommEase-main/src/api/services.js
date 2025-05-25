@@ -1,4 +1,4 @@
-import api, { getCsrfCookie } from './axios';
+import api from './axios';
 
 // Auth Services
 export const authService = {
@@ -9,8 +9,6 @@ export const authService = {
 
     // Login/Logout
     login: async (credentials) => {
-        // Get CSRF token before login
-        await getCsrfCookie();
         const response = await api.post('auth/login', credentials);
         // Store user data in session storage
         if (response.data.user) {
@@ -22,8 +20,6 @@ export const authService = {
         await api.post('auth/logout');
         // Clear session storage
         sessionStorage.removeItem('user');
-        // Regenerate CSRF token after logout
-        await getCsrfCookie();
     },
 
     // Password Reset
