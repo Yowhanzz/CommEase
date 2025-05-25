@@ -192,7 +192,7 @@
         <PieChart />
       </div>
 
-      <div class="total-graph-glasscard">
+      <div class="suggestion-glasscard-whole">
         <h5 class="title-graph">Ideas & Suggestions</h5>
         <div class="suggestions-container">
           <div class="suggestions-separations">

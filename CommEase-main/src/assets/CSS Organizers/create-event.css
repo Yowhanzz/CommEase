@@ -1,15 +1,17 @@
 .sidebar {
+  position: fixed;
   width: 230px !important;
   height: 100vh;
   background: #436850;
-  color: #DAF1DE;
+  color: #e8f4ea;
   transition: width 0.3s ease;
-  position: fixed;
   left: 0;
   top: 0;
   padding: 15px;
   overflow: hidden;
+  z-index: 1000;
 }
+
 .sidebar:not(.open) {
   width: 70px !important;
 }
@@ -42,7 +44,7 @@ li {
 a {
   display: flex;
   align-items: center;
-  color: #DAF1DE;
+  color: #daf1de;
   text-decoration: none;
   padding: 10px;
   border-radius: 5px;
@@ -58,7 +60,7 @@ i {
 
 #btn:not(.open) {
   margin-right: 10%;
-} 
+}
 
 .main-content {
   margin-left: 230px;
@@ -84,11 +86,15 @@ i {
 }
 
 .logout-modal {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0)
+  );
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-radius: 20px;
-  border:1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
   padding: 20px;
   border-radius: 10px;
@@ -100,11 +106,11 @@ i {
 
 .logout-modal h2 {
   margin-bottom: 10px;
-  color: #E9E5D6;
+  color: #e9e5d6;
 }
 
 .logout-modal p {
-  color: #E9E5D6;
+  color: #e9e5d6;
 }
 
 .logout-modal-buttons {
@@ -114,14 +120,13 @@ i {
 }
 
 .logout-btn {
-  background: #59692A;
+  background: #59692a;
   color: white;
   padding: 8px 15px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  transition: .15s ease-in-out background-color,
-  .15s ease-in-out color;
+  transition: 0.15s ease-in-out background-color, 0.15s ease-in-out color;
 }
 
 .cancel-btn {
@@ -131,12 +136,12 @@ i {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  transition: .15s ease-in-out background-color;
+  transition: 0.15s ease-in-out background-color;
 }
 
 .logout-btn:hover {
-  background-color: #E9E5D6;
-  color: #464E2E;
+  background-color: #e9e5d6;
+  color: #464e2e;
 }
 
 .cancel-btn:hover {
@@ -145,98 +150,113 @@ i {
 
 /* NOTIFICATION PANEL */
 .notification-panel {
-	position: fixed;
-	top: 0;
-	left: -300px; /* Initially off-screen to the left */
-	width: 300px;
-	height: 100%;
-	background: #12372A;
-	color: #DAF1DE;
-	box-shadow: -4px 0 10px rgba(0, 0, 0, 0.3);
-	z-index: 1000;
-	padding: 15px;
-	display: flex;
-	flex-direction: column;
-	transition: transform 0.3s ease-in-out; /* Smooth glide transition */
+  position: fixed;
+  top: 0;
+  left: -300px; /* Initially off-screen to the left */
+  width: 300px;
+  height: 100%;
+  background: #12372a;
+  color: #daf1de;
+  box-shadow: -4px 0 10px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease-in-out; /* Smooth glide transition */
 }
 
 /* Close button */
 .notification-panel .close-btn {
-	position: absolute;
-	top: 15px;
-	right: 15px;
-	font-size: 30px;
-	cursor: pointer;
-	color: white;
-	transition: 0.15s ease-in-out opacity;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 30px;
+  cursor: pointer;
+  color: white;
+  transition: 0.15s ease-in-out opacity;
 }
 
 /* Slide in effect */
 .notification-panel.open {
-	transform: translateX(300px); /* Slides in from the left */
+  transform: translateX(300px); /* Slides in from the left */
 }
 
 /* Close button hover effect */
 .notification-panel .close-btn:hover {
-	opacity: 0.6;
+  opacity: 0.6;
 }
 
 .notification-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-top: 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 25px;
 }
 
 .close-btn {
-	font-size: 24px;
-	cursor: pointer;
+  font-size: 24px;
+  cursor: pointer;
 }
 
 .notification-list {
-	margin-top: 10px;
+  margin-top: 10px;
 }
 
 .notification-item {
-	background: rgba(255, 255, 255, 0.2);
-	padding: 10px;
-	border-radius: 10px;
-	margin-bottom: 10px;
-	cursor: pointer;
-	transition: 0.15s ease-in-out background-color, 0.15s ease-in-out color;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: 0.15s ease-in-out background-color, 0.15s ease-in-out color;
 }
 
 .notification-item:hover {
-	background-color: #e9e5d6;
-	color: black;
+  background-color: #e9e5d6;
+  color: black;
 }
 
 .notification-item:hover .time {
-	color: #313131; /* Change the color of the span.time on hover */
+  color: #313131; /* Change the color of the span.time on hover */
 }
 
 .notification-item h4 {
-	margin: 0;
-	font-size: 14px;
-	font-weight: bold;
+  margin: 0;
+  font-size: 14px;
+  font-weight: bold;
 }
 
 .notification-item p {
-	font-size: 12px;
-	margin: 5px 0;
+  font-size: 12px;
+  margin: 5px 0;
 }
 
 .notification-item .time {
-	font-size: 10px;
-	color: #ccc;
+  font-size: 10px;
+  color: #ccc;
 }
 
 .notification-item .time:hover {
-	color: #313131;
+  color: #313131;
 }
 
-
 /* CREATE EVENT SECTION  */
+
+.sidebar-collapsed {
+  /* REVISED COPY */
+  padding-left: 90px !important;
+}
+
+.hide-card {
+  /* TESTING */
+  /* margin-left: 8% !important; */
+  transition: all 0.3s ease;
+}
+
+.sidebar-collapsed-for-divider {
+  /* REVISED */
+  width: calc(100% - 270px) !important;
+}
 
 .event-container {
   margin-left: 19%;
@@ -250,30 +270,28 @@ i {
   place-items: start;
   row-gap: 25px;
   animation-name: slideinTopOverallContainer;
-  animation-duration:1s;
-  animation-timing-function:ease-in-out;
-  animation-delay:0s;
+  animation-duration: 1s;
+  animation-timing-function: ease-in-out;
+  animation-delay: 0s;
   animation-iteration-count: 1;
 }
 
 @keyframes slideinTopOverallContainer {
   from {
-      opacity: 0.2;
-      transform: translateY(70px);
-
+    opacity: 0.2;
+    transform: translateY(70px);
   }
 
   to {
-      opacity: 1;
-      transform: translateY(0);
-
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
 .title-safety {
   margin-left: 19%;
   margin-top: 4%;
-  color: #12372A;
+  color: #12372a;
 }
 
 .safety-hr {
@@ -293,19 +311,17 @@ i {
   height: 40px;
   border-radius: 8px;
   border-style: none;
-  background-color: #DAF1DE;
+  background-color: #daf1de;
   box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.3);
   padding-left: 20px;
-  transition: 0.15s ease-in-out outline,
-  .15s ease-in-out border-color,
-  .15s ease-in-out box-shadow;
-  
+  transition: 0.15s ease-in-out outline, 0.15s ease-in-out border-color,
+    0.15s ease-in-out box-shadow;
 }
 
 .create-event-input:focus {
   outline: none;
-  border-color: #DAF1DE;
-  box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.8)
+  border-color: #daf1de;
+  box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.8);
 }
 
 /* PROGRAMS CHECKBOX */
@@ -321,7 +337,7 @@ i {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background-color: #DAF1DE;
+  background-color: #daf1de;
   box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.3);
   padding: 0.5rem 1rem;
   border-radius: 8px;
@@ -350,28 +366,27 @@ i {
   font-size: 13px;
   resize: none;
   margin-top: 5%;
-  background-color: #DAF1DE;
+  background-color: #daf1de;
   box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.3);
-  transition: 0.15s ease-in-out outline,
-  .15s ease-in-out border-color,
-  .15s ease-in-out box-shadow;
+  transition: 0.15s ease-in-out outline, 0.15s ease-in-out border-color,
+    0.15s ease-in-out box-shadow;
 }
 
 .modal-textarea:focus {
   outline: none;
-  border-color: #DAF1DE;
-  box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.8)
+  border-color: #daf1de;
+  box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.8);
 }
 
 .create-event-title {
   font-size: 20px;
-  color: #464E2E;
+  color: #464e2e;
   font-weight: 700;
   margin-top: 5%;
 }
 
 .things-needed-container {
-  background-color: #DAF1DE;
+  background-color: #daf1de;
   box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.3);
   width: 90%;
   height: auto;
@@ -421,19 +436,18 @@ i {
   cursor: pointer;
   text-align: left;
   border: 1px solid black;
-    color: #DAF1DE;
-  transition: .15s ease-in-out background-color, 
-              .15s ease-in-out color;
+  color: #daf1de;
+  transition: 0.15s ease-in-out background-color, 0.15s ease-in-out color;
 }
 
 .button-things:hover {
-  background-color: #12372A;
-  color: #DAF1DE;
+  background-color: #12372a;
+  color: #daf1de;
 }
 
 /* Active (selected) button */
 .active-button {
-  background-color: #E9E5D6 !important;
+  background-color: #e9e5d6 !important;
   color: black;
   border: 1px solid black;
 }
@@ -445,16 +459,15 @@ i {
   border-radius: 8px;
   border-style: none;
   padding-left: 10px;
-  transition: 0.15s ease-in-out outline,
-  .15s ease-in-out border-color,
-  .15s ease-in-out box-shadow;
+  transition: 0.15s ease-in-out outline, 0.15s ease-in-out border-color,
+    0.15s ease-in-out box-shadow;
   box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.3);
 }
 
 .things-input:focus {
   outline: none;
-  border-color: #DAF1DE;
-  box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.5)
+  border-color: #daf1de;
+  box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.5);
 }
 
 .button-container {
@@ -462,27 +475,29 @@ i {
   margin-top: -6%;
 }
 
-.create-cancel, .create-submit {
+.create-cancel,
+.create-submit {
   width: 66px;
   height: 35px;
   margin-left: 10px;
   border-radius: 5px;
   border-style: none;
-  background-color: #12372A;
-  color: #DAF1DE;
+  background-color: #12372a;
+  color: #daf1de;
   cursor: pointer;
   font-weight: 600;
-  transition: .15s ease-in-out background-color, 
-  .15s ease-in-out color;
+  transition: 0.15s ease-in-out background-color, 0.15s ease-in-out color;
 }
 
-.create-submit:hover, .create-cancel:hover {
-  background-color: #DAF1DE;
-  color: #12372A;
-  border: 1px solid #12372A;
+.create-submit:hover,
+.create-cancel:hover {
+  background-color: #daf1de;
+  color: #12372a;
+  border: 1px solid #12372a;
 }
 
-.create-cancel:active, .create-submit:active {
+.create-cancel:active,
+.create-submit:active {
   opacity: 0.8;
 }
 
@@ -497,8 +512,7 @@ i {
   font-weight: 600;
   margin-top: 10%;
   background-color: #436850;
-  color: #DAF1DE;
-
+  color: #daf1de;
 }
 
 .thing-x {
@@ -506,10 +520,8 @@ i {
   padding-left: 10px;
   font-weight: bold;
   font-size: 16px;
-  transition: .15s ease-in-out margin-left,
-  .15s ease-in-out padding-left,
-  .15s ease-in-out font-weight,
-  .15s ease-in-out font-size;
+  transition: 0.15s ease-in-out margin-left, 0.15s ease-in-out padding-left,
+    0.15s ease-in-out font-weight, 0.15s ease-in-out font-size;
 }
 
 .thing-x:hover {
@@ -523,21 +535,116 @@ i {
   margin-top: 3%;
   border-radius: 5px;
   border-style: none;
-  background-color: #12372A;
-  color: #DAF1DE;
+  background-color: #12372a;
+  color: #daf1de;
   cursor: pointer;
   font-weight: 500;
-  transition: .15s ease-in-out background-color, 
-  .15s ease-in-out color;
+  transition: 0.15s ease-in-out background-color, 0.15s ease-in-out color;
 }
 
 .add-inside-button:hover {
-  background-color: #DAF1DE;
-  color: #12372A;
-  border: 1px solid #12372A;
+  background-color: #daf1de;
+  color: #12372a;
+  border: 1px solid #12372a;
 }
 
 .add-inside-button:active {
   opacity: 0.8;
 }
 
+/* RESPONSIVE PART */
+
+@media (max-width: 1298px) {
+  .button-container {
+    justify-content: flex-end;
+    margin-left: 60%;
+    margin-top: -7%;
+    scale: 1;
+  }
+}
+
+/* 1116px and below */
+@media (max-width: 1116px) {
+  .button-container {
+    margin-left: 54%;
+    margin-top: -8%;
+  }
+}
+
+@media (max-width: 910px) {
+  .button-container {
+    margin-left: 50%;
+    margin-top: -10%;
+    scale: 0.9;
+  }
+
+  .add-inside-button {
+    scale: 0.9;
+  }
+}
+
+/* 868px and below */
+@media (max-width: 868px) {
+  .create-event-separation {
+    display: grid;
+    grid-template-columns: 1fr;
+    place-items: start;
+  }
+
+  .create-event-headers,
+  .create-event-title {
+    font-size: 15px;
+  }
+
+  .title-safety {
+    font-size: 20px;
+  }
+
+  .button-container {
+    margin-left: 65%;
+    margin-top: -6%;
+  }
+}
+
+/* 851px and below */
+@media (max-width: 851px) {
+  .button-container {
+    margin-left: 65%;
+    margin-top: -6%;
+  }
+}
+
+/* 657px and below */
+@media (max-width: 657px) {
+  .button-container {
+    margin-left: 60%;
+    margin-top: -8%;
+    scale: 0.95;
+  }
+}
+
+/* 544px and below */
+@media (max-width: 544px) {
+  .button-container {
+    margin-left: 52%;
+    margin-top: -9%;
+    scale: 0.8;
+  }
+
+  .create-event-input {
+    margin-top: 0.5rem;
+  }
+
+  .create-event-checkbox-group {
+    margin: 0.5rem 0 0.5rem -4%;
+    scale: 0.9;
+  }
+
+  .add-inside-button {
+    scale: 0.8;
+  }
+
+  .modal-textarea {
+    margin-top: 0.5rem;
+  }
+}

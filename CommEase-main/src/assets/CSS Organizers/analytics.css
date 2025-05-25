@@ -2,7 +2,7 @@
   width: 230px !important;
   height: 100vh;
   background: #436850;
-  color: #DAF1DE;
+  color: #daf1de;
   transition: width 0.3s ease;
   position: fixed;
   left: 0;
@@ -42,7 +42,7 @@ li {
 a {
   display: flex;
   align-items: center;
-  color: #DAF1DE;
+  color: #daf1de;
   text-decoration: none;
   padding: 10px;
   border-radius: 5px;
@@ -58,7 +58,7 @@ i {
 
 #btn:not(.open) {
   margin-right: 10%;
-} 
+}
 
 .main-content {
   margin-left: 230px;
@@ -68,7 +68,6 @@ i {
 .sidebar:not(.open) ~ .main-content {
   margin-left: 70px;
 }
-
 
 /* Logout Modal */
 .logout-modal-overlay {
@@ -85,11 +84,15 @@ i {
 }
 
 .logout-modal {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0));
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.1),
+    rgba(255, 255, 255, 0)
+  );
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border-radius: 20px;
-  border:1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
   padding: 20px;
   border-radius: 10px;
@@ -101,11 +104,11 @@ i {
 
 .logout-modal h2 {
   margin-bottom: 10px;
-  color: #E9E5D6;
+  color: #e9e5d6;
 }
 
 .logout-modal p {
-  color: #E9E5D6;
+  color: #e9e5d6;
 }
 
 .logout-modal-buttons {
@@ -115,14 +118,13 @@ i {
 }
 
 .logout-btn {
-  background: #59692A;
+  background: #59692a;
   color: white;
   padding: 8px 15px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  transition: .15s ease-in-out background-color,
-  .15s ease-in-out color;
+  transition: 0.15s ease-in-out background-color, 0.15s ease-in-out color;
 }
 
 .cancel-btn {
@@ -132,12 +134,12 @@ i {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  transition: .15s ease-in-out background-color;
+  transition: 0.15s ease-in-out background-color;
 }
 
 .logout-btn:hover {
-  background-color: #E9E5D6;
-  color: #464E2E;
+  background-color: #e9e5d6;
+  color: #464e2e;
 }
 
 .cancel-btn:hover {
@@ -147,7 +149,7 @@ i {
 /* ANALYTICS SECTION */
 
 .analytics-title {
-  color: #12372A;
+  color: #12372a;
   margin-left: 19%; /* Remove left margin to avoid misalignment */
   margin-top: 2%;
 }
@@ -159,47 +161,48 @@ i {
 }
 
 .total-analytics-container {
-  margin-left: 19%;
+  padding-left: 280px;
+  padding-right: 40px;
   margin-top: 2%;
 }
 
 .total-analytics-separation {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr 1fr;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
 }
 
 .total-container {
   background-color: #436850;
-  width: 260px;
+  width: 100%;
   height: 140px;
   border-radius: 10px;
   padding: 15px 15px;
 }
 
 .title-total {
-  color: #DAF1DE;
+  color: #daf1de;
   font-size: 17px;
-  font-weight:400;
+  font-weight: 400;
   margin-bottom: 10%;
 }
 
 .total-no {
   font-size: 30px;
-  color: #DAF1DE;
+  color: #daf1de;
   font-weight: 700;
 }
 
 /* GRAPH SECTION */
 
 .total-graph-container {
-  margin-left: 19%;
+  padding-left: 19%;
   margin-top: 2%;
 }
 
 .total-graph-separation {
   display: grid;
-  grid-template-columns: 1fr 1fr  ;
-  column-gap: 78px;
+  grid-template-columns: 1fr 410px;
   row-gap: 20px;
 }
 
@@ -211,16 +214,16 @@ i {
   padding: 35px 35px;
 }
 
-.total-pie-graph-glasscard{
+.total-pie-graph-glasscard {
   background-color: #436850;
   width: 373px;
   height: 380px;
   border-radius: 10px;
   padding: 25px 25px;
-} 
+}
 
 .title-graph {
-  color: #E9E5D6;
+  color: #e9e5d6;
   font-size: 20px;
   font-weight: 700;
   margin-bottom: 10%;
@@ -234,16 +237,14 @@ i {
   margin-left: -2%;
   padding: 20px;
   max-height: 300px; /* fixed maximum height for scrolling */
-  overflow-y: auto;  /* enables vertical scroll */
-  overflow-x: hidden;  /* prevents horizontal scroll */
+  overflow-y: auto; /* enables vertical scroll */
+  overflow-x: hidden; /* prevents horizontal scroll */
 }
 
 /* Styling the scrollbar */
 .container-table::-webkit-scrollbar {
   width: 8px; /* Width of the vertical scrollbar */
- 
 }
-
 
 .container-table::-webkit-scrollbar-thumb {
   background-color: rgba(255, 255, 255, 0.3);
@@ -257,12 +258,13 @@ i {
   min-width: 600px; /* Optional: ensures the table has enough width */
 }
 
-.users-table th, .users-table td {
+.users-table th,
+.users-table td {
   padding: 10px;
   font-size: 14px;
-  color: #DAF1DE;
+  color: #daf1de;
   text-align: left;
-  border-bottom: 1px solid #DAF1DE;
+  border-bottom: 1px solid #daf1de;
   margin: 0;
   box-sizing: border-box;
 }
@@ -271,11 +273,17 @@ i {
   font-weight: bold; /* Optional: adds emphasis to table headers */
 }
 
-
-
 /* HINDI PA SCROLLABLE AT HINDI PA MAAYOS LINE SA BABA */
 
 /* SUGGESTIONS CONTAINER */
+
+.suggestion-glasscard-whole {
+  background-color: #436850;
+  width: 730px;
+  height: 380px;
+  border-radius: 10px;
+  padding: 35px 35px;
+}
 
 .suggestions-container {
   max-height: 250px;
@@ -283,7 +291,6 @@ i {
   padding-right: 10px;
   margin-top: -40px; /* tinaasan para umangat */
 }
-
 
 .suggestions-separations {
   display: flex;
@@ -301,7 +308,6 @@ i {
   border-radius: 10px;
 }
 
-
 .suggestions-separations {
   display: grid;
   grid-template-rows: repeat(auto-fill, minmax(20px, 1fr));
@@ -310,7 +316,7 @@ i {
 
 .suggestions-glasscard {
   border-radius: 10px;
-  border: 1px solid #DAF1DE;
+  border: 1px solid #daf1de;
   padding: 15px 15px;
   margin-bottom: 10px;
 }
@@ -320,7 +326,7 @@ i {
   height: 50px;
   object-fit: cover;
   border-radius: 100%;
-  background-color: #DAF1DE;
+  background-color: #daf1de;
 }
 
 .suggestions-titles {
@@ -330,19 +336,19 @@ i {
 }
 
 .name {
-  color: #DAF1DE;
+  color: #daf1de;
   font-size: 17px;
   font-weight: 500;
 }
 
 .date {
-  color: #DAF1DE;
+  color: #daf1de;
   font-size: 12px;
   font-weight: 500;
 }
 
 .content {
-  color: #DAF1DE;
+  color: #daf1de;
   font-size: 13px;
   font-weight: 500;
   text-align: justify;
@@ -351,95 +357,118 @@ i {
 
 /* NOTIFICATION PANEL */
 .notification-panel {
-	position: fixed;
-	top: 0;
-	left: -300px; /* Initially off-screen to the left */
-	width: 300px;
-	height: 100%;
-	background: #12372A;
-	color: #DAF1DE;
-	box-shadow: -4px 0 10px rgba(0, 0, 0, 0.3);
-	z-index: 1000;
-	padding: 15px;
-	display: flex;
-	flex-direction: column;
-	transition: transform 0.3s ease-in-out; /* Smooth glide transition */
+  position: fixed;
+  top: 0;
+  left: -300px; /* Initially off-screen to the left */
+  width: 300px;
+  height: 100%;
+  background: #12372a;
+  color: #daf1de;
+  box-shadow: -4px 0 10px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.3s ease-in-out; /* Smooth glide transition */
 }
 
 /* Close button */
 .notification-panel .close-btn {
-	position: absolute;
-	top: 15px;
-	right: 15px;
-	font-size: 30px;
-	cursor: pointer;
-	color: white;
-	transition: 0.15s ease-in-out opacity;
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 30px;
+  cursor: pointer;
+  color: white;
+  transition: 0.15s ease-in-out opacity;
 }
 
 /* Slide in effect */
 .notification-panel.open {
-	transform: translateX(300px); /* Slides in from the left */
+  transform: translateX(300px); /* Slides in from the left */
 }
 
 /* Close button hover effect */
 .notification-panel .close-btn:hover {
-	opacity: 0.6;
+  opacity: 0.6;
 }
 
 .notification-header {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	margin-top: 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 25px;
 }
 
 .close-btn {
-	font-size: 24px;
-	cursor: pointer;
+  font-size: 24px;
+  cursor: pointer;
 }
 
 .notification-list {
-	margin-top: 10px;
+  margin-top: 10px;
 }
 
 .notification-item {
-	background: rgba(255, 255, 255, 0.2);
-	padding: 10px;
-	border-radius: 10px;
-	margin-bottom: 10px;
-	cursor: pointer;
-	transition: 0.15s ease-in-out background-color, 0.15s ease-in-out color;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 10px;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  cursor: pointer;
+  transition: 0.15s ease-in-out background-color, 0.15s ease-in-out color;
 }
 
 .notification-item:hover {
-	background-color: #e9e5d6;
-	color: black;
+  background-color: #e9e5d6;
+  color: black;
 }
 
 .notification-item:hover .time {
-	color: #313131; /* Change the color of the span.time on hover */
+  color: #313131; /* Change the color of the span.time on hover */
 }
 
 .notification-item h4 {
-	margin: 0;
-	font-size: 14px;
-	font-weight: bold;
+  margin: 0;
+  font-size: 14px;
+  font-weight: bold;
 }
 
 .notification-item p {
-	font-size: 12px;
-	margin: 5px 0;
+  font-size: 12px;
+  margin: 5px 0;
 }
 
 .notification-item .time {
-	font-size: 10px;
-	color: #ccc;
+  font-size: 10px;
+  color: #ccc;
 }
 
 .notification-item .time:hover {
-	color: #313131;
+  color: #313131;
 }
 
+/* RESPONSIVE PART */
+/* @media (max-width: 1440px) {
+  .total-graph-separation {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
 
-/* WALA PA SYANG SCROLLABLE AND HOVER FINISHES */
+  .total-pie-graph-glasscard {
+    background-color: #436850;
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    padding: 25px 25px;
+  }
+
+  .total-graph-glasscard {
+    background-color: #436850;
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+    padding: 35px 35px;
+  }
+}
+ */

@@ -201,6 +201,8 @@
       </div>
     </div>
   </div>
+
+  <div class="overlay" v-if="!isMobile && isSidebarOpen"></div>
 </template>
 
 <script>
@@ -222,6 +224,9 @@ export default {
       showQRCode: false,
       userEmail: "",
       userPassword: "",
+
+      //
+      isMobile: false,
 
       // Search & UI
       searchQuery: "",
@@ -302,11 +307,21 @@ export default {
       });
     }
   },
+
   methods: {
     toggleSidebar() {
       this.isSidebarOpen = !this.isSidebarOpen;
       this.isOpen = !this.isOpen;
     },
+
+    handleResize() {
+      /* ADDED */
+      this.isMobile = window.innerWidth <= 928;
+      if (this.isMobile) {
+        this.isSidebarOpen = false;
+      }
+    },
+
     toggleDropdown() {
       console.log("Dropdown toggled", this.showDropdown);
       this.showDropdown = !this.showDropdown;
