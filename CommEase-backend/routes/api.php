@@ -9,6 +9,7 @@ use App\Http\Controllers\EventController;
 use App\Http\Controllers\VolunteerController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Middleware\CheckRole;
 
 Route::middleware(['auth', 'web'])->get('/user', function (Request $request) {
     return $request->user();
@@ -23,7 +24,7 @@ Route::prefix('auth')->middleware(['web'])->group(function () {
 
     // Login/Logout
     Route::post('login', [LoginController::class, 'login']);
-    Route::post('logout', [LoginController::class, 'logout'])->middleware('auth');
+    Route::post('logout', [LoginController::class, 'logout'])->middleware(['web', 'auth']);
 
     // Password Reset
     Route::post('forgot-password', [ForgotPasswordController::class, 'sendOtp']);
@@ -39,7 +40,7 @@ Route::middleware(['web'])->group(function () {
 });
 
 // Protected Organizer Routes
-Route::middleware(['auth', 'role:organizer'])->group(function () {
+Route::middleware(['auth', CheckRole::class.':organizer'])->group(function () {
     Route::post('events', [EventController::class, 'store']);
     Route::put('events/{event}', [EventController::class, 'update']);
     Route::delete('events/{event}', [EventController::class, 'destroy']);
@@ -52,7 +53,7 @@ Route::middleware(['auth', 'role:organizer'])->group(function () {
 });
 
 // Protected Volunteer Routes
-Route::middleware(['auth', 'role:volunteer'])->group(function () {
+Route::middleware(['auth', CheckRole::class.':volunteer'])->group(function () {
     Route::post('events/{event}/register', [VolunteerController::class, 'registerForEvent']);
     Route::post('events/{event}/unregister', [VolunteerController::class, 'unregisterFromEvent']);
     Route::post('events/{event}/things-brought', [VolunteerController::class, 'submitThingsBrought']);

@@ -54,7 +54,18 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'otp_expires_at' => 'datetime',
             'password' => 'hashed',
+            'role' => 'string',
         ];
+    }
+
+    /**
+     * Get the user's role.
+     *
+     * @return string
+     */
+    public function getRoleAttribute()
+    {
+        return $this->attributes['role'];
     }
 
     public function organizedEvents()
