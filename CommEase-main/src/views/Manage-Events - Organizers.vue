@@ -113,248 +113,152 @@
     >
 
     <!-- EVENTS TABLE -->
-    <div class="container-table" :class="{ 'sidebar-collapsed': !isOpen }">
-      <table class="users-table">
-        <thead>
-          <tr>
-            <th>No.</th>
-            <th>Event Title</th>
-            <th>Barangay</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Organizer</th>
-            <th>Programs</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- Loop through the 'events' array -->
-          <tr v-for="(event, index) in filteredEvents" :key="index">
-            <td data-label="Id">{{ index + 1 }}</td>
-            <td data-label="Event Name">{{ event.title }}</td>
-            <td data-label="Time">{{ event.barangay }}, Olongapo City</td>
-            <td data-label="Date">{{ event.date }}</td>
-            <td data-label="Time">{{ event.time }}</td>
-            <td data-label="Organizer">{{ event.organizer }}</td>
-            <td>{{ (event.programs || []).join(", ") }}</td>
+  <div class="container-table"  :class="{ 'sidebar-collapsed': !isOpen }">
+    <table class="users-table">
+      <thead>
+        <tr>
+          <th>No.</th>
+          <th>Event Title</th>
+          <th>Barangay</th>
+          <th>Date</th>
+          <th>Time</th>
+          <th>Organizer</th>
+          <th>Programs</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Loop through the 'events' array -->
+        <tr v-for="(event, index) in filteredEvents" :key="index">
+          <td data-label="Id">{{ index + 1 }}</td>
+          <td data-label="Event Name">{{ event.event_title }}</td>
+          <td data-label="Time">{{ event.barangay }}</td>
+          <td data-label="Date">{{ event.date }}</td>
+          <td data-label="Time">{{ `${event.start_time} - ${event.end_time}` }}</td>
+          <td data-label="Organizer">{{ event.organizer?.first_name }} {{ event.organizer?.last_name }}</td>
+          <td>{{ (event.programs || []).join(', ') }}</td>
 
-            <td>
-              <span
-                :class="{
-                  'status-pending': event.event_status === 'Pending',
-                  'status-active': event.event_status === 'Active',
-                  'status-completed': event.event_status === 'Completed',
-                }"
-              >
-                {{ event.status }}
-              </span>
-            </td>
-            <td data-label="Action" class="action-button">
-              <div class="test">
-                <button class="entries-edit" @click="handleEdit(event)">
-                  Edit
-                </button>
-                <button
-                  class="entries-delete"
-                  @click="handleDelete(event.event_id)"
-                >
-                  Delete
-                </button>
-              </div>
-            </td>
-          </tr>
-          <!-- Show placeholder if 'events' is empty -->
-          <tr v-if="events.length === 0">
-            <td colspan="8" class="no-data">No events available</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+          <td>
+            <span
+              :class="{
+                'status-pending': event.status === 'Pending',
+                'status-active': event.status === 'Active',
+                'status-completed': event.status === 'Completed',
+              }"
+            >
+              {{ event.status }}
+            </span>
+          </td>
+          <td data-label="Action" class="action-button">
+            <div class="test">
+            <button class="entries-edit" @click="handleEdit(event)">Edit</button>
+            <button class="entries-edit" @click="handleDelete(event.id)">Delete</button>
+            </div>
+          </td>
+        </tr>
+        <!-- Show placeholder if 'events' is empty -->
+        <tr v-if="events.length === 0">
+          <td colspan="8" class="no-data">No events available</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
   </div>
 
   <div class="overlay" v-if="!isMobile && isSidebarOpen"></div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      // UI Toggles
-      showNotifications: false,
-      showLogoutModal: false,
-      isOpen: false,
-      isSidebarOpen: false,
+<script setup>
+import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { eventService, authService } from '../api/services';
 
-      //
-      isMobile: false,
+const router = useRouter();
+const showNotifications = ref(false);
+const showLogoutModal = ref(false);
+const isOpen = ref(false);
+const isSidebarOpen = ref(false);
+const searchQuery = ref("");
+const loading = ref(false);
+const error = ref(null);
+const events = ref([]);
 
-      // Search
-      searchQuery: "",
+const notifications = ref([
+  { message: "You completed the 'Update website content' task.", time: "2 hours ago" },
+  { message: "You completed the 'Clean up drive' task.", time: "3 hours ago" },
+  { message: "You completed the 'Meeting with organizers' task.", time: "5 hours ago" },
+]);
 
-      // Notifications
-      notifications: [
-        {
-          message: "You completed the 'Update website content' task.",
-          time: "2 hours ago",
-        },
-        {
-          message: "You completed the 'Clean up drive' task.",
-          time: "3 hours ago",
-        },
-        {
-          message: "You completed the 'Meeting with organizers' task.",
-          time: "5 hours ago",
-        },
-      ],
+const filteredEvents = computed(() => {
+  const query = searchQuery.value.toLowerCase();
+  return events.value.filter(event =>
+    event.event_title.toLowerCase().includes(query) ||
+    event.barangay.toLowerCase().includes(query) ||
+    event.date.toLowerCase().includes(query) ||
+    `${event.start_time} - ${event.end_time}`.toLowerCase().includes(query) ||
+    event.organizer?.first_name?.toLowerCase().includes(query) ||
+    event.organizer?.last_name?.toLowerCase().includes(query) ||
+    event.status.toLowerCase().includes(query)
+  );
+});
 
-      // Events
-      events: [
-        {
-          event_id: 1,
-          title: "Clean Up Drive",
-          barangay: "East Bajac - Bajac",
-          date: "08/06/2025",
-          time: "10:00 - 12:00",
-          organizer: "ELITES",
-          status: "Pending",
-        },
-        {
-          event_id: 2,
-          title: "Tree Planting",
-          barangay: "West Bajac - Bajac",
-          date: "09/10/2025",
-          time: "8:00 - 10:00",
-          organizer: "GREEN INITIATIVE",
-          status: "Pending",
-        },
-        {
-          event_id: 3,
-          title: "Feeding Program",
-          barangay: "North Bajac - Bajac",
-          date: "10/12/2025",
-          time: "2:00 - 4:00",
-          organizer: "HELPING HANDS",
-          status: "Pending",
-        },
-        {
-          event_id: 4,
-          title: "Blood Donation",
-          barangay: "South Bajac - Bajac",
-          date: "12/15/2025",
-          time: "9:00 - 1:00",
-          organizer: "HEALTH TEAM",
-          status: "Pending",
-        },
-      ],
-    };
-  },
-
-  computed: {
-    filteredEvents() {
-      const query = this.searchQuery.toLowerCase();
-      return this.events.filter(
-        (event) =>
-          event.title.toLowerCase().includes(query) ||
-          event.barangay.toLowerCase().includes(query) ||
-          event.date.toLowerCase().includes(query) ||
-          event.time.toLowerCase().includes(query) ||
-          event.organizer.toLowerCase().includes(query) ||
-          event.status.toLowerCase().includes(query)
-      );
-    },
-  },
-
-  mounted() {
-    const storedEvents = JSON.parse(localStorage.getItem("events"));
-
-    if (storedEvents !== null) {
-      this.events = storedEvents;
-    } else {
-      // Only set default events on first load (when there's no events key at all)
-      localStorage.setItem("events", JSON.stringify(this.events));
-    }
-  },
-
-  methods: {
-    toggleNotifications() {
-      this.showNotifications = !this.showNotifications;
-    },
-
-    handleResize() {
-      /* ADDED */
-      this.isMobile = window.innerWidth <= 928;
-      if (this.isMobile) {
-        this.isSidebarOpen = false;
-      }
-    },
-
-    toggleSidebar() {
-      this.isSidebarOpen = !this.isSidebarOpen;
-      this.isOpen = !this.isOpen; // optional extra toggle state
-    },
-
-    confirmLogout() {
-      this.$router.push("/LoginOrganizers");
-    },
-
-    handleEdit(event) {
-      const [startTime, endTime] = event.time.split(" - ");
-      this.$router.push({
-        path: "/EditEventOrganizers",
-        query: {
-          event_id: event.event_id,
-          title: event.title,
-          barangay: event.barangay,
-          date: event.date,
-          startTime,
-          endTime,
-          organizer: event.organizer,
-          status: event.status,
-        },
-      });
-    },
-
-    handleDelete(eventId) {
-      if (confirm("Are you sure you want to delete this event?")) {
-        this.events = this.events.filter((e) => e.event_id !== eventId);
-        localStorage.setItem("events", JSON.stringify(this.events));
-        alert("Event deleted successfully!");
-      }
-    },
-
-    saveEvent(newEvent) {
-      // Check if updating existing event
-      const index = this.events.findIndex(
-        (e) => e.event_id === newEvent.event_id
-      );
-      if (index !== -1) {
-        this.events.splice(index, 1, newEvent);
-      } else {
-        // New event, assign new id
-        newEvent.event_id = this.events.length
-          ? Math.max(...this.events.map((e) => e.event_id)) + 1
-          : 1;
-        this.events.push(newEvent);
-      }
-      localStorage.setItem("events", JSON.stringify(this.events));
-      alert("Event saved successfully!");
-    },
-
-    onSubmitEvent() {
-      const newEvent = {
-        event_id: null, // or existing id if editing
-        title: this.title,
-        barangay: this.barangay,
-        date: this.date, // format: YYYY-MM-DD or your format
-        time: `${this.startTime} - ${this.endTime}`,
-        organizer: this.organizer,
-        status: "Pending",
-      };
-      this.saveEvent(newEvent);
-    },
-  },
+const toggleNotifications = () => {
+  showNotifications.value = !showNotifications.value;
 };
+
+const toggleSidebar = () => {
+  isSidebarOpen.value = !isSidebarOpen.value;
+  isOpen.value = !isOpen.value;
+};
+
+const confirmLogout = async () => {
+  try {
+    await authService.logout();
+    router.push('/LoginOrganizers');
+  } catch (error) {
+    console.error('Logout failed:', error);
+  }
+};
+
+const handleEdit = (event) => {
+  router.push({
+    name: 'EditEventOrganizers',
+    params: { id: event.id }
+  });
+};
+
+const handleDelete = async (eventId) => {
+  if (confirm("Are you sure you want to delete this event?")) {
+    try {
+      loading.value = true;
+      error.value = null;
+      await eventService.deleteEvent(eventId);
+      events.value = events.value.filter(event => event.id !== eventId);
+    } catch (err) {
+      error.value = err.response?.data?.message || err.message || 'Failed to delete event';
+    } finally {
+      loading.value = false;
+    }
+  }
+};
+
+const fetchEvents = async () => {
+  try {
+    loading.value = true;
+    error.value = null;
+    const response = await eventService.getEvents();
+    events.value = response.data.data;
+  } catch (err) {
+    error.value = err.response?.data?.message || err.message || 'Failed to fetch events';
+  } finally {
+    loading.value = false;
+  }
+};
+
+onMounted(() => {
+  fetchEvents();
+});
 </script>
 
 <style scoped src="/src/assets/CSS Organizers/Manage-events.css"></style>

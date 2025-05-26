@@ -339,64 +339,51 @@
 <script>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { authService } from '@/api/services';
 
-export default {
-  name: "YourComponentName",
+// === Sidebar Toggle ===
+const isSidebarOpen = ref(true);
+const toggleSidebar = () => {
+	isSidebarOpen.value = !isSidebarOpen.value;
+};
 
-  data() {
-    return {
-      isOpen: false, // you requested this
-      isSidebarOpen: false, // toggle sidebar
-      showNotifications: false,
-      showLogoutModal: false,
-      //
-      isMobile: false,
+// === Notification Functionality ===
+const showNotifications = ref(false);
+const notifications = ref([
+	{
+		message: 'You completed the "Update website content" task.',
+		time: "2 hours ago",
+	},
+	{
+		message: 'You completed the "Clean up drive" task.',
+		time: "3 hours ago",
+	},
+	{
+		message: 'You completed the "Meeting with organizers" task.',
+		time: "5 hours ago",
+	},
+]);
 
-      notifications: [
-        {
-          message: 'You completed the "Update website content" task.',
-          time: "2 hours ago",
-        },
-        {
-          message: 'You completed the "Clean up drive" task.',
-          time: "3 hours ago",
-        },
-        {
-          message: 'You completed the "Meeting with organizers" task.',
-          time: "5 hours ago",
-        },
-      ],
-    };
-  },
+const toggleNotifications = () => {
+	showNotifications.value = !showNotifications.value;
+};
 
-  setup() {
-    const router = useRouter();
-    return { router };
-  },
+// === Logout Modal ===
+const showLogoutModal = ref(false);
+const router = useRouter();
 
-  methods: {
-    toggleSidebar() {
-      this.isSidebarOpen = !this.isSidebarOpen;
-      this.isOpen = !this.isOpen; // toggle the titles
-    },
-
-    handleResize() {
-      /* ADDED */
-      this.isMobile = window.innerWidth <= 928;
-      if (this.isMobile) {
-        this.isSidebarOpen = false;
-      }
-    },
-
-    toggleNotifications() {
-      this.showNotifications = !this.showNotifications;
-    },
-
-    confirmLogout() {
-      this.showLogoutModal = false;
-      this.router.push("/login");
-    },
-  },
+const confirmLogout = async () => {
+	try {
+		await authService.logout();
+		// Clear any local storage or state
+		localStorage.clear();
+		// Redirect to login page
+		router.push('/LoginOrganizers');
+	} catch (error) {
+		console.error('Logout failed:', error);
+		// Even if the API call fails, we should still redirect to login
+		router.push('/LoginOrganizers');
+	}
 };
 </script>
 

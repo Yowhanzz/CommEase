@@ -139,79 +139,70 @@
 </template>
 
 <script>
+import { ref, computed } from 'vue';
+import { useRouter } from 'vue-router';
+import { authService } from '@/api/services';
+
 export default {
-  data() {
-    return {
-      // UI Toggles
-      showNotifications: false,
-      showLogoutModal: false,
-      isOpen: false,
-      isSidebarOpen: false,
+  setup() {
+    const router = useRouter();
+    const showNotifications = ref(false);
+    const showLogoutModal = ref(false);
+    const isOpen = ref(false);
+    const isSidebarOpen = ref(false);
+    const searchQuery = ref("");
+    const notifications = ref([
+      {
+        message: "You completed the 'Update website content' task.",
+        time: "2 hours ago",
+      },
+      {
+        message: "You completed the 'Clean up drive' task.",
+        time: "3 hours ago",
+      },
+      {
+        message: "You completed the 'Meeting with organizers' task.",
+        time: "5 hours ago",
+      },
+    ]);
+    const events = ref([
+      {
+        title: "Clean Up Drive",
+        barangay: "East Bajac - Bajac",
+        date: "08/06/2025",
+        time: "10:00 - 12:00",
+        organizer: "ELITES",
+        status: "Pending",
+      },
+      {
+        title: "Tree Planting",
+        barangay: "West Bajac - Bajac",
+        date: "09/10/2025",
+        time: "8:00 - 10:00",
+        organizer: "GREEN INITIATIVE",
+        status: "Pending",
+      },
+      {
+        title: "Feeding Program",
+        barangay: "North Bajac - Bajac",
+        date: "10/12/2025",
+        time: "2:00 - 4:00",
+        organizer: "HELPING HANDS",
+        status: "Pending",
+      },
+      {
+        title: "Blood Donation",
+        barangay: "South Bajac - Bajac",
+        date: "12/15/2025",
+        time: "9:00 - 1:00",
+        organizer: "HEALTH TEAM",
+        status: "Pending",
+      },
+    ]);
 
-      // Search
-      searchQuery: "",
-
-      //
-      isMobile: false,
-
-      // Notifications
-      notifications: [
-        {
-          message: "You completed the 'Update website content' task.",
-          time: "2 hours ago",
-        },
-        {
-          message: "You completed the 'Clean up drive' task.",
-          time: "3 hours ago",
-        },
-        {
-          message: "You completed the 'Meeting with organizers' task.",
-          time: "5 hours ago",
-        },
-      ],
-
-      // Events
-      events: [
-        {
-          title: "Clean Up Drive",
-          barangay: "East Bajac - Bajac",
-          date: "08/06/2025",
-          time: "10:00 - 12:00",
-          organizer: "ELITES",
-          status: "Pending",
-        },
-        {
-          title: "Tree Planting",
-          barangay: "West Bajac - Bajac",
-          date: "09/10/2025",
-          time: "8:00 - 10:00",
-          organizer: "GREEN INITIATIVE",
-          status: "Pending",
-        },
-        {
-          title: "Feeding Program",
-          barangay: "North Bajac - Bajac",
-          date: "10/12/2025",
-          time: "2:00 - 4:00",
-          organizer: "HELPING HANDS",
-          status: "Pending",
-        },
-        {
-          title: "Blood Donation",
-          barangay: "South Bajac - Bajac",
-          date: "12/15/2025",
-          time: "9:00 - 1:00",
-          organizer: "HEALTH TEAM",
-          status: "Pending",
-        },
-      ],
-    };
-  },
-
-  computed: {
-    filteredEvents() {
-      const query = this.searchQuery.toLowerCase();
-      return this.events.filter(
+    const filteredEvents = computed(() => {
+      const query = searchQuery.value.toLowerCase();
+      return events.value.filter(
         (event) =>
           event.title.toLowerCase().includes(query) ||
           event.barangay.toLowerCase().includes(query) ||
@@ -219,30 +210,44 @@ export default {
           event.time.toLowerCase().includes(query) ||
           event.organizer.toLowerCase().includes(query)
       );
-    },
-  },
+    });
 
-  methods: {
-    toggleNotifications() {
-      this.showNotifications = !this.showNotifications;
-    },
+    const toggleNotifications = () => {
+      showNotifications.value = !showNotifications.value;
+    };
 
-    handleResize() {
-      /* ADDED */
-      this.isMobile = window.innerWidth <= 928;
-      if (this.isMobile) {
-        this.isSidebarOpen = false;
+    const toggleSidebar = () => {
+      isSidebarOpen.value = !isSidebarOpen.value;
+      isOpen.value = !isOpen.value; // optional if you're toggling extra state
+    };
+
+    const confirmLogout = async () => {
+      try {
+        await authService.logout();
+        // Clear any local storage or state
+        localStorage.clear();
+        // Redirect to login page
+        router.push('/LoginOrganizers');
+      } catch (error) {
+        console.error('Logout failed:', error);
+        // Even if the API call fails, we should still redirect to login
+        router.push('/LoginOrganizers');
       }
-    },
+    };
 
-    toggleSidebar() {
-      this.isSidebarOpen = !this.isSidebarOpen;
-      this.isOpen = !this.isOpen; // optional if you're toggling extra state
-    },
-
-    confirmLogout() {
-      this.$router.push("/LoginOrganizers");
-    },
+    return {
+      showNotifications,
+      showLogoutModal,
+      isOpen,
+      isSidebarOpen,
+      searchQuery,
+      notifications,
+      events,
+      filteredEvents,
+      toggleNotifications,
+      toggleSidebar,
+      confirmLogout,
+    };
   },
 };
 </script>

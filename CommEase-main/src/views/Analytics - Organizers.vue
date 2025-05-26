@@ -232,106 +232,93 @@
   <div class="overlay" v-if="!isMobile && isSidebarOpen"></div>
 </template>
 
-<script>
+<script setup>
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
+import { authService } from "@/api/services";
 import BarChart from "@/components/Barchart.vue";
 import PieChart from "@/components/PieChart.vue";
 
-export default {
-  components: {
-    BarChart,
-    PieChart,
+const isSidebarOpen = ref(true);
+const isOpen = ref(false); // for sidebar icon animation toggle
+const showNotifications = ref(false);
+const showLogoutModal = ref(false);
+const searchQuery = ref("");
+const isMobile = ref(false);
+const router = useRouter();
+
+const notifications = ref([
+  {
+    message: "You completed the 'Update website content' task.",
+    time: "2 hours ago",
   },
-  setup() {
-    const isSidebarOpen = ref(true);
-    const isOpen = ref(false); // for sidebar icon animation toggle
-    const showNotifications = ref(false);
-    const showLogoutModal = ref(false);
-    const searchQuery = ref("");
-    const isMobile = ref(false);
-    const router = useRouter();
-
-    const notifications = ref([
-      {
-        message: "You completed the 'Update website content' task.",
-        time: "2 hours ago",
-      },
-      {
-        message: "You completed the 'Clean up drive' task.",
-        time: "3 hours ago",
-      },
-      {
-        message: "You completed the 'Meeting with organizers' task.",
-        time: "5 hours ago",
-      },
-    ]);
-
-    const events = ref([
-      {
-        title: "Clean Up Drive",
-        location: "Barangay East Bajac-Bajac",
-        time: "10:00am - 12:00pm",
-        date: "08/04/2025",
-      },
-      {
-        title: "Tree Planting",
-        location: "Barangay West Tapinac",
-        time: "8:00am - 10:00am",
-        date: "09/10/2025",
-      },
-      {
-        title: "Feeding Program",
-        location: "Barangay Sta. Rita",
-        time: "2:00pm - 4:00pm",
-        date: "12/15/2025",
-      },
-    ]);
-
-    const filteredEvents = computed(() =>
-      events.value.filter(
-        (event) =>
-          event.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
-          event.location.toLowerCase().includes(searchQuery.value.toLowerCase())
-      )
-    );
-
-    const toggleSidebar = () => {
-      isSidebarOpen.value = !isSidebarOpen.value;
-      isOpen.value = !isOpen.value;
-    };
-
-    const handleResize = () => {
-      /* ADDED */
-      this.isMobile = window.innerWidth <= 928;
-      if (this.isMobile) {
-        this.isSidebarOpen = false;
-      }
-    };
-
-    const toggleNotifications = () => {
-      showNotifications.value = !showNotifications.value;
-    };
-
-    const confirmLogout = () => {
-      router.push("/LoginVolunteers");
-    };
-
-    return {
-      isSidebarOpen,
-      isOpen,
-      toggleSidebar,
-      showNotifications,
-      showLogoutModal,
-      searchQuery,
-      notifications,
-      events,
-      isMobile,
-      filteredEvents,
-      toggleNotifications,
-      confirmLogout,
-    };
+  {
+    message: "You completed the 'Clean up drive' task.",
+    time: "3 hours ago",
   },
+  {
+    message: "You completed the 'Meeting with organizers' task.",
+    time: "5 hours ago",
+  },
+]);
+
+const events = ref([
+  {
+    title: "Clean Up Drive",
+    location: "Barangay East Bajac-Bajac",
+    time: "10:00am - 12:00pm",
+    date: "08/04/2025",
+  },
+  {
+    title: "Tree Planting",
+    location: "Barangay West Tapinac",
+    time: "8:00am - 10:00am",
+    date: "09/10/2025",
+  },
+  {
+    title: "Feeding Program",
+    location: "Barangay Sta. Rita",
+    time: "2:00pm - 4:00pm",
+    date: "12/15/2025",
+  },
+]);
+
+const filteredEvents = computed(() =>
+  events.value.filter(
+    (event) =>
+      event.title.toLowerCase().includes(searchQuery.value.toLowerCase()) ||
+      event.location.toLowerCase().includes(searchQuery.value.toLowerCase())
+  )
+);
+
+const toggleSidebar = () => {
+  isSidebarOpen.value = !isSidebarOpen.value;
+  isOpen.value = !isOpen.value;
+};
+
+const handleResize = () => {
+  isMobile.value = window.innerWidth <= 928;
+  if (isMobile.value) {
+    isSidebarOpen.value = false;
+  }
+};
+
+const toggleNotifications = () => {
+  showNotifications.value = !showNotifications.value;
+};
+
+const confirmLogout = async () => {
+  try {
+    await authService.logout();
+    // Clear any local storage or state
+    localStorage.clear();
+    // Redirect to login page
+    router.push("/LoginOrganizers");
+  } catch (error) {
+    console.error("Logout failed:", error);
+    // Even if the API call fails, we should still redirect to login
+    router.push("/LoginOrganizers");
+  }
 };
 </script>
 

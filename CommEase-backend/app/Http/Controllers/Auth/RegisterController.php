@@ -75,6 +75,7 @@ class RegisterController extends Controller
         $user->update([
             'otp' => null,
             'otp_expires_at' => null,
+            'email_verified_at' => now()
         ]);
 
         return response()->json([

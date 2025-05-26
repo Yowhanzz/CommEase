@@ -21,7 +21,7 @@
           <input v-model="password" type="password" class="singup-input" />
 
           <h5 class="title">Confirm Password</h5>
-          <input v-model="confirmPassword" type="password" class="singup-input" />
+          <input v-model="confirm_password" type="password" class="singup-input" />
         </div>
       </div>    
     </div>
@@ -45,32 +45,74 @@ import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 
 const password = ref(localStorage.getItem('password') || '')
-const confirmPassword = ref(localStorage.getItem('confirmPassword') || '')
+const confirm_password = ref(localStorage.getItem('confirmPassword') || '')
 const router = useRouter()
 
 // Save to localStorage whenever changed
-watch([password, confirmPassword], () => {
+watch([password, confirm_password], () => {
   localStorage.setItem('password', password.value)
-  localStorage.setItem('confirmPassword', confirmPassword.value)
+  localStorage.setItem('confirmPassword', confirm_password.value)
 })
 
 // Check if both fields are filled and match
 const isPasswordValid = computed(() => {
   return password.value !== '' &&
-         confirmPassword.value !== '' &&
-         password.value === confirmPassword.value
+         confirm_password.value !== '' &&
+         password.value === confirm_password.value
 })
 
 // Handle Next
-const handleNext = () => {
-  if (!password.value || !confirmPassword.value) {
-    alert('Please fill out both fields.')
-  } else if (password.value !== confirmPassword.value) {
-    alert('Passwords do not match. Please try again.')
-  } else {
-    alert('Account updated!')
-    router.push('/LoginVolunteers')
-  }
+const handleNext = async () => {
+    if (!password.value || !confirm_password.value) {
+        alert('Please fill out both fields.')
+        return
+    }
+
+    if (password.value !== confirm_password.value) {
+        alert('Passwords do not match. Please try again.')
+        return
+    }
+
+    if (password.value.length < 8) {
+        alert('Password must be at least 8 characters long.')
+        return
+    }
+
+    try {
+        const email = sessionStorage.getItem('temp_email')
+        
+        if (!email) {
+            alert('Session expired. Please start password reset again.')
+            router.push('/CreateGmailVolunteers')
+            return
+        }
+
+        console.log('Sending password reset data:', {
+            email,
+            password: password.value,
+            confirmPassword: confirm_password.value
+        })
+
+        // Removed import of authService
+        // ... existing code ...
+    } catch (error) {
+        console.error('Password reset failed:', error)
+        
+        // Handle validation errors from the server
+        if (error.response?.status === 422) {
+            console.log('Server validation errors:', error.response.data)
+            const serverErrors = error.response.data.errors
+            if (serverErrors) {
+                // Display the first error message
+                const errorMessage = Object.values(serverErrors)[0][0]
+                alert(errorMessage)
+            } else {
+                alert('Invalid password. Please try again.')
+            }
+        } else {
+            alert('Failed to reset password. Please try again.')
+        }
+    }
 }
 </script>
 

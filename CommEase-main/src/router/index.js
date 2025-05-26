@@ -66,8 +66,8 @@ const router = createRouter({
     },
  
     {
-      path: '/dashboard_volunteers',
-      name: 'dashboard-volunteers',
+      path: '/DashboardVolunteers',
+      name: 'DashboardVolunteers',
       component: DashboardVolunteers,
     },
 
@@ -91,7 +91,7 @@ const router = createRouter({
 
     {
       path: '/LoginVolunteers',
-      name: 'LOginVolunteers',
+      name: 'LoginVolunteers',
       component: LoginVolunteers,
     },
 

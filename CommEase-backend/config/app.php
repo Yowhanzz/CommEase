@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Str;
+
 return [
 
     /*
@@ -121,6 +123,62 @@ return [
     'maintenance' => [
         'driver' => env('APP_MAINTENANCE_DRIVER', 'file'),
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Authentication Configuration
+    |--------------------------------------------------------------------------
+    |
+    | Here you may configure the authentication settings for your application.
+    | This includes the session configuration and authentication guards.
+    |
+    */
+
+    'auth' => [
+        'defaults' => [
+            'guard' => 'web',
+            'passwords' => 'users',
+        ],
+
+        'guards' => [
+            'web' => [
+                'driver' => 'session',
+                'provider' => 'users',
+            ],
+            'api' => [
+                'driver' => 'sanctum',
+                'provider' => 'users',
+            ],
+        ],
+
+        'providers' => [
+            'users' => [
+                'driver' => 'eloquent',
+                'model' => App\Models\User::class,
+            ],
+        ],
+    ],
+
+    'session' => [
+        'driver' => env('SESSION_DRIVER', 'file'),
+        'lifetime' => 120,
+        'expire_on_close' => false,
+        'encrypt' => false,
+        'files' => storage_path('framework/sessions'),
+        'connection' => env('SESSION_CONNECTION'),
+        'table' => 'sessions',
+        'store' => env('SESSION_STORE'),
+        'lottery' => [2, 100],
+        'cookie' => env(
+            'SESSION_COOKIE',
+            Str::slug(env('APP_NAME', 'laravel'), '_').'_session'
+        ),
+        'path' => '/',
+        'domain' => env('SESSION_DOMAIN', null),
+        'secure' => env('SESSION_SECURE_COOKIE'),
+        'http_only' => true,
+        'same_site' => 'lax',
     ],
 
 ];

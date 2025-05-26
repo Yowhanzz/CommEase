@@ -41,36 +41,88 @@
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
+import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { authService } from '../api/services'
 
-const password = ref(localStorage.getItem('password') || '')
-const confirmPassword = ref(localStorage.getItem('confirmPassword') || '')
+const password = ref('')
+const confirmPassword = ref('')
 const router = useRouter()
-
-// Save to localStorage whenever changed
-watch([password, confirmPassword], () => {
-  localStorage.setItem('password', password.value)
-  localStorage.setItem('confirmPassword', confirmPassword.value)
-})
 
 // Check if both fields are filled and match
 const isPasswordValid = computed(() => {
-  return password.value !== '' &&
-         confirmPassword.value !== '' &&
-         password.value === confirmPassword.value
+    return password.value !== '' &&
+           confirmPassword.value !== '' &&
+           password.value === confirmPassword.value
 })
 
 // Handle Next
-const handleNext = () => {
-  if (!password.value || !confirmPassword.value) {
-    alert('Please fill out both fields.')
-  } else if (password.value !== confirmPassword.value) {
-    alert('Passwords do not match. Please try again.')
-  } else {
-    alert('Account created!')
-    router.push('/LoginVolunteers')
-  }
+const handleNext = async () => {
+    if (!password.value || !confirmPassword.value) {
+        alert('Please fill out both fields.')
+        return
+    }
+    
+    if (password.value !== confirmPassword.value) {
+        alert('Passwords do not match. Please try again.')
+        return
+    }
+
+    // Password validation
+    if (password.value.length < 8) {
+        alert('Password must be at least 8 characters long.')
+        return
+    }
+
+    try {
+        const email = sessionStorage.getItem('temp_email')
+        
+        if (!email) {
+            alert('Session expired. Please start registration again.')
+            router.push('/signup')
+            return
+        }
+
+        console.log('Sending password creation data:', {
+            email,
+            password: password.value,
+            confirmPassword: confirmPassword.value
+        })
+
+        const response = await authService.createPassword(
+            email,
+            password.value,
+            confirmPassword.value
+        )
+
+        console.log('Password creation response:', response)
+
+        if (response) {
+            alert('Account created successfully!')
+            // Clear temporary session data
+            sessionStorage.removeItem('temp_email')
+            router.push('/LoginVolunteers')
+        } else {
+            throw new Error('Password creation failed')
+        }
+    } catch (error) {
+        console.error('Password creation failed:', error)
+        
+        // Handle validation errors from the server
+        if (error.response?.status === 422) {
+            console.log('Server validation errors:', error.response.data)
+            const serverErrors = error.response.data.errors
+            if (serverErrors) {
+                // Display the first error message
+                const errorMessage = Object.values(serverErrors)[0][0]
+                alert(errorMessage)
+            } else {
+                alert('Invalid password. Please try again.')
+            }
+        } else {
+            alert('Failed to create password. Please try again.')
+        }
+    }
 }
 </script>
 

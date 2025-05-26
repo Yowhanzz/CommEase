@@ -134,7 +134,9 @@
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import { authService } from '../api/services';
 
 export default {
   data() {
@@ -222,13 +224,21 @@ export default {
 
     toggleSidebar() {
       this.isSidebarOpen = !this.isSidebarOpen;
-      this.isOpen = !this.isOpen;
-    },
+      this.isOpen = !this.isOpen; 
+    }, 
 
-    confirmLogout() {
-      this.$router.push("/login");
-    },
-  },
+    async confirmLogout() {
+      try {
+        await authService.logout();
+        this.showLogoutModal = false;
+        // Redirect to login page
+        this.$router.push('/LoginVolunteers');
+      } catch (error) {
+        console.error('Logout failed:', error);
+        alert('Failed to logout. Please try again.');
+      }
+    }
+  }
 };
 </script>
 
