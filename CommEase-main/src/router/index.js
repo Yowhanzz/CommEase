@@ -91,7 +91,7 @@ const router = createRouter({
 
     {
       path: '/LoginVolunteers',
-      name: 'LOginVolunteers',
+      name: 'LoginVolunteers',
       component: LoginVolunteers,
     },
 

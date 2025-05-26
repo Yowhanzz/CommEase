@@ -243,7 +243,6 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
-import { authService } from "../api/services";
 
 // === Sidebar Toggle ===
 const isSidebarOpen = ref(true);
@@ -286,18 +285,7 @@ const showLogoutModal = ref(false);
 const router = useRouter();
 const confirmLogout = () => {
   showLogoutModal.value = false;
-  authService.logout()
-    .then(() => {
-      // Clear any local storage or state
-      localStorage.clear();
-      // Redirect to login page
-      router.push('/LoginVolunteers');
-    })
-    .catch((error) => {
-      console.error('Logout failed:', error);
-      // Even if the API call fails, we should still redirect to login
-      router.push('/LoginVolunteers');
-    });
+  router.push('/LoginVolunteers');
 };
 
 const registrationForm = ref([

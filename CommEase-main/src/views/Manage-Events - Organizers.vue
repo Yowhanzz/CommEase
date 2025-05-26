@@ -172,7 +172,6 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { eventService, authService } from '../api/services';
 
 const router = useRouter();
 const showNotifications = ref(false);

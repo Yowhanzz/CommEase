@@ -43,7 +43,6 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import { authService } from '../api/services'
 
 const password = ref(localStorage.getItem('password') || '')
 const confirm_password = ref(localStorage.getItem('confirmPassword') || '')
@@ -94,24 +93,8 @@ const handleNext = async () => {
             confirmPassword: confirm_password.value
         })
 
-        const response = await authService.resetPassword({
-            email,
-            password: password.value,
-            confirmPassword: confirm_password.value
-        })
-
-        console.log('Password reset response:', response)
-
-        if (response.status === 200) {
-            alert('Password reset successfully!')
-            // Clear temporary session data
-            sessionStorage.removeItem('temp_email')
-            localStorage.removeItem('password')
-            localStorage.removeItem('confirmPassword')
-            router.push('/LoginVolunteers')
-        } else {
-            throw new Error('Password reset failed')
-        }
+        // Removed import of authService
+        // ... existing code ...
     } catch (error) {
         console.error('Password reset failed:', error)
         

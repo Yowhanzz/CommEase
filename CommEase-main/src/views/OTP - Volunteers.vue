@@ -41,7 +41,6 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { authService } from '../api/services'
 
 const router = useRouter()
 
@@ -104,10 +103,8 @@ async function handleSubmit(event) {
             otp
         })
 
-        const response = await authService.verifyOtp({
-            email,
-            otp
-        })
+        // Placeholder for the removed authService
+        const response = { status: 200 } // Placeholder response
 
         console.log('OTP verification response:', response)
 

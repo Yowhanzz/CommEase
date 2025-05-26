@@ -36,8 +36,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { authService } from '../api/services'
-import { ensureCsrfToken } from '../api/axios'
+import { ensureCsrfToken, login } from '../api/services'
 
 const email = ref('')
 const password = ref('')
@@ -45,35 +44,40 @@ const router = useRouter()
 const isLoading = ref(false)
 
 onMounted(async () => {
-    // Ensure CSRF token exists when reaching login page
     await ensureCsrfToken();
 });
 
 async function handleLogin() {
-	if (!email.value.trim() || !password.value.trim()) {
-		alert('Please fill in both email and password.')
-		return
-	}
+    if (!email.value.trim() || !password.value.trim()) {
+        alert('Please fill in both email and password.')
+        return
+    }
 
-	isLoading.value = true
-	try {
-		await authService.login({
-			email: email.value,
-			password: password.value
-		})
-		
-		// Redirect to dashboard
-		router.push('/DashboardOrganizers')
-	} catch (error) {
-		console.error('Login failed:', error)
-		if (error.response?.status === 419) {
-			alert('Session expired. Please try logging in again.')
-		} else {
-			alert('Login failed. Please check your credentials and try again.')
-		}
-	} finally {
-		isLoading.value = false
-	}
+    // Validate email format
+    if (!email.value.endsWith('@gordoncollege.edu.ph')) {
+        alert('Please use your Gordon College email address (@gordoncollege.edu.ph)')
+        return
+    }
+
+    try {
+        const response = await login(email.value, password.value)
+
+        const userData = response.data.user
+        const userRole = userData.role
+
+        localStorage.setItem('user', JSON.stringify(userData))
+        localStorage.setItem('role', userRole)
+
+        if (userRole === 'Volunteer') {
+            console.log('You are a volunteer, cannot access this page')
+            router.push('/LoginVolunteers')
+        } else {
+            router.push('/DashboardOrganizers')
+        }
+    } catch (error) {
+        console.error('Login failed:', error)
+        alert(error.message || 'Login failed. Please try again.')
+    }
 }
 </script>
 

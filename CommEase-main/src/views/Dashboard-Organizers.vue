@@ -241,7 +241,6 @@
 import 'vue-cal/dist/vuecal.css';
 import VueCal from 'vue-cal';
 import { QrcodeStream } from 'vue-qrcode-reader';
-import { authService } from '../api/services';
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 
@@ -359,18 +358,10 @@ export default {
 
     const confirmLogout = () => {
       showLogoutModal.value = false;
-      authService.logout()
-        .then(() => {
-          // Clear any local storage or state
-          localStorage.clear();
-          // Redirect to login page
-          router.push('/LoginOrganizers');
-        })
-        .catch((error) => {
-          console.error('Logout failed:', error);
-          // Even if the API call fails, we should still redirect to login
-          router.push('/LoginOrganizers');
-        });
+      // Clear any local storage or state
+      localStorage.clear();
+      // Redirect to login page
+      router.push('/LoginOrganizers');
     };
 
     return {

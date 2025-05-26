@@ -16,7 +16,6 @@
 
 <script>
 import { ref } from 'vue';
-import { authService } from '../api/services';
 
 export default {
   name: 'Login',
@@ -26,12 +25,7 @@ export default {
 
     const handleLogin = async () => {
       try {
-        const response = await authService.login({
-          email: email.value,
-          password: password.value
-        });
-        console.log('Login successful:', response.data);
-        // Handle successful login (e.g., store token, redirect)
+        // Handle login logic here
       } catch (error) {
         console.error('Login failed:', error);
         // Handle login error

@@ -339,7 +339,6 @@
 <script>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { authService } from "../api/services";
 
 // === Sidebar Toggle ===
 const isSidebarOpen = ref(true);
@@ -374,18 +373,8 @@ const router = useRouter();
 
 const confirmLogout = () => {
 	showLogoutModal.value = false;
-	authService.logout()
-		.then(() => {
-			// Clear any local storage or state
-			localStorage.clear();
-			// Redirect to login page
-			router.push('/LoginOrganizers');
-		})
-		.catch((error) => {
-			console.error('Logout failed:', error);
-			// Even if the API call fails, we should still redirect to login
-			router.push('/LoginOrganizers');
-		});
+	// Redirect to login page
+	router.push('/LoginOrganizers');
 };
 </script>
 

@@ -49,22 +49,6 @@ class LoginController extends Controller
             ], 403);
         }
 
-        // Create Sanctum token
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        // Create cookie with the token
-        $cookie = cookie(
-            'auth_token',
-            $token,
-            60 * 24 * 7, // 7 days
-            '/',
-            null,
-            false, // secure
-            true, // httpOnly
-            false,
-            'Lax'
-        );
-
         // Regenerate session ID for security
         $request->session()->regenerate();
 
@@ -76,18 +60,13 @@ class LoginController extends Controller
 
         return response()->json([
             'message' => 'Login successful',
-            'user' => $user,
-            'access_token' => $token,
-            'token_type' => 'Bearer'
-        ])->withCookie($cookie);
+            'user' => $user
+        ]);
     }
 
     public function logout(Request $request)
     {
         Log::info('Logout attempt:', ['user_id' => $request->user()?->id]);
-
-        // Revoke the token that was used to authenticate the current request
-        $request->user()->currentAccessToken()->delete();
 
         // Logout the user
         Auth::logout();
@@ -96,20 +75,7 @@ class LoginController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        // Create an expired cookie to clear the auth cookie
-        $cookie = cookie(
-            'auth_token',
-            '',
-            -1,
-            '/',
-            null,
-            true,
-            true,
-            false,
-            'Lax'
-        );
-
         Log::info('Logout successful');
-        return response()->json(['message' => 'Logged out successfully'])->withCookie($cookie);
+        return response()->json(['message' => 'Logged out successfully']);
     }
 }

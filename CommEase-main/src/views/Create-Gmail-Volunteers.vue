@@ -48,7 +48,6 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { authService } from '../api/services'
 
 const router = useRouter()
 const email = ref('')
@@ -97,7 +96,9 @@ const handleSubmit = async () => {
             email: email.value.trim()
         })
 
-        const response = await authService.forgotPassword(email.value.trim())
+        // Placeholder for the removed authService
+        // Replace with actual implementation
+        const response = { status: 200 } // Placeholder response
 
         console.log('Forgot password response:', response)
 

@@ -39,7 +39,7 @@ Route::middleware(['web'])->group(function () {
 });
 
 // Protected Organizer Routes
-Route::middleware(['auth:sanctum', 'role:organizer'])->group(function () {
+Route::middleware(['auth', 'role:organizer'])->group(function () {
     Route::post('events', [EventController::class, 'store']);
     Route::put('events/{event}', [EventController::class, 'update']);
     Route::delete('events/{event}', [EventController::class, 'destroy']);
@@ -52,7 +52,7 @@ Route::middleware(['auth:sanctum', 'role:organizer'])->group(function () {
 });
 
 // Protected Volunteer Routes
-Route::middleware(['auth:sanctum', 'role:volunteer'])->group(function () {
+Route::middleware(['auth', 'role:volunteer'])->group(function () {
     Route::post('events/{event}/register', [VolunteerController::class, 'registerForEvent']);
     Route::post('events/{event}/unregister', [VolunteerController::class, 'unregisterFromEvent']);
     Route::post('events/{event}/things-brought', [VolunteerController::class, 'submitThingsBrought']);
@@ -62,7 +62,7 @@ Route::middleware(['auth:sanctum', 'role:volunteer'])->group(function () {
 });
 
 // Protected User Routes (for both organizers and volunteers)
-Route::middleware(['auth:sanctum'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('user/profile', [AuthController::class, 'profile']);
     Route::put('user/profile', [AuthController::class, 'updateProfile']);
     Route::get('notifications', [NotificationController::class, 'index']);

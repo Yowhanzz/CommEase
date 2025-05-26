@@ -194,7 +194,7 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
-import { authService, eventService } from '../api/services';
+
 
 // === Sidebar Toggle ===
 const isSidebarOpen = ref(true);

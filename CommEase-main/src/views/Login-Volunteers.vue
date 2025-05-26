@@ -41,8 +41,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { authService } from '../api/services'
-import { ensureCsrfToken } from '../api/axios'
+import { ensureCsrfToken } from '../api/services'
 
 const email = ref('')
 const password = ref('')
@@ -60,24 +59,20 @@ async function handleLogin() {
 		return
 	}
 
-	isLoading.value = true
-	try {
-		await authService.login({
-			email: email.value,
-			password: password.value
-		})
-		
-		// Redirect to dashboard
-		router.push('/DashboardVolunteers')
-	} catch (error) {
-		console.error('Login failed:', error)
-		if (error.response?.status === 419) {
-			alert('Session expired. Please try logging in again.')
-		} else {
-			alert('Login failed. Please check your credentials and try again.')
+	const login = async (email, password) => {
+		try {
+			const response = await api.post('auth/login', {
+				email: email,
+				password: password,
+			})
+		} catch (error) {
+			console.error('Login failed:', error)
+			if (error.response?.status === 419) {
+				alert('Session expired. Please try logging in again.')
+			} else {
+				alert('Login failed. Please check your credentials and try again.')
+			}
 		}
-	} finally {
-		isLoading.value = false
 	}
 }
 </script>
