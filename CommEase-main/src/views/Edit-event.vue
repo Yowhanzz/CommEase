@@ -94,8 +94,13 @@
   </div>
 
   <!-- CREATE EVENT SECTION -->
-  <h1 class="title-safety">Edit Event</h1>
-  <hr class="safety-hr" :class="{ 'sidebar-collapsed-for-divider': isOpen }" />
+  <div class="test" :class="{ 'sidebar-collapsed': !isOpen }">
+    <h1 class="title-safety">Edit Event</h1>
+    <hr
+      class="safety-hr"
+      :class="{ 'sidebar-collapsed-for-divider': isOpen }"
+    />
+  </div>
 
   <div class="event-container" :class="{ 'sidebar-collapsed': !isOpen }">
     <div
@@ -204,164 +209,218 @@
       </div>
     </div>
   </div>
+
+  <div class="overlay" v-if="!isMobile && isSidebarOpen"></div>
 </template>
 
-<script setup>
+<script>
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
-const route = useRoute();
-const router = useRouter();
+export default {
+  setup() {
+    const route = useRoute();
+    const router = useRouter();
 
-const isSidebarOpen = ref(true);
-const showNotifications = ref(false);
-const showLogoutModal = ref(false);
-const searchQuery = ref("");
+    const isSidebarOpen = ref(true);
+    const showNotifications = ref(false);
+    const showLogoutModal = ref(false);
+    const searchQuery = ref("");
+    const isOpen = ref(false); // sidebar animation or icon toggle
+    const isMobile = ref(false);
 
-// Event form fields (include organizer!)
-const event_id = ref(null);
-const title = ref("");
-const barangay = ref("");
-const date = ref("");
-const startTime = ref("");
-const endTime = ref("");
-const programs = ref([]); // event creation selected programs
-const programFilters = ref([]); // for BSIT, BSCS, BSEMC checkboxes
-const organizer = ref("");
-const status = ref("");
-const objective = ref("");
-const description = ref("");
-const thingsNeeded = ref([]);
-const newThing = ref("");
+    // Event form fields
+    const event_id = ref(null);
+    const title = ref("");
+    const barangay = ref("");
+    const date = ref("");
+    const startTime = ref("");
+    const endTime = ref("");
+    const programs = ref([]);
+    const programFilters = ref([]);
+    const organizer = ref("");
+    const status = ref("");
+    const objective = ref("");
+    const description = ref("");
+    const thingsNeeded = ref([]);
+    const newThing = ref("");
 
-// === Notifications Data ===
-const notifications = ref([
-  {
-    message: "You completed the 'Update website content' task.",
-    time: "2 hours ago",
-  },
-  { message: "You completed the 'Clean up drive' task.", time: "3 hours ago" },
-  {
-    message: "You completed the 'Meeting with organizers' task.",
-    time: "5 hours ago",
-  },
-]);
+    // Notifications
+    const notifications = ref([
+      {
+        message: "You completed the 'Update website content' task.",
+        time: "2 hours ago",
+      },
+      {
+        message: "You completed the 'Clean up drive' task.",
+        time: "3 hours ago",
+      },
+      {
+        message: "You completed the 'Meeting with organizers' task.",
+        time: "5 hours ago",
+      },
+    ]);
 
-// Load event info on mount
-onMounted(() => {
-  event_id.value = route.query.event_id;
-  const events = JSON.parse(localStorage.getItem("events")) || [];
-  const existingEvent = events.find((e) => e.event_id == event_id.value);
+    // Load event info on mount
+    onMounted(() => {
+      event_id.value = route.query.event_id;
+      const events = JSON.parse(localStorage.getItem("events")) || [];
+      const existingEvent = events.find((e) => e.event_id == event_id.value);
 
-  if (existingEvent) {
-    title.value = existingEvent.title ?? "";
-    barangay.value = existingEvent.barangay ?? "";
-    date.value = existingEvent.date ?? "";
-    const [start, end] = (existingEvent.time ?? "").split(" - ");
-    startTime.value = start?.trim() ?? "";
-    endTime.value = end?.trim() ?? "";
-    organizer.value = existingEvent.organizer ?? "";
-    status.value = existingEvent.status ?? "";
-    objective.value = existingEvent.objective ?? "";
-    description.value = existingEvent.description ?? "";
-    thingsNeeded.value = existingEvent.thingsNeeded ?? [];
-    programs.value = existingEvent.programs ?? []; // ✅ Dito kukunin yung saved programs
-  } else {
-    alert("Event not found.");
-    router.push("/DashboardOrganizers");
-  }
-});
+      if (existingEvent) {
+        title.value = existingEvent.title ?? "";
+        barangay.value = existingEvent.barangay ?? "";
+        date.value = existingEvent.date ?? "";
+        const [start = "", end = ""] = (existingEvent.time ?? "").split(" - ");
+        startTime.value = start.trim();
+        endTime.value = end.trim();
+        organizer.value = existingEvent.organizer ?? "";
+        status.value = existingEvent.status ?? "";
+        objective.value = existingEvent.objective ?? "";
+        description.value = existingEvent.description ?? "";
+        thingsNeeded.value = existingEvent.thingsNeeded ?? [];
+        programs.value = existingEvent.programs ?? [];
+      } else {
+        alert("Event not found.");
+        router.push("/DashboardOrganizers");
+      }
+    });
 
-// Methods
-const toggleSidebar = () => {
-  isSidebarOpen.value = !isSidebarOpen.value;
-};
-
-const toggleNotifications = () => {
-  showNotifications.value = !showNotifications.value;
-};
-
-const confirmLogout = () => {
-  router.push("/login");
-};
-
-const addThing = () => {
-  if (newThing.value.trim()) {
-    thingsNeeded.value.push(newThing.value.trim());
-    newThing.value = "";
-  }
-};
-
-const removeThing = (index) => {
-  thingsNeeded.value.splice(index, 1);
-};
-
-const cancelEdit = () => {
-  title.value = "";
-  barangay.value = "";
-  date.value = "";
-  startTime.value = "";
-  endTime.value = "";
-  organizer.value = "";
-  status.value = "";
-  objective.value = "";
-  programs.value = [];
-  description.value = "";
-  thingsNeeded.value = [];
-  newThing.value = "";
-};
-
-const saveChanges = () => {
-  if (
-    !title.value.trim() ||
-    !barangay.value.trim() ||
-    !date.value.trim() ||
-    !startTime.value.trim() ||
-    !endTime.value.trim() ||
-    !objective.value.trim() ||
-    !description.value.trim() ||
-    thingsNeeded.value.length === 0 ||
-    !organizer.value.trim() ||
-    programs.value.length === 0
-  ) {
-    alert("You need to fill all the required input");
-    return;
-  }
-
-  const today = new Date();
-  const selectedDate = new Date(date.value);
-
-  // Prevent updating if date is in the past
-  if (selectedDate < today.setHours(0, 0, 0, 0)) {
-    alert("Your date is no longer available.");
-    return;
-  }
-
-  const events = JSON.parse(localStorage.getItem("events")) || [];
-
-  const index = events.findIndex((e) => e.event_id == event_id.value);
-  if (index !== -1) {
-    events[index] = {
-      ...events[index],
-      title: title.value,
-      barangay: barangay.value,
-      date: date.value,
-      time: `${startTime.value} - ${endTime.value}`,
-      organizer: organizer.value,
-      status: status.value,
-      objective: objective.value,
-      description: description.value,
-      programs: [...programs.value],
-      thingsNeeded: [...thingsNeeded.value],
+    const toggleSidebar = () => {
+      isSidebarOpen.value = !isSidebarOpen.value;
+      isOpen.value = !isOpen.value;
     };
 
-    localStorage.setItem("events", JSON.stringify(events));
-    alert("Event updated!");
-    router.push("/DashboardOrganizers");
-  } else {
-    alert("Event not found.");
-  }
+    const handleResize = () => {
+      /* ADDED */
+      this.isMobile = window.innerWidth <= 928;
+      if (this.isMobile) {
+        this.isSidebarOpen = false;
+      }
+    };
+
+    const toggleNotifications = () => {
+      showNotifications.value = !showNotifications.value;
+    };
+
+    const confirmLogout = () => {
+      router.push("/login");
+    };
+
+    const addThing = () => {
+      const trimmed = newThing.value.trim();
+      if (trimmed) {
+        thingsNeeded.value.push(trimmed);
+        newThing.value = "";
+      }
+    };
+
+    const removeThing = (index) => {
+      thingsNeeded.value.splice(index, 1);
+    };
+
+    const cancelEdit = () => {
+      title.value = "";
+      barangay.value = "";
+      date.value = "";
+      startTime.value = "";
+      endTime.value = "";
+      organizer.value = "";
+      status.value = "";
+      objective.value = "";
+      description.value = "";
+      programs.value = [];
+      thingsNeeded.value = [];
+      newThing.value = "";
+    };
+
+    const saveChanges = () => {
+      if (
+        !title.value.trim() ||
+        !barangay.value.trim() ||
+        !date.value.trim() ||
+        !startTime.value.trim() ||
+        !endTime.value.trim() ||
+        !organizer.value.trim() ||
+        !status.value.trim() ||
+        !objective.value.trim() ||
+        !description.value.trim() ||
+        programs.value.length === 0 ||
+        thingsNeeded.value.length === 0
+      ) {
+        alert("You need to fill all the required input");
+        return;
+      }
+
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const selectedDate = new Date(date.value);
+      selectedDate.setHours(0, 0, 0, 0);
+
+      if (selectedDate < today) {
+        alert("Your date is no longer available.");
+        return;
+      }
+
+      const events = JSON.parse(localStorage.getItem("events")) || [];
+      const index = events.findIndex((e) => e.event_id == event_id.value);
+
+      if (index !== -1) {
+        events[index] = {
+          ...events[index],
+          title: title.value,
+          barangay: barangay.value,
+          date: date.value,
+          time: `${startTime.value} - ${endTime.value}`,
+          organizer: organizer.value,
+          status: status.value,
+          objective: objective.value,
+          description: description.value,
+          programs: [...programs.value],
+          thingsNeeded: [...thingsNeeded.value],
+        };
+
+        localStorage.setItem("events", JSON.stringify(events));
+        alert("Event updated!");
+        router.push("/DashboardOrganizers");
+      } else {
+        alert("Event not found.");
+      }
+    };
+
+    return {
+      isSidebarOpen,
+      showNotifications,
+      showLogoutModal,
+      searchQuery,
+      isOpen,
+      isMobile,
+      event_id,
+      title,
+      barangay,
+      date,
+      startTime,
+      endTime,
+      programs,
+      programFilters,
+      organizer,
+      status,
+      objective,
+      description,
+      thingsNeeded,
+      newThing,
+      notifications,
+      toggleSidebar,
+      toggleNotifications,
+      confirmLogout,
+      addThing,
+      removeThing,
+      cancelEdit,
+      saveChanges,
+    };
+  },
 };
 </script>
 
-<style scoped src="/src/assets/CSS Organizers/create-event.css"></style>
+<style scoped src="/src/assets/CSS Organizers/edit-event.css"></style>
