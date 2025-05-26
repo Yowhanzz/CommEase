@@ -18,16 +18,38 @@
 
     <div class="input-container">
       <i class='bx bx-envelope'></i>
-      <input v-model="email" type="email" placeholder="Email" class="input-type" />
+      <input 
+        v-model="email" 
+        type="email" 
+        placeholder="Email" 
+        class="input-type"
+        :class="{ 'error': errors.email }"
+        @input="errors.email = ''"
+      />
+      <span class="error-message" v-if="errors.email">{{ errors.email }}</span>
     </div>
 
     <div class="input-container">
       <i class='bx bx-lock-alt'></i>
-      <input v-model="password" type="password" placeholder="Password" class="input-type" />
+      <input 
+        v-model="password" 
+        type="password" 
+        placeholder="Password" 
+        class="input-type"
+        :class="{ 'error': errors.password }"
+        @input="errors.password = ''"
+      />
+      <span class="error-message" v-if="errors.password">{{ errors.password }}</span>
     </div>
 
     <div class="button-separation">
-      <button class="login-btn" @click="handleLogin">LOGIN</button>
+      <button 
+        class="login-btn" 
+        @click="handleLogin"
+        :disabled="isLoading"
+      >
+        {{ isLoading ? 'LOGGING IN...' : 'LOGIN' }}
+      </button>
     </div>
   </div>
   </div>
@@ -36,50 +58,99 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ensureCsrfToken, login } from '../api/services'
+import { authService } from '../api/services'
 
+const router = useRouter()
 const email = ref('')
 const password = ref('')
-const router = useRouter()
 const isLoading = ref(false)
+const errors = ref({
+    email: '',
+    password: ''
+})
 
 onMounted(async () => {
-    await ensureCsrfToken();
+    try {
+        // Ensure CSRF token exists when reaching login page
+        await authService.ensureCsrfToken();
+    } catch (error) {
+        console.error('Failed to get CSRF token:', error);
+        alert('Failed to initialize login. Please refresh the page.');
+    }
 });
 
-async function handleLogin() {
-    if (!email.value.trim() || !password.value.trim()) {
-        alert('Please fill in both email and password.')
-        return
+const validateEmail = (email) => {
+    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return re.test(email);
+}
+
+const handleLogin = async () => {
+    // Reset errors
+    errors.value = {
+        email: '',
+        password: ''
+    };
+
+    // Validate inputs
+    if (!email.value.trim()) {
+        errors.value.email = 'Email is required';
+        return;
+    }
+    if (!validateEmail(email.value)) {
+        errors.value.email = 'Please enter a valid email address';
+        return;
+    }
+    if (!password.value.trim()) {
+        errors.value.password = 'Password is required';
+        return;
     }
 
-    // Validate email format
-    if (!email.value.endsWith('@gordoncollege.edu.ph')) {
-        alert('Please use your Gordon College email address (@gordoncollege.edu.ph)')
-        return
-    }
+    isLoading.value = true;
 
     try {
-        const response = await login(email.value, password.value)
-
-        const userData = response.data.user
-        const userRole = userData.role
-
-        localStorage.setItem('user', JSON.stringify(userData))
-        localStorage.setItem('role', userRole)
-
-        if (userRole === 'Volunteer') {
-            console.log('You are a volunteer, cannot access this page')
-            router.push('/LoginVolunteers')
+        const response = await authService.login(email.value, password.value);
+        console.log('Login successful:', response);
+        
+        // Check if user is an organizer
+        if (response.user && response.user.role === 'organizer') {
+            router.push('/DashboardOrganizers');
         } else {
-            router.push('/DashboardOrganizers')
+            alert('Access denied. This login is for organizers only.');
+            await authService.logout(); // Logout if not an organizer
         }
     } catch (error) {
-        console.error('Login failed:', error)
-        alert(error.message || 'Login failed. Please try again.')
+        console.error('Login failed:', error);
+        if (error.response?.status === 419) {
+            alert('Session expired. Please try logging in again.');
+        } else if (error.response?.status === 401) {
+            alert('Invalid email or password. Please check your credentials.');
+        } else if (error.response?.status === 403) {
+            alert('Please verify your email before logging in.');
+        } else {
+            alert('Login failed. Please check your credentials and try again.');
+        }
+    } finally {
+        isLoading.value = false;
     }
 }
 </script>
 
+<style scoped>
+.error-message {
+  color: #dc3545;
+  font-size: 0.8rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.input-type.error {
+  border-color: #dc3545;
+}
+
+.login-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+</style>
 
 <style scoped src="/src/assets/CSS Organizers/login.css"></style>

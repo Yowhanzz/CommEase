@@ -43,6 +43,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { authService } from '../api/services'
 
 const password = ref('')
 const confirmPassword = ref('')
@@ -88,15 +89,15 @@ const handleNext = async () => {
             confirmPassword: confirmPassword.value
         })
 
-        const response = await authService.createPassword({
+        const response = await authService.createPassword(
             email,
-            password: password.value,
-            confirmPassword: confirmPassword.value
-        })
+            password.value,
+            confirmPassword.value
+        )
 
         console.log('Password creation response:', response)
 
-        if (response.status === 200) {
+        if (response) {
             alert('Account created successfully!')
             // Clear temporary session data
             sessionStorage.removeItem('temp_email')
@@ -119,7 +120,7 @@ const handleNext = async () => {
                 alert('Invalid password. Please try again.')
             }
         } else {
-            alert('Failed to create account. Please try again.')
+            alert('Failed to create password. Please try again.')
         }
     }
 }

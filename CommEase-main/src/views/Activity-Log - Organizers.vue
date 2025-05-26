@@ -141,6 +141,7 @@
 <script>
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
+import { authService } from '@/api/services';
 
 export default {
   setup() {
@@ -220,20 +221,18 @@ export default {
       isOpen.value = !isOpen.value; // optional if you're toggling extra state
     };
 
-    const confirmLogout = () => {
-      showLogoutModal.value = false;
-      authService.logout()
-        .then(() => {
-          // Clear any local storage or state
-          localStorage.clear();
-          // Redirect to login page
-          router.push('/LoginOrganizers');
-        })
-        .catch((error) => {
-          console.error('Logout failed:', error);
-          // Even if the API call fails, we should still redirect to login
-          router.push('/LoginOrganizers');
-        });
+    const confirmLogout = async () => {
+      try {
+        await authService.logout();
+        // Clear any local storage or state
+        localStorage.clear();
+        // Redirect to login page
+        router.push('/LoginOrganizers');
+      } catch (error) {
+        console.error('Logout failed:', error);
+        // Even if the API call fails, we should still redirect to login
+        router.push('/LoginOrganizers');
+      }
     };
 
     return {

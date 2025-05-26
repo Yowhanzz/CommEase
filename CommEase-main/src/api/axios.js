@@ -12,16 +12,26 @@ export const api = axios.create({
 });
 
 // Add request interceptor to include CSRF token
-api.interceptors.request.use(config => {
+api.interceptors.request.use(async config => {
     // Get CSRF token from cookie
     const token = document.cookie.split('; ')
         .find(row => row.startsWith('XSRF-TOKEN='))
         ?.split('=')[1];
 
-    if (token) {
-        // Decode the token (it's base64 encoded)
-        const decodedToken = decodeURIComponent(token);
-        config.headers['X-XSRF-TOKEN'] = decodedToken;
+    if (!token) {
+        // If no token exists, get a new one
+        await axios.get('http://localhost:8000/sanctum/csrf-cookie', {
+            withCredentials: true
+        });
+        // Get the new token
+        const newToken = document.cookie.split('; ')
+            .find(row => row.startsWith('XSRF-TOKEN='))
+            ?.split('=')[1];
+        if (newToken) {
+            config.headers['X-XSRF-TOKEN'] = decodeURIComponent(newToken);
+        }
+    } else {
+        config.headers['X-XSRF-TOKEN'] = decodeURIComponent(token);
     }
 
     return config;
@@ -33,11 +43,12 @@ api.interceptors.response.use(
     error => {
         if (error.response?.status === 419) {
             // If we get a 419, try to refresh the CSRF token
-            return axios.get('http://localhost:8000/sanctum/csrf-cookie')
-                .then(() => {
-                    // Retry the original request
-                    return api(error.config);
-                });
+            return axios.get('http://localhost:8000/sanctum/csrf-cookie', {
+                withCredentials: true
+            }).then(() => {
+                // Retry the original request
+                return api(error.config);
+            });
         }
         return Promise.reject(error);
     }

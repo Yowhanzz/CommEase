@@ -91,6 +91,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { authService } from '../api/services'
 
 const router = useRouter()
 
@@ -168,21 +169,17 @@ const handleRegister = async () => {
     isLoading.value = true
 
     try {
-        console.log('Sending registration data:', {
+        const userData = {
             firstName: firstName.value.trim(),
             lastName: lastName.value.trim(),
             middleInitial: middleInitial.value.trim(),
             program: program.value.trim(),
             email: email.value.trim()
-        })
+        }
 
-        const response = await authService.register({
-            firstName: firstName.value.trim(),
-            lastName: lastName.value.trim(),
-            middleInitial: middleInitial.value.trim(),
-            program: program.value.trim(),
-            email: email.value.trim()
-        })
+        console.log('Sending registration data:', userData)
+
+        const response = await authService.register(userData)
 
         // Store email for OTP verification
         sessionStorage.setItem('temp_email', email.value.trim())
@@ -198,7 +195,6 @@ const handleRegister = async () => {
             const serverErrors = error.response.data.errors
             if (serverErrors) {
                 Object.keys(serverErrors).forEach(key => {
-                    console.log(`Server error for ${key}:`, serverErrors[key])
                     if (errors.value.hasOwnProperty(key)) {
                         errors.value[key] = serverErrors[key][0]
                     }

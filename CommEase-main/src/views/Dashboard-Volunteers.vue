@@ -12,7 +12,7 @@
 
       <ul>
         <li>
-          <router-link to="/dashboard_volunteers">
+          <router-link to="/DashboardVolunteers">
             <i class="bx bxs-dashboard"></i>
             <span class="nav-item" v-show="isSidebarOpen">Dashboard</span>
           </router-link>
@@ -24,7 +24,7 @@
           </router-link>
         </li>
         <li>
-          <router-link to="safety_protocol">
+          <router-link to="SafetyProtocols">
             <i class="bx bxs-shield-plus"></i>
             <span class="nav-item" v-show="isSidebarOpen"
               >Safety & Protocols</span
@@ -210,6 +210,7 @@ import { QrcodeStream } from "vue-qrcode-reader";
 import VueCal from "vue-cal";
 import VueQrcode from "@chenfengyuan/vue-qrcode";
 import "vue-cal/dist/vuecal.css";
+import { authService } from '../api/services';
 
 export default {
   components: {
@@ -368,12 +369,16 @@ export default {
         selected
       );
     },
-    confirmLogout() {
-      this.showLogoutModal = false;
-      // Clear any local storage or state
-      localStorage.clear();
-      // Redirect to login page
-      this.$router.push('/LoginVolunteers');
+    async confirmLogout() {
+      try {
+        await authService.logout();
+        this.showLogoutModal = false;
+        // Redirect to login page
+        this.$router.push('/LoginVolunteers');
+      } catch (error) {
+        console.error('Logout failed:', error);
+        alert('Failed to logout. Please try again.');
+      }
     },
   },
 };

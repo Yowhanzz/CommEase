@@ -10,6 +10,7 @@ use App\Http\Controllers\VolunteerController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Middleware\CheckRole;
+use App\Http\Middleware\CheckEventProgram;
 
 Route::middleware(['auth', 'web'])->get('/user', function (Request $request) {
     return $request->user();
@@ -36,30 +37,30 @@ Route::prefix('auth')->middleware(['web'])->group(function () {
 // Public Event Routes
 Route::middleware(['web'])->group(function () {
     Route::get('events', [EventController::class, 'index']);
-    Route::get('events/{event}', [EventController::class, 'show']);
+    Route::get('events/{event}', [EventController::class, 'show'])->middleware(CheckEventProgram::class);
 });
 
 // Protected Organizer Routes
 Route::middleware(['auth', CheckRole::class.':organizer'])->group(function () {
     Route::post('events', [EventController::class, 'store']);
-    Route::put('events/{event}', [EventController::class, 'update']);
-    Route::delete('events/{event}', [EventController::class, 'destroy']);
-    Route::post('events/{event}/start', [EventController::class, 'startEvent']);
-    Route::post('events/{event}/end', [EventController::class, 'endEvent']);
-    Route::get('events/{event}/analytics', [EventController::class, 'getAnalytics']);
-    Route::post('events/{event}/attendance', [EventController::class, 'markAttendance']);
-    Route::get('events/{event}/attendance', [EventController::class, 'getAttendance']);
-    Route::get('events/{event}/feedback', [EventController::class, 'getFeedback']);
+    Route::put('events/{event}', [EventController::class, 'update'])->middleware(CheckEventProgram::class);
+    Route::delete('events/{event}', [EventController::class, 'destroy'])->middleware(CheckEventProgram::class);
+    Route::post('events/{event}/start', [EventController::class, 'startEvent'])->middleware(CheckEventProgram::class);
+    Route::post('events/{event}/end', [EventController::class, 'endEvent'])->middleware(CheckEventProgram::class);
+    Route::get('events/{event}/analytics', [EventController::class, 'getAnalytics'])->middleware(CheckEventProgram::class);
+    Route::post('events/{event}/attendance', [EventController::class, 'markAttendance'])->middleware(CheckEventProgram::class);
+    Route::get('events/{event}/attendance', [EventController::class, 'getAttendance'])->middleware(CheckEventProgram::class);
+    Route::get('events/{event}/feedback', [EventController::class, 'getFeedback'])->middleware(CheckEventProgram::class);
 });
 
 // Protected Volunteer Routes
 Route::middleware(['auth', CheckRole::class.':volunteer'])->group(function () {
-    Route::post('events/{event}/register', [VolunteerController::class, 'registerForEvent']);
-    Route::post('events/{event}/unregister', [VolunteerController::class, 'unregisterFromEvent']);
-    Route::post('events/{event}/things-brought', [VolunteerController::class, 'submitThingsBrought']);
-    Route::post('events/{event}/suggestions', [VolunteerController::class, 'submitSuggestion']);
+    Route::post('events/{event}/register', [VolunteerController::class, 'registerForEvent'])->middleware(CheckEventProgram::class);
+    Route::post('events/{event}/unregister', [VolunteerController::class, 'unregisterFromEvent'])->middleware(CheckEventProgram::class);
+    Route::post('events/{event}/things-brought', [VolunteerController::class, 'submitThingsBrought'])->middleware(CheckEventProgram::class);
+    Route::post('events/{event}/suggestions', [VolunteerController::class, 'submitSuggestion'])->middleware(CheckEventProgram::class);
     Route::get('event-history', [VolunteerController::class, 'getEventHistory']);
-    Route::post('events/{event}/feedback', [EventController::class, 'submitFeedback']);
+    Route::post('events/{event}/feedback', [EventController::class, 'submitFeedback'])->middleware(CheckEventProgram::class);
 });
 
 // Protected User Routes (for both organizers and volunteers)

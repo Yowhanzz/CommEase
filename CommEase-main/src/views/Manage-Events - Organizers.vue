@@ -136,7 +136,7 @@
           <td data-label="Time">{{ event.barangay }}</td>
           <td data-label="Date">{{ event.date }}</td>
           <td data-label="Time">{{ `${event.start_time} - ${event.end_time}` }}</td>
-          <td data-label="Organizer">{{ event.organizer }}</td>
+          <td data-label="Organizer">{{ event.organizer?.first_name }} {{ event.organizer?.last_name }}</td>
           <td>{{ (event.programs || []).join(', ') }}</td>
 
           <td>
@@ -172,6 +172,7 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
+import { eventService, authService } from '../api/services';
 
 const router = useRouter();
 const showNotifications = ref(false);
@@ -196,7 +197,8 @@ const filteredEvents = computed(() => {
     event.barangay.toLowerCase().includes(query) ||
     event.date.toLowerCase().includes(query) ||
     `${event.start_time} - ${event.end_time}`.toLowerCase().includes(query) ||
-    event.organizer?.toLowerCase().includes(query) ||
+    event.organizer?.first_name?.toLowerCase().includes(query) ||
+    event.organizer?.last_name?.toLowerCase().includes(query) ||
     event.status.toLowerCase().includes(query)
   );
 });

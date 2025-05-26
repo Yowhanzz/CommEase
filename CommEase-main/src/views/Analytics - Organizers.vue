@@ -224,6 +224,7 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
+import { authService } from '@/api/services';
 import BarChart from "@/components/Barchart.vue";
 import PieChart from "@/components/PieChart.vue";
 
@@ -282,8 +283,18 @@ const toggleNotifications = () => {
   showNotifications.value = !showNotifications.value;
 };
 
-const confirmLogout = () => {
-  router.push("/LoginVolunteers"); // Update this if your logout logic is different
+const confirmLogout = async () => {
+  try {
+    await authService.logout();
+    // Clear any local storage or state
+    localStorage.clear();
+    // Redirect to login page
+    router.push('/LoginOrganizers');
+  } catch (error) {
+    console.error('Logout failed:', error);
+    // Even if the API call fails, we should still redirect to login
+    router.push('/LoginOrganizers');
+  }
 };
 </script>
 

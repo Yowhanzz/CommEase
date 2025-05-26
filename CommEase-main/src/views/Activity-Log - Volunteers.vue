@@ -136,6 +136,7 @@
 <script>
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { authService } from '../api/services';
 
 export default {
   data() {
@@ -226,12 +227,16 @@ export default {
       this.isOpen = !this.isOpen; 
     }, 
 
-    confirmLogout() {
-      this.showLogoutModal = false;
-      // Clear any local storage or state
-      localStorage.clear();
-      // Redirect to login page
-      this.$router.push('/LoginVolunteers');
+    async confirmLogout() {
+      try {
+        await authService.logout();
+        this.showLogoutModal = false;
+        // Redirect to login page
+        this.$router.push('/LoginVolunteers');
+      } catch (error) {
+        console.error('Logout failed:', error);
+        alert('Failed to logout. Please try again.');
+      }
     }
   }
 };

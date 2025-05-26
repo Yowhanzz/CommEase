@@ -41,6 +41,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { authService } from '../api/services'
 
 const router = useRouter()
 
@@ -103,13 +104,11 @@ async function handleSubmit(event) {
             otp
         })
 
-        // Placeholder for the removed authService
-        const response = { status: 200 } // Placeholder response
+        const response = await authService.verifyOtp(email, otp)
 
         console.log('OTP verification response:', response)
 
-        // Check if the response is successful (status 200)
-        if (response.status === 200) {
+        if (response) {
             alert('OTP verified successfully')
             // Store the email for password creation
             sessionStorage.setItem('temp_email', email)

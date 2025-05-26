@@ -209,6 +209,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import { authService } from '@/api/services';
 
 const route = useRoute();
 const router = useRouter();
@@ -347,9 +348,14 @@ const saveChanges = async () => {
 const confirmLogout = async () => {
   try {
     await authService.logout();
+    // Clear any local storage or state
+    localStorage.clear();
+    // Redirect to login page
     router.push('/LoginOrganizers');
   } catch (error) {
     console.error('Logout failed:', error);
+    // Even if the API call fails, we should still redirect to login
+    router.push('/LoginOrganizers');
   }
 };
 </script>

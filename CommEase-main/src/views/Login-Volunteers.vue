@@ -41,37 +41,38 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import { ensureCsrfToken } from '../api/services'
+import { authService } from '../api/services'
 
+const router = useRouter()
 const email = ref('')
 const password = ref('')
-const router = useRouter()
 const isLoading = ref(false)
 
 onMounted(async () => {
 	// Ensure CSRF token exists when reaching login page
-	await ensureCsrfToken();
+	await authService.ensureCsrfToken();
 });
 
-async function handleLogin() {
+const handleLogin = async () => {
 	if (!email.value.trim() || !password.value.trim()) {
 		alert('Please fill in both email and password.')
 		return
 	}
 
-	const login = async (email, password) => {
-		try {
-			const response = await api.post('auth/login', {
-				email: email,
-				password: password,
-			})
-		} catch (error) {
-			console.error('Login failed:', error)
-			if (error.response?.status === 419) {
-				alert('Session expired. Please try logging in again.')
-			} else {
-				alert('Login failed. Please check your credentials and try again.')
-			}
+	try {
+		const response = await authService.login(email.value, password.value)
+		console.log('Login successful:', response)
+		router.push('/DashboardVolunteers')
+	} catch (error) {
+		console.error('Login failed:', error)
+		if (error.response?.status === 419) {
+			alert('Session expired. Please try logging in again.')
+		} else if (error.response?.status === 401) {
+			alert('Invalid email or password. Please check your credentials.')
+		} else if (error.response?.status === 403) {
+			alert('Please verify your email before logging in.')
+		} else {
+			alert('Login failed. Please check your credentials and try again.')
 		}
 	}
 }

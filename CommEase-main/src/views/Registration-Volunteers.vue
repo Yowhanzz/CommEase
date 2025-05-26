@@ -11,7 +11,7 @@
 
       <ul>
         <li>
-          <router-link to="/dashboard_volunteers">
+          <router-link to="/DashboardVolunteers">
             <i class="bx bxs-dashboard"></i>
             <span class="nav-item" v-show="isSidebarOpen">Dashboard</span>
           </router-link>
@@ -243,15 +243,16 @@
 <script setup>
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
+import { authService } from '../api/services';
 
 // === Sidebar Toggle ===
 const isSidebarOpen = ref(true);
-const isOpen = ref(false); // Added this based on your request
+const isOpen = ref(false);
 const isMobile = ref(false);
 
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value;
-  isOpen.value = !isOpen.value; // Sync both values
+  isOpen.value = !isOpen.value;
 };
 
 const handleResize = () => {
@@ -283,9 +284,17 @@ const notifications = ref([
 // === Logout Modal ===
 const showLogoutModal = ref(false);
 const router = useRouter();
-const confirmLogout = () => {
-  showLogoutModal.value = false;
-  router.push('/LoginVolunteers');
+
+const confirmLogout = async () => {
+  try {
+    await authService.logout();
+    showLogoutModal.value = false;
+    // Redirect to login page
+    router.push('/LoginVolunteers');
+  } catch (error) {
+    console.error('Logout failed:', error);
+    alert('Failed to logout. Please try again.');
+  }
 };
 
 const registrationForm = ref([
