@@ -14,7 +14,8 @@ class VolunteerController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['auth', 'role:volunteer']);
+        $this->middleware('auth');
+        $this->middleware('role:volunteer');
     }
 
     public function registerForEvent(Request $request, Event $event)
@@ -23,7 +24,7 @@ class VolunteerController extends Controller
             return response()->json(['message' => 'Cannot register for this event'], 422);
         }
 
-        if (!$event->programs->contains($request->user()->program)) {
+        if (!in_array($request->user()->program, $event->programs)) {
             return response()->json(['message' => 'This event is not available for your program'], 422);
         }
 

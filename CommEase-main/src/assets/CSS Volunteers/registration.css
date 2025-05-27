@@ -837,3 +837,157 @@ textarea:focus {
 }
 
 /* MAY HORIZONTAL SCROLLING PA */
+
+.event-info-container {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.event-header {
+  margin-bottom: 2rem;
+}
+
+.event-header h2 {
+  color: #333;
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+.event-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.event-meta p {
+  margin: 0.5rem 0;
+  color: #555;
+}
+
+.event-meta span {
+  font-weight: 600;
+  color: #333;
+}
+
+.event-content {
+  margin: 2rem 0;
+}
+
+.content-section {
+  margin-bottom: 2rem;
+}
+
+.content-section h3 {
+  color: #333;
+  font-size: 1.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.content-section hr {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 0.5rem 0 1rem;
+}
+
+.task-separation {
+  background: rgba(255, 255, 255, 0.7);
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+.task-bullet-points {
+  list-style: none;
+  padding: 0;
+}
+
+.p-per-task {
+  margin: 0.5rem 0;
+  color: #555;
+  line-height: 1.5;
+}
+
+.event-footer {
+  margin-top: 2rem;
+  padding-top: 1rem;
+  border-top: 1px solid #ddd;
+}
+
+.task-note {
+  background: rgba(255, 255, 255, 0.7);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.span-take-note {
+  font-weight: 600;
+  color: #333;
+}
+
+.button-specific-event {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.button-things-back,
+.button-things-submit {
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.button-things-back {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.button-things-submit {
+  background: #4CAF50;
+  color: white;
+}
+
+.button-things-back:hover {
+  background: #e0e0e0;
+}
+
+.button-things-submit:hover {
+  background: #45a049;
+}
+
+.button-things-back:disabled,
+.button-things-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Loading and Error States */
+.loading-message,
+.error-message,
+.no-event-message {
+  text-align: center;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 15px;
+  margin: 1rem 0;
+}
+
+.error-message {
+  color: #d32f2f;
+}
+
+.loading-message {
+  color: #666;
+}
+
+.no-event-message {
+  color: #666;
+  font-style: italic;
+}

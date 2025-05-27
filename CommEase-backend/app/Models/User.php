@@ -75,7 +75,7 @@ class User extends Authenticatable
 
     public function volunteeredEvents()
     {
-        return $this->belongsToMany(Event::class, 'event_volunteers')
+        return $this->belongsToMany(Event::class, 'event_volunteers', 'user_id', 'event_id')
             ->withPivot('things_brought', 'time_in', 'time_out')
             ->withTimestamps();
     }

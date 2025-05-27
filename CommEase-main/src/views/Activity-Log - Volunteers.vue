@@ -113,17 +113,26 @@
             <th>Date</th>
             <th>Time</th>
             <th>Organizer</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(event, index) in filteredEvents" :key="index">
             <td>{{ index + 1 }}</td>
-            <!-- No. column -->
             <td>{{ event.title }}</td>
             <td>{{ event.barangay }}</td>
-            <td>{{ event.date }}</td>
-            <td>{{ event.time }}</td>
+            <td>{{ formatDate(event.date) }}</td>
+            <td>{{ formatTime(event.time_in) }} - {{ formatTime(event.time_out) }}</td>
             <td>{{ event.organizer }}</td>
+            <td>
+              <button 
+                v-if="event.status === 'upcoming'"
+                @click="unregisterFromEvent(event.id)" 
+                class="unregister-btn"
+              >
+                Unregister
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -134,9 +143,13 @@
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { authService } from '../api/services';
+import axios from 'axios';
+
+// Configure axios default base URL
+axios.defaults.baseURL = 'http://localhost:8000'; // Update this to match your Laravel backend URL
 
 export default {
   data() {
@@ -145,10 +158,7 @@ export default {
       showLogoutModal: false,
       isOpen: false,
       isSidebarOpen: false,
-
-      //
       isMobile: false,
-
       searchQuery: "",
       notifications: [
         {
@@ -164,58 +174,84 @@ export default {
           time: "5 hours ago",
         },
       ],
-      events: [
-        {
-          title: "Clean Up Drive",
-          barangay: "East Bajac - Bajac",
-          date: "08/06/2025",
-          time: "10:00 - 12:00",
-          organizer: "ELITES",
-        },
-        {
-          title: "Tree Planting",
-          barangay: "West Bajac - Bajac",
-          date: "09/10/2025",
-          time: "8:00 - 10:00",
-          organizer: "GREEN INITIATIVE",
-        },
-        {
-          title: "Feeding Program",
-          barangay: "North Bajac - Bajac",
-          date: "10/12/2025",
-          time: "2:00 - 4:00",
-          organizer: "HELPING HANDS",
-        },
-        {
-          title: "Blood Donation",
-          barangay: "South Bajac - Bajac",
-          date: "12/15/2025",
-          time: "9:00 - 1:00",
-          organizer: "HEALTH TEAM",
-        },
-      ],
+      events: [],
     };
   },
   computed: {
     filteredEvents() {
+      if (!Array.isArray(this.events)) {
+        return [];
+      }
       const query = this.searchQuery.toLowerCase();
       return this.events.filter(
         (event) =>
           event.title.toLowerCase().includes(query) ||
-          event.barangay.toLowerCase().includes(query) ||
-          event.date.toLowerCase().includes(query) ||
-          event.time.toLowerCase().includes(query) ||
-          event.organizer.toLowerCase().includes(query)
+          event.organizer.toLowerCase().includes(query) ||
+          this.formatDate(event.date).toLowerCase().includes(query)
       );
     },
   },
   methods: {
+    async fetchEventHistory() {
+      try {
+        console.log('Fetching event history...');
+        const response = await axios.get('/api/event-history', {
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          withCredentials: true // This is important for handling cookies/session
+        });
+        console.log('API Response:', response.data);
+        this.events = Array.isArray(response.data) ? response.data : [];
+        console.log('Processed events:', this.events);
+      } catch (error) {
+        console.error('Failed to fetch event history:', error);
+        console.error('Error details:', error.response?.data || error.message);
+        this.events = []; // Ensure events is an array even on error
+        alert('Failed to load event history. Please try again.');
+      }
+    },
+
+    async unregisterFromEvent(eventId) {
+      if (!confirm('Are you sure you want to unregister from this event?')) {
+        return;
+      }
+
+      try {
+        await axios.post(`/api/events/${eventId}/unregister`);
+        await this.fetchEventHistory(); // Refresh the list
+        alert('Successfully unregistered from the event');
+      } catch (error) {
+        console.error('Failed to unregister:', error);
+        alert('Failed to unregister from the event. Please try again.');
+      }
+    },
+
+    formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+    },
+
+    formatTime(timeString) {
+      if (!timeString) return 'N/A';
+      const date = new Date(timeString);
+      return date.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: true
+      });
+    },
+
     toggleNotifications() {
       this.showNotifications = !this.showNotifications;
     },
 
     handleResize() {
-      /* ADDED */
       this.isMobile = window.innerWidth <= 928;
       if (this.isMobile) {
         this.isSidebarOpen = false;
@@ -231,15 +267,44 @@ export default {
       try {
         await authService.logout();
         this.showLogoutModal = false;
-        // Redirect to login page
         this.$router.push('/LoginVolunteers');
       } catch (error) {
         console.error('Logout failed:', error);
         alert('Failed to logout. Please try again.');
       }
     }
+  },
+  mounted() {
+    this.fetchEventHistory();
+    window.addEventListener('resize', this.handleResize);
+    this.handleResize();
+  },
+  beforeUnmount() {
+    window.removeEventListener('resize', this.handleResize);
   }
 };
 </script>
 
 <style scoped src="/src/assets/CSS Volunteers/Activitylog.css"></style>
+<style scoped>
+/* Add these styles to your existing CSS */
+.unregister-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.unregister-btn:hover {
+  background-color: #c82333;
+}
+
+.unregister-btn:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+</style>

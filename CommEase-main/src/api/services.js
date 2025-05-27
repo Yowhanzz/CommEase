@@ -1,22 +1,22 @@
 import api from './axios';
 import axios from 'axios';
 
-export const ensureCsrfToken = async () => {
-    try {
-        const response = await axios.get('http://localhost:8000/sanctum/csrf-cookie', {
-            withCredentials: true
-        });
-        return response.data;
-    } catch (error) {
-        console.error('Failed to get CSRF token:', error);
-        throw error;
-    }
-};
-
 export const authService = {
+    async ensureCsrfToken() {
+        try {
+            const response = await axios.get('http://localhost:8000/sanctum/csrf-cookie', {
+                withCredentials: true
+            });
+            return response.data;
+        } catch (error) {
+            console.error('Failed to get CSRF token:', error);
+            throw error;
+        }
+    },
+
     async register(userData) {
         try {
-            await ensureCsrfToken();
+            await this.ensureCsrfToken();
             const response = await api.post('/auth/register', userData);
             return response.data;
         } catch (error) {
@@ -27,7 +27,7 @@ export const authService = {
 
     async verifyOtp(email, otp) {
         try {
-            await ensureCsrfToken();
+            await this.ensureCsrfToken();
             const response = await api.post('/auth/verify-otp', { email, otp });
             return response.data;
         } catch (error) {
@@ -38,7 +38,7 @@ export const authService = {
 
     async createPassword(email, password, confirmPassword) {
         try {
-            await ensureCsrfToken();
+            await this.ensureCsrfToken();
             const response = await api.post('/auth/create-password', {
                 email,
                 password,
@@ -53,7 +53,7 @@ export const authService = {
 
     async login(email, password) {
         try {
-            await ensureCsrfToken();
+            await this.ensureCsrfToken();
             const response = await api.post('/auth/login', { email, password });
             return response.data;
         } catch (error) {
@@ -64,7 +64,7 @@ export const authService = {
 
     async logout() {
         try {
-            await ensureCsrfToken();
+            await this.ensureCsrfToken();
             const response = await api.post('/auth/logout');
             return response.data;
         } catch (error) {
@@ -77,7 +77,7 @@ export const authService = {
 export const eventService = {
     async createEvent(eventData) {
         try {
-            await ensureCsrfToken();
+            await authService.ensureCsrfToken();
             const response = await api.post('/events', eventData);
             return response;
         } catch (error) {
@@ -115,7 +115,7 @@ export const eventService = {
                 }
             });
             console.log('Event API response:', response);
-            return response;
+            return response.data;
         } catch (error) {
             console.error('Get event error details:', {
                 status: error.response?.status,
@@ -132,7 +132,7 @@ export const eventService = {
 
     async register(eventId) {
         try {
-            await ensureCsrfToken();
+            await authService.ensureCsrfToken();
             const response = await api.post(`/events/${eventId}/register`);
             return response;
         } catch (error) {
@@ -143,7 +143,7 @@ export const eventService = {
 
     async submitThingsBrought(eventId, data) {
         try {
-            await ensureCsrfToken();
+            await authService.ensureCsrfToken();
             const response = await api.post(`/events/${eventId}/things-brought`, data);
             return response;
         } catch (error) {
@@ -154,7 +154,7 @@ export const eventService = {
 
     async submitSuggestion(eventId, data) {
         try {
-            await ensureCsrfToken();
+            await authService.ensureCsrfToken();
             const response = await api.post(`/events/${eventId}/suggestions`, data);
             return response;
         } catch (error) {
@@ -165,7 +165,7 @@ export const eventService = {
 
     async updateEvent(eventId, eventData) {
         try {
-            await ensureCsrfToken();
+            await authService.ensureCsrfToken();
             console.log('Updating event with data:', JSON.stringify(eventData, null, 2));
             const response = await api.put(`/events/${eventId}`, eventData);
             console.log('Update response:', response);
@@ -196,7 +196,7 @@ export const eventService = {
 
     async deleteEvent(eventId) {
         try {
-            await ensureCsrfToken();
+            await authService.ensureCsrfToken();
             const response = await api.delete(`/events/${eventId}`);
             return response;
         } catch (error) {
