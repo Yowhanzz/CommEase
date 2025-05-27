@@ -55,7 +55,7 @@
     <div class="dropdown">
       <button class="dropbtn" @click="toggleDropdown">Options ▼</button>
       <div class="dropdown-content" :class="{ active: showDropdown }">
-        <a @click="showQRCode = true">Show My QR Code</a>
+        <a @click="openQRCodeModal">Show My QR Code</a>
         <a @click="toggleCalendar">Calendar</a>
       </div>
     </div>
@@ -80,7 +80,7 @@
         <h3 class="modal-title">Your QR Code</h3>
         <button class="close-btn-qr" @click="closeQRCode">✕</button>
       </div>
-      <vue-qrcode :value="qrValue" :options="{ width: 200, height: 200 }" />
+      <img v-if="qrValue" :src="qrValue" alt="QR Code" style="width:200px;height:200px;" />
       <p class="qr-label">
         Scan this QR to attend quickly to the event you want
       </p>
@@ -206,14 +206,14 @@
           </div>
           <div class="button">
             <button 
-              v-if="event.status === 'upcoming'"
+              v-if="event.status && event.status.toLowerCase() === 'upcoming'"
               @click="registerForEvent(event.id)" 
               class="button-enter"
             >
               Register
             </button>
             <span v-else class="button-enter disabled">
-              {{ event.status }}
+              {{ event.status.charAt(0).toUpperCase() + event.status.slice(1) }}
             </span>
           </div>
         </div>
@@ -229,7 +229,7 @@ import { QrcodeStream } from "vue-qrcode-reader";
 import VueCal from "vue-cal";
 import VueQrcode from "@chenfengyuan/vue-qrcode";
 import "vue-cal/dist/vuecal.css";
-import { authService, eventService } from '../api/services';
+import { authService, eventService, formatTime, formatDate, qrService } from '../api/services';
 import axios from 'axios';
 
 export default {
@@ -238,10 +238,17 @@ export default {
     VueCal,
     VueQrcode,
   },
+  setup() {
+    return {
+      formatTime,
+      formatDate
+    };
+  },
   data() {
     return {
       // QR Code
       showQRCode: false,
+      qrValue: '',
       userEmail: "",
       userPassword: "",
 
@@ -311,8 +318,10 @@ export default {
       try {
         this.loading = true;
         this.error = null;
-        const response = await eventService.getEvents();
-        this.events = response.data.data;
+        const response = await eventService.getEventsVolunteer();
+        // Handle both possible response structures
+        const eventsData = response.data.data || response.data;
+        this.events = Array.isArray(eventsData) ? eventsData : [];
       } catch (err) {
         this.error = err.response?.data?.message || 'Failed to fetch events';
         console.error('Error fetching events:', err);
@@ -341,8 +350,20 @@ export default {
     toggleDropdown() {
       this.showDropdown = !this.showDropdown;
     },
+    async openQRCodeModal() {
+      try {
+        // Fetch permanent user QR code from backend
+        const response = await qrService.getUserQR();
+        this.qrValue = response.qr_code;
+        this.showQRCode = true;
+      } catch (error) {
+        alert('Failed to generate QR code');
+        this.qrValue = '';
+      }
+    },
     closeQRCode() {
       this.showQRCode = false;
+      this.qrValue = '';
       localStorage.setItem("qrModalShown", "true");
     },
     toggleCalendar() {
@@ -358,23 +379,6 @@ export default {
     },
     toggleNotifications() {
       this.showNotifications = !this.showNotifications;
-    },
-    formatTime(datetime) {
-      if (!datetime) return '';
-      return new Date(datetime).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false
-      });
-    },
-    formatDate(datetime) {
-      if (!datetime) return '';
-      return new Date(datetime).toLocaleDateString([], {
-        weekday: "short",
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      });
     },
     onDateClick({ date }) {
       const selected = this.events.find((event) => {

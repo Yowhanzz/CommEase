@@ -159,15 +159,12 @@
 
       <div class="things-needed-container">
         <div class="things-separation">
-          <button
-            v-for="(item, index) in thingsNeeded"
-            :key="index"
-            class="things-button"
-            @click="removeThing(index)"
-          >
-            <span>{{ item }}</span>
-            <span class="thing-x">✖</span>
-          </button>
+          <div v-for="(item, index) in thingsNeeded" :key="index" class="thing-item">
+            <button class="things-button" @click="removeThing(index)">
+              <span>{{ item }}</span>
+              <span class="thing-x">✖</span>
+            </button>
+          </div>
         </div>
 
         <div class="input-and-buttons">
@@ -177,6 +174,7 @@
               class="things-input"
               type="text"
               placeholder="Things needed"
+              @keyup.enter="addThing"
             />
             <button @click="addThing" class="add-inside-button">Add</button>
           </div>
@@ -192,16 +190,15 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { eventService } from '../api/services';
 import { authService } from '../api/services';
 
 // === Sidebar Toggle ===
 const isSidebarOpen = ref(true);
-const toggleSidebar = () => {
-  isSidebarOpen.value = !isSidebarOpen.value;
-};
+const isOpen = ref(false);
+const isMobile = ref(false);
 
 // === Data for the Component ===
 const showNotifications = ref(false);
@@ -373,6 +370,63 @@ const confirmLogout = async () => {
 const toggleNotifications = () => {
   showNotifications.value = !showNotifications.value;
 };
+
+const toggleSidebar = () => {
+  isSidebarOpen.value = !isSidebarOpen.value;
+  isOpen.value = !isOpen.value;
+};
+
+const handleResize = () => {
+  isMobile.value = window.innerWidth <= 928;
+  if (isMobile.value) {
+    isSidebarOpen.value = false;
+  }
+};
+
+onMounted(() => {
+  window.addEventListener('resize', handleResize);
+  handleResize();
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize);
+});
 </script>
 
 <style scoped src="/src/assets/CSS Organizers/create-event.css"></style>
+
+<style scoped>
+/* Add these styles */
+.thing-item {
+  margin: 5px;
+  display: inline-block;
+}
+
+.things-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.things-button:hover {
+  background: #f8f8f8;
+}
+
+.thing-x {
+  color: #dc3545;
+  font-size: 14px;
+}
+
+.things-separation {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 15px;
+}
+</style>

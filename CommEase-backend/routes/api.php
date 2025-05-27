@@ -11,6 +11,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Middleware\CheckRole;
 use App\Http\Middleware\CheckEventProgram;
+use App\Http\Controllers\AttendanceController;
+use App\Http\Controllers\QRController;
 
 Route::middleware(['auth', 'web'])->get('/user', function (Request $request) {
     return $request->user();
@@ -51,6 +53,8 @@ Route::middleware(['auth', CheckRole::class.':organizer'])->group(function () {
     Route::post('events/{event}/attendance', [EventController::class, 'markAttendance'])->middleware(CheckEventProgram::class);
     Route::get('events/{event}/attendance', [EventController::class, 'getAttendance'])->middleware(CheckEventProgram::class);
     Route::get('events/{event}/feedback', [EventController::class, 'getFeedback'])->middleware(CheckEventProgram::class);
+    Route::post('events/{event}/scan-qr', [AttendanceController::class, 'scanQR'])->middleware(CheckEventProgram::class);
+    Route::get('events/{event}/attendance-status', [AttendanceController::class, 'getAttendanceStatus'])->middleware(CheckEventProgram::class);
 });
 
 // Protected Volunteer Routes
@@ -61,6 +65,11 @@ Route::middleware(['auth', CheckRole::class.':volunteer'])->group(function () {
     Route::post('events/{event}/suggestions', [VolunteerController::class, 'submitSuggestion'])->middleware(CheckEventProgram::class);
     Route::get('event-history', [VolunteerController::class, 'getEventHistory']);
     Route::post('events/{event}/feedback', [EventController::class, 'submitFeedback'])->middleware(CheckEventProgram::class);
+    
+    
+    // QR Code Routes for Volunteers
+    Route::post('events/{event}/generate-qr', [QRController::class, 'generateQR'])->middleware(CheckEventProgram::class);
+    Route::get('events/{event}/qr-status', [QRController::class, 'getQRStatus'])->middleware(CheckEventProgram::class);
 });
 
 // Protected User Routes (for both organizers and volunteers)
@@ -69,4 +78,5 @@ Route::middleware(['auth'])->group(function () {
     Route::put('user/profile', [AuthController::class, 'updateProfile']);
     Route::get('notifications', [NotificationController::class, 'index']);
     Route::put('notifications/{notification}', [NotificationController::class, 'markAsRead']);
+    Route::get('user/qr', [AuthController::class, 'getUserQR']);
 });

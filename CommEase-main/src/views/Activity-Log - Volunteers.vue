@@ -119,10 +119,10 @@
         <tbody>
           <tr v-for="(event, index) in filteredEvents" :key="index">
             <td>{{ index + 1 }}</td>
-            <td>{{ event.title }}</td>
+            <td>{{ event.event_title || event.title }}</td>
             <td>{{ event.barangay }}</td>
             <td>{{ formatDate(event.date) }}</td>
-            <td>{{ formatTime(event.time_in) }} - {{ formatTime(event.time_out) }}</td>
+            <td>{{ formatTime(event.start_time) }} - {{ formatTime(event.end_time) }}</td>
             <td>{{ event.organizer }}</td>
             <td>
               <button 
@@ -142,147 +142,129 @@
   <div class="overlay" v-if="!isMobile && isSidebarOpen"></div>
 </template>
 
-<script>
-import { ref, onMounted } from 'vue';
+<script setup>
+import { ref, onMounted, computed, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { authService } from '../api/services';
+import { authService, formatTime, formatDate, eventService } from '../api/services';
 import axios from 'axios';
 
-// Configure axios default base URL
-axios.defaults.baseURL = 'http://localhost:8000'; // Update this to match your Laravel backend URL
+// Configure axios default base URL (this might be better configured globally elsewhere)
+axios.defaults.baseURL = 'http://localhost:8000';
 
-export default {
-  data() {
-    return {
-      showNotifications: false,
-      showLogoutModal: false,
-      isOpen: false,
-      isSidebarOpen: false,
-      isMobile: false,
-      searchQuery: "",
-      notifications: [
-        {
-          message: "You completed the 'Update website content' task.",
-          time: "2 hours ago",
-        },
-        {
-          message: "You completed the 'Clean up drive' task.",
-          time: "3 hours ago",
-        },
-        {
-          message: "You completed the 'Meeting with organizers' task.",
-          time: "5 hours ago",
-        },
-      ],
-      events: [],
-    };
+const router = useRouter();
+
+const showNotifications = ref(false);
+const showLogoutModal = ref(false);
+const isOpen = ref(false);
+const isSidebarOpen = ref(false);
+const isMobile = ref(false);
+const searchQuery = ref("");
+const events = ref([]);
+
+const notifications = ref([
+  {
+    message: "You completed the 'Update website content' task.",
+    time: "2 hours ago",
   },
-  computed: {
-    filteredEvents() {
-      if (!Array.isArray(this.events)) {
-        return [];
-      }
-      const query = this.searchQuery.toLowerCase();
-      return this.events.filter(
-        (event) =>
-          event.title.toLowerCase().includes(query) ||
-          event.organizer.toLowerCase().includes(query) ||
-          this.formatDate(event.date).toLowerCase().includes(query)
-      );
-    },
+  {
+    message: "You completed the 'Clean up drive' task.",
+    time: "3 hours ago",
   },
-  methods: {
-    async fetchEventHistory() {
-      try {
-        console.log('Fetching event history...');
-        const response = await axios.get('/api/event-history', {
-          headers: {
-            'Accept': 'application/json',
-            'Content-Type': 'application/json'
-          },
-          withCredentials: true // This is important for handling cookies/session
-        });
-        console.log('API Response:', response.data);
-        this.events = Array.isArray(response.data) ? response.data : [];
-        console.log('Processed events:', this.events);
-      } catch (error) {
-        console.error('Failed to fetch event history:', error);
-        console.error('Error details:', error.response?.data || error.message);
-        this.events = []; // Ensure events is an array even on error
-        alert('Failed to load event history. Please try again.');
-      }
-    },
-
-    async unregisterFromEvent(eventId) {
-      if (!confirm('Are you sure you want to unregister from this event?')) {
-        return;
-      }
-
-      try {
-        await axios.post(`/api/events/${eventId}/unregister`);
-        await this.fetchEventHistory(); // Refresh the list
-        alert('Successfully unregistered from the event');
-      } catch (error) {
-        console.error('Failed to unregister:', error);
-        alert('Failed to unregister from the event. Please try again.');
-      }
-    },
-
-    formatDate(dateString) {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-      });
-    },
-
-    formatTime(timeString) {
-      if (!timeString) return 'N/A';
-      const date = new Date(timeString);
-      return date.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true
-      });
-    },
-
-    toggleNotifications() {
-      this.showNotifications = !this.showNotifications;
-    },
-
-    handleResize() {
-      this.isMobile = window.innerWidth <= 928;
-      if (this.isMobile) {
-        this.isSidebarOpen = false;
-      }
-    },
-
-    toggleSidebar() {
-      this.isSidebarOpen = !this.isSidebarOpen;
-      this.isOpen = !this.isOpen; 
-    }, 
-
-    async confirmLogout() {
-      try {
-        await authService.logout();
-        this.showLogoutModal = false;
-        this.$router.push('/LoginVolunteers');
-      } catch (error) {
-        console.error('Logout failed:', error);
-        alert('Failed to logout. Please try again.');
-      }
-    }
+  {
+    message: "You completed the 'Meeting with organizers' task.",
+    time: "5 hours ago",
   },
-  mounted() {
-    this.fetchEventHistory();
-    window.addEventListener('resize', this.handleResize);
-    this.handleResize();
-  },
-  beforeUnmount() {
-    window.removeEventListener('resize', this.handleResize);
+]);
+
+const filteredEvents = computed(() => {
+  if (!Array.isArray(events.value)) {
+    return [];
   }
-};
+  const query = searchQuery.value.toLowerCase();
+  // Using the data structure returned by getEventHistory
+  return events.value.filter(
+    (event) =>
+      event.title?.toLowerCase().includes(query) ||
+      event.barangay?.toLowerCase().includes(query) || // Assuming barangay is still in the history data or you adjust the backend map
+      event.organizer?.toLowerCase().includes(query) ||
+      formatDate(event.date)?.toLowerCase().includes(query)
+      // Add time filtering if needed, but it might be complex with ranges
+  );
+});
+
+async function fetchEventHistory() {
+  try {
+    console.log('Fetching event history...');
+    // Use getEventHistory which is designed for volunteer's events
+    const response = await eventService.getEventHistory();
+    console.log('API Response for Event History:', response);
+    
+    // The backend getEventHistory returns a direct array of event data in response.data
+    const eventsData = response.data;
+    
+    // The data structure from getEventHistory is already mapped in the backend
+    events.value = Array.isArray(eventsData) ? eventsData : [];
+    console.log('Processed event history:', events.value);
+  } catch (error) {
+    console.error('Failed to fetch event history:', error);
+    console.error('Error details:', error.response?.data || error.message);
+    events.value = []; // Ensure events is an array even on error
+    alert('Failed to load event history. Please try again.');
+  }
+}
+
+async function unregisterFromEvent(eventId) {
+  if (!confirm('Are you sure you want to unregister from this event?')) {
+    return;
+  }
+
+  try {
+    await eventService.unregister(eventId);
+    await fetchEventHistory(); // Refresh the list
+    alert('Successfully unregistered from the event');
+  } catch (error) {
+    console.error('Failed to unregister:', error);
+    alert('Failed to unregister from the event. Please try again.');
+  }
+}
+
+function toggleNotifications() {
+  showNotifications.value = !showNotifications.value;
+}
+
+function handleResize() {
+  isMobile.value = window.innerWidth <= 928;
+  if (isMobile.value) {
+    isSidebarOpen.value = false;
+  }
+}
+
+function toggleSidebar() {
+  isSidebarOpen.value = !isSidebarOpen.value;
+  isOpen.value = !isOpen.value; 
+} 
+
+async function confirmLogout() {
+  try {
+    await authService.logout();
+    showLogoutModal.value = false;
+    router.push('/LoginVolunteers');
+  } catch (error) {
+    console.error('Logout failed:', error);
+    alert('Failed to logout. Please try again.');
+  }
+}
+
+onMounted(() => {
+  fetchEventHistory();
+  window.addEventListener('resize', handleResize);
+  handleResize();
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize);
+});
+
 </script>
 
 <style scoped src="/src/assets/CSS Volunteers/Activitylog.css"></style>

@@ -84,25 +84,41 @@
     <div class="qr-modal-content">
       <button class="close-btn" @click="showQRCode = false">X</button>
       <h3>Scan QR Code</h3>
-      <qrcode-stream
-        @detect="onDetect"
-        class="scanner-box"
-        :constraints="{
-          video: {
-            facingMode: 'environment',
-            frameRate: { ideal: 60, max: 60 },
-          },
-        }"
-      />
-      <p class="or">or</p>
-      <div class="input-attendance-volunteer">
-        <input
-          v-model="studentID"
-          class="input-attendance"
-          type="text"
-          placeholder="Input your student ID here..."
+      
+      <!-- Event Selection -->
+      <div class="event-selection">
+        <select v-model="selectedEvent" class="event-select">
+          <option value="">Select an event</option>
+          <option v-for="event in ongoingEvents" :key="event.id" :value="event">
+            {{ event.event_title }} ({{ event.status }})
+          </option>
+        </select>
+      </div>
+
+      <div v-if="selectedEvent" class="scanner-container">
+        <qrcode-stream
+          @detect="onDetect"
+          class="scanner-box"
+          :constraints="{
+            video: {
+              facingMode: 'environment',
+              frameRate: { ideal: 60, max: 60 },
+            },
+          }"
         />
-        <button class="input-submit" @click="submitID">Submit</button>
+        <p class="or">or</p>
+        <div class="input-attendance-volunteer">
+          <input
+            v-model="studentID"
+            class="input-attendance"
+            type="text"
+            placeholder="Input student ID here..."
+          />
+          <button class="input-submit" @click="submitID">Submit</button>
+        </div>
+      </div>
+      <div v-else class="no-event-selected">
+        Please select an event to start scanning
       </div>
     </div>
   </div>
@@ -241,9 +257,11 @@
 import 'vue-cal/dist/vuecal.css';
 import VueCal from 'vue-cal';
 import { QrcodeStream } from 'vue-qrcode-reader';
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { authService } from '@/api/services';
+import { qrService } from '@/api/services';
+import { eventService } from '@/api/services';
 
 export default {
   components: {
@@ -272,6 +290,24 @@ export default {
       { message: 'You completed the "Meeting with organizers" task.', time: '5 hours ago' },
     ]);
     const events = ref([]);
+
+    // Only show ongoing events in the QR scanner dropdown
+    const ongoingEvents = computed(() => events.value.filter(e => e.status && e.status.toLowerCase() === 'ongoing'));
+
+    // Fetch events from backend
+    const fetchEvents = async () => {
+      try {
+        const response = await eventService.getEvents();
+        events.value = response.data.data;
+        console.log('Fetched events:', events.value);
+      } catch (err) {
+        console.error('Failed to fetch events:', err);
+      }
+    };
+
+    onMounted(() => {
+      fetchEvents();
+    });
 
     const filteredEvents = computed(() => {
       return events.value.filter((event) => {
@@ -303,29 +339,52 @@ export default {
       showDropdown.value = false;
     };
 
-    const submitID = () => {
-      const id = studentID.value.trim();
-      if (!/^\d+$/.test(id)) {
-        alert("Student ID must contain only numbers.");
-        return;
+    const onDetect = async (result) => {
+      try {
+        const scannedText = result[0].rawValue;
+        // Extract user_email_id from the scanned text (format: numbers@gordoncollege.edu.ph)
+        const userEmailId = scannedText.split('@')[0];
+        
+        if (!userEmailId) {
+          throw new Error("Invalid QR code format");
+        }
+
+        // Get the current event ID (you'll need to set this when opening the QR scanner)
+        if (!selectedEvent.value) {
+          throw new Error("No event selected");
+        }
+
+        const response = await qrService.scanQR(selectedEvent.value.id, userEmailId);
+        alert(`Attendance recorded: ${response.message}`);
+      } catch (error) {
+        console.error('QR scan failed:', error);
+        alert(error.response?.data?.message || error.message || 'Failed to process QR code');
       }
-      if (id.length !== 9) {
-        alert("Student ID must be exactly 9 digits.");
-        return;
-      }
-      if (timedIDs.has(id)) {
-        alert('Time out successfully!');
-        timedIDs.delete(id);
-      } else {
-        alert('Time in successfully!');
-        timedIDs.add(id);
-      }
-      studentID.value = '';
     };
 
-    const onDetect = (result) => {
-      const scannedText = result[0].rawValue;
-      alert(`✅ Scanned Successfully: ${scannedText}`);
+    const submitID = async () => {
+      try {
+        const id = studentID.value.trim();
+        if (!/^\d+$/.test(id)) {
+          alert("Student ID must contain only numbers.");
+          return;
+        }
+        if (id.length !== 9) {
+          alert("Student ID must be exactly 9 digits.");
+          return;
+        }
+
+        if (!selectedEvent.value) {
+          throw new Error("No event selected");
+        }
+
+        const response = await qrService.scanQR(selectedEvent.value.id, id);
+        alert(`Attendance recorded: ${response.message}`);
+        studentID.value = '';
+      } catch (error) {
+        console.error('Manual ID submission failed:', error);
+        alert(error.response?.data?.message || error.message || 'Failed to process ID');
+      }
     };
 
     const onDateClick = ({ date }) => {
@@ -386,19 +445,49 @@ export default {
       notifications,
       events,
       filteredEvents,
+      ongoingEvents,
       toggleSidebar,
       toggleDropdown,
       toggleCalendar,
-      submitID,
       onDetect,
       onDateClick,
       toggleNotifications,
       formatTime,
       formatDate,
       confirmLogout,
+      submitID,
+      fetchEvents,
     };
   },
 };
 </script>
 
 <style scoped src="/src/assets/CSS Organizers/dashboard.css"></style>
+
+<style scoped>
+.event-selection {
+  margin-bottom: 20px;
+}
+
+.event-select {
+  width: 90%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #12372a;
+  background-color: white;
+  font-size: 14px;
+}
+
+.scanner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.no-event-selected {
+  text-align: center;
+  color: #666;
+  padding: 20px;
+  font-style: italic;
+}
+</style>

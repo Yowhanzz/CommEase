@@ -24,11 +24,13 @@ class User extends Authenticatable
         'last_name',
         'program',
         'email',
+        'user_email_id',
         'password',
         'role',
         'otp',
         'otp_expires_at',
-        'email_verified_at'
+        'email_verified_at',
+        'profile_picture',
     ];
 
     /**
@@ -95,5 +97,22 @@ class User extends Authenticatable
         return $this->middle_initial
             ? "{$this->first_name} {$this->middle_initial}. {$this->last_name}"
             : "{$this->first_name} {$this->last_name}";
+    }
+
+    /**
+     * Get the events that the user is volunteering for.
+     */
+    public function events()
+    {
+        return $this->belongsToMany(Event::class, 'event_volunteers')
+            ->withPivot(['things_brought', 'time_in', 'time_out'])
+            ->withTimestamps();
+    }
+
+    // Add this method to automatically set user_email_id when email is set
+    public function setEmailAttribute($value)
+    {
+        $this->attributes['email'] = $value;
+        $this->attributes['user_email_id'] = strstr($value, '@', true);
     }
 }

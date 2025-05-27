@@ -113,7 +113,7 @@
             :key="index"
             :class="[
               'button-things',
-              { 'active-button': selectedItems.includes(item) },
+              { 'active-button': selectedItems.includes(item) }
             ]"
             :disabled="!agreed"
             @click="toggleItem(item)"
@@ -346,11 +346,15 @@ const itemsNeeded = computed(() => {
 const selectedItems = ref([]);
 
 const toggleItem = (item) => {
-  if (selectedItems.value.includes(item)) {
-    selectedItems.value = selectedItems.value.filter((i) => i !== item);
-  } else {
+  const index = selectedItems.value.indexOf(item);
+  if (index === -1) {
+    // Item is not selected, add it
     selectedItems.value.push(item);
+  } else {
+    // Item is already selected, remove it
+    selectedItems.value.splice(index, 1);
   }
+  console.log('Selected items:', selectedItems.value); // Debug log
 };
 
 const handleAgree = () => {
@@ -377,27 +381,46 @@ const handleSubmit = async () => {
   }
 
   try {
-    // First register for the event
-    await eventService.register(event.value.id);
+    // Register for the event
+    const registerResponse = await eventService.register(event.value.id);
     
-    // Then submit the things they will bring
-    await eventService.submitThingsBrought(event.value.id, {
-      thingsBrought: selectedItems.value
-    });
-
-    // If there's a recommendation, submit it as a suggestion
-    if (ideaMessage.value.trim()) {
-      await eventService.submitSuggestion(event.value.id, {
-        suggestion: ideaMessage.value
+    if (registerResponse.status === 200 || registerResponse.status === 201) {
+      // Then submit the things they will bring
+      await eventService.submitThingsBrought(event.value.id, {
+        thingsBrought: selectedItems.value
       });
-    }
 
-    alert("Registration successful!");
-    router.push("/DashboardVolunteers");
+      // If there's a recommendation, submit it as a suggestion
+      if (ideaMessage.value.trim()) {
+        await eventService.submitSuggestion(event.value.id, {
+          suggestion: ideaMessage.value
+        });
+      }
+
+      alert("Registration successful!");
+      router.push("/DashboardVolunteers");
+    }
   } catch (error) {
-    const errorMessage = error.response?.data?.message || "Failed to register for event";
-    alert(errorMessage);
+    let errorMessage = "Failed to register for event";
+    
+    if (error.response?.status === 422) {
+      if (error.response.data.message?.includes('already registered')) {
+        errorMessage = "You are already registered for this event";
+      } else if (error.response.data.message?.includes('not available for your program')) {
+        errorMessage = "This event is not available for your program";
+      } else if (error.response.data.message?.includes('Cannot register for this event')) {
+        errorMessage = "This event is not in upcoming status";
+      } else if (error.response.data.errors) {
+        errorMessage = Object.values(error.response.data.errors).flat().join('\n');
+      } else {
+        errorMessage = error.response.data.message || errorMessage;
+      }
+    } else if (error.response?.status === 403) {
+      errorMessage = "You do not have permission to register for this event";
+    }
+    
     console.error('Registration error:', error);
+    alert(errorMessage);
   }
 };
 

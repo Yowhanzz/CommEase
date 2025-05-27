@@ -126,6 +126,7 @@
           <th>Programs</th>
           <th>Status</th>
           <th>Action</th>
+          <th>Event Control</th>
         </tr>
       </thead>
       <tbody>
@@ -134,26 +135,46 @@
           <td data-label="Id">{{ index + 1 }}</td>
           <td data-label="Event Name">{{ event.event_title }}</td>
           <td data-label="Time">{{ event.barangay }}</td>
-          <td data-label="Date">{{ event.date }}</td>
-          <td data-label="Time">{{ `${event.start_time} - ${event.end_time}` }}</td>
+          <td data-label="Date">{{ formatDateFn(event.date) }}</td>
+          <td data-label="Time">{{ formatTimeFn(event.start_time) }} - {{ formatTimeFn(event.end_time) }}</td>
           <td data-label="Organizer">{{ event.organizer?.first_name }} {{ event.organizer?.last_name }}</td>
           <td>{{ (event.programs || []).join(', ') }}</td>
-
           <td>
             <span
               :class="{
-                'status-pending': event.status === 'Pending',
-                'status-active': event.status === 'Active',
-                'status-completed': event.status === 'Completed',
+                'status-pending': event.status === 'pending',
+                'status-active': event.status === 'active',
+                'status-completed': event.status === 'completed',
               }"
             >
-              {{ event.status }}
+              {{ event.status.charAt(0).toUpperCase() + event.status.slice(1) }}
             </span>
           </td>
           <td data-label="Action" class="action-button">
             <div class="test">
-            <button class="entries-edit" @click="handleEdit(event)">Edit</button>
-            <button class="entries-edit" @click="handleDelete(event.id)">Delete</button>
+              <button class="entries-edit" @click="handleEdit(event)">Edit</button>
+              <button class="entries-edit" @click="handleDelete(event.id)">Delete</button>
+            </div>
+          </td>
+          <td data-label="Event Control" class="event-control">
+            <div class="test">
+              <button 
+                v-if="event.status.toLowerCase() === 'upcoming'" 
+                class="start-btn" 
+                @click="handleStartEvent(event.id)"
+              >
+                Start
+              </button>
+              <button 
+                v-else-if="event.status.toLowerCase() === 'ongoing'" 
+                class="end-btn" 
+                @click="handleEndEvent(event.id)"
+              >
+                End
+              </button>
+              <span v-else class="event-status">
+                {{ event.status.charAt(0).toUpperCase() + event.status.slice(1) }}
+              </span>
             </div>
           </td>
         </tr>
@@ -170,9 +191,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { eventService, authService } from '../api/services';
+import { eventService, authService, formatTime, formatDate } from '../api/services';
 
 const router = useRouter();
 const showNotifications = ref(false);
@@ -183,6 +204,11 @@ const searchQuery = ref("");
 const loading = ref(false);
 const error = ref(null);
 const events = ref([]);
+const isMobile = ref(false);
+
+// Expose the formatting functions
+const formatTimeFn = formatTime;
+const formatDateFn = formatDate;
 
 const notifications = ref([
   { message: "You completed the 'Update website content' task.", time: "2 hours ago" },
@@ -191,13 +217,16 @@ const notifications = ref([
 ]);
 
 const filteredEvents = computed(() => {
+  if (!Array.isArray(events.value)) {
+    return [];
+  }
   const query = searchQuery.value.toLowerCase();
   return events.value.filter(event =>
-    event.event_title.toLowerCase().includes(query) ||
-    event.barangay.toLowerCase().includes(query) ||
-    event.date.toLowerCase().includes(query) ||
-    `${event.start_time} - ${event.end_time}`.toLowerCase().includes(query) ||
-    event.organizer?.first_name?.toLowerCase().includes(query)
+    event.event_title?.toLowerCase().includes(query) ||
+    event.barangay?.toLowerCase().includes(query) ||
+    formatDateFn(event.date)?.toLowerCase().includes(query) ||
+    `${formatTimeFn(event.start_time)} - ${formatTimeFn(event.end_time)}`.toLowerCase().includes(query) ||
+    `${event.organizer?.first_name} ${event.organizer?.last_name}`.toLowerCase().includes(query)
   );
 });
 
@@ -243,22 +272,111 @@ const handleDelete = async (eventId) => {
   }
 };
 
-const fetchEvents = async () => {
+const handleStartEvent = async (eventId) => {
   try {
     loading.value = true;
     error.value = null;
-    const response = await eventService.getEvents();
-    events.value = response.data.data;
+    await eventService.startEvent(eventId);
+    // Update the event status in the local events array
+    events.value = events.value.map(event =>
+      event.id === eventId ? { ...event, status: 'ongoing' } : event
+    );
   } catch (err) {
-    error.value = err.response?.data?.message || err.message || 'Failed to fetch events';
+    error.value = err.response?.data?.message || err.message || 'Failed to start event';
+    console.error('Start event failed:', err);
   } finally {
     loading.value = false;
   }
 };
 
+const handleEndEvent = async (eventId) => {
+  try {
+    loading.value = true;
+    error.value = null;
+    await eventService.endEvent(eventId);
+    events.value = events.value.map(event =>
+      event.id === eventId ? { ...event, status: 'Completed' } : event
+    );
+  } catch (err) {
+    error.value = err.response?.data?.message || err.message || 'Failed to end event';
+  } finally {
+    loading.value = false;
+  }
+};
+
+const fetchEvents = async () => {
+  try {
+    loading.value = true;
+    error.value = null;
+    const response = await eventService.getEventsOrganizer();
+    // Handle both possible response structures
+    const eventsData = response.data.data || response.data;
+    events.value = Array.isArray(eventsData) ? eventsData : [];
+    console.log('Events data:', events.value); // Debug log
+  } catch (err) {
+    error.value = err.response?.data?.message || err.message || 'Failed to fetch events';
+    events.value = []; // Ensure events is an array even on error
+  } finally {
+    loading.value = false;
+  }
+};
+
+const handleResize = () => {
+  isMobile.value = window.innerWidth <= 928;
+};
+
 onMounted(() => {
+  window.addEventListener('resize', handleResize);
+  handleResize();
   fetchEvents();
+});
+
+onUnmounted(() => {
+  window.removeEventListener('resize', handleResize);
 });
 </script>
 
 <style scoped src="/src/assets/CSS Organizers/Manage-events.css"></style>
+
+<style scoped>
+.event-control {
+  text-align: center;
+}
+
+.start-btn, .end-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.start-btn {
+  background-color: #28a745;
+  color: white;
+}
+
+.start-btn:hover {
+  background-color: #218838;
+}
+
+.end-btn {
+  background-color: #dc3545;
+  color: white;
+}
+
+.end-btn:hover {
+  background-color: #c82333;
+}
+
+.event-status {
+  color: #6c757d;
+  font-style: italic;
+}
+
+.start-btn:disabled, .end-btn:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+</style>
