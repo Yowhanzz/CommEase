@@ -94,8 +94,13 @@
   </div>
 
   <!-- CREATE EVENT SECTION -->
-  <h1 class="title-safety">Edit Event</h1>
-  <hr class="safety-hr" :class="{ 'sidebar-collapsed-for-divider': isOpen }" />
+  <div class="test" :class="{ 'sidebar-collapsed': !isOpen }">
+    <h1 class="title-safety">Edit Event</h1>
+    <hr
+      class="safety-hr"
+      :class="{ 'sidebar-collapsed-for-divider': isOpen }"
+    />
+  </div>
 
   <div class="event-container" :class="{ 'sidebar-collapsed': !isOpen }">
     <div
@@ -204,12 +209,14 @@
       </div>
     </div>
   </div>
+
+  <div class="overlay" v-if="!isMobile && isSidebarOpen"></div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { eventService, authService } from '@/api/services';
+import { ref, onMounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { authService, eventService } from "@/api/services";
 
 const route = useRoute();
 const router = useRouter();
@@ -218,31 +225,36 @@ const isSidebarOpen = ref(true);
 const showNotifications = ref(false);
 const showLogoutModal = ref(false);
 const searchQuery = ref("");
+const isOpen = ref(false); // sidebar animation or icon toggle
+const isMobile = ref(false);
 
 // Event form fields
 const event_id = ref(null);
-const title = ref('');
-const barangay = ref('');
-const date = ref('');
-const startTime = ref('');
-const endTime = ref('');
+const title = ref("");
+const barangay = ref("");
+const date = ref("");
+const startTime = ref("");
+const endTime = ref("");
 const programs = ref([]);
-const organizer = ref('');
-const status = ref('');
-const objective = ref('');
-const description = ref('');
+const organizer = ref("");
+const status = ref("");
+const objective = ref("");
+const description = ref("");
 const thingsNeeded = ref([]);
-const newThing = ref('');
+const newThing = ref("");
 const loading = ref(false);
 const error = ref(null);
 
-// === Notifications Data ===
+// Notifications
 const notifications = ref([
   {
     message: "You completed the 'Update website content' task.",
     time: "2 hours ago",
   },
-  { message: "You completed the 'Clean up drive' task.", time: "3 hours ago" },
+  {
+    message: "You completed the 'Clean up drive' task.",
+    time: "3 hours ago",
+  },
   {
     message: "You completed the 'Meeting with organizers' task.",
     time: "5 hours ago",
@@ -254,10 +266,10 @@ onMounted(async () => {
   try {
     loading.value = true;
     error.value = null;
-    
+
     const eventId = route.params.id;
     if (!eventId) {
-      throw new Error('Event ID is required');
+      throw new Error("Event ID is required");
     }
 
     const response = await eventService.getEvent(eventId);
@@ -288,16 +300,24 @@ onMounted(async () => {
     thingsNeeded.value = event.things_needed || [];
     programs.value = event.programs || [];
   } catch (err) {
-    error.value = err.response?.data?.message || err.message || 'Failed to load event';
-    router.push('/ManageEventsOrganizers');
+    error.value =
+      err.response?.data?.message || err.message || "Failed to load event";
+    router.push("/ManageEventsOrganizers");
   } finally {
     loading.value = false;
   }
 });
 
-// Methods
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value;
+  isOpen.value = !isOpen.value;
+};
+
+const handleResize = () => {
+  isMobile.value = window.innerWidth <= 928;
+  if (isMobile.value) {
+    isSidebarOpen.value = false;
+  }
 };
 
 const toggleNotifications = () => {
@@ -316,7 +336,7 @@ const removeThing = (index) => {
 };
 
 const cancelEdit = () => {
-  router.push('/ManageEventsOrganizers');
+  router.push("/ManageEventsOrganizers");
 };
 
 const saveChanges = async () => {
@@ -325,12 +345,20 @@ const saveChanges = async () => {
     error.value = null;
 
     // Validate required fields
-    if (!title.value || !barangay.value || !date.value || !startTime.value || !endTime.value || !objective.value || !description.value) {
-      throw new Error('Please fill in all required fields');
+    if (
+      !title.value ||
+      !barangay.value ||
+      !date.value ||
+      !startTime.value ||
+      !endTime.value ||
+      !objective.value ||
+      !description.value
+    ) {
+      throw new Error("Please fill in all required fields");
     }
 
     if (programs.value.length === 0) {
-      throw new Error('Please select at least one program');
+      throw new Error("Please select at least one program");
     }
 
     // Validate date is after today
@@ -369,31 +397,15 @@ const saveChanges = async () => {
       objective: objective.value,
       description: description.value,
       programs: programs.value,
-      thingsNeeded: thingsNeeded.value,
+      things_needed: thingsNeeded.value,
       status: status.value,
-      organizer: 'Elites'
     };
 
-    console.log('Sending event data:', JSON.stringify(eventData, null, 2));
-
-    const response = await eventService.updateEvent(event_id.value, eventData);
-    console.log('Update response:', response);
-    router.push('/ManageEventsOrganizers');
+    await eventService.updateEvent(event_id.value, eventData);
+    router.push("/ManageEventsOrganizers");
   } catch (err) {
-    console.error('Error details:', {
-      message: err.message,
-      response: err.response?.data,
-      status: err.response?.status
-    });
-
-    if (err.response?.data?.errors) {
-      const errorMessages = Object.entries(err.response.data.errors)
-        .map(([field, messages]) => `${field}: ${Array.isArray(messages) ? messages.join(', ') : messages}`)
-        .join('\n');
-      error.value = errorMessages;
-    } else {
-      error.value = err.message || 'Failed to update event';
-    }
+    error.value =
+      err.response?.data?.message || err.message || "Failed to update event";
   } finally {
     loading.value = false;
   }
@@ -405,13 +417,13 @@ const confirmLogout = async () => {
     // Clear any local storage or state
     localStorage.clear();
     // Redirect to login page
-    router.push('/LoginOrganizers');
+    router.push("/LoginOrganizers");
   } catch (error) {
-    console.error('Logout failed:', error);
+    console.error("Logout failed:", error);
     // Even if the API call fails, we should still redirect to login
-    router.push('/LoginOrganizers');
+    router.push("/LoginOrganizers");
   }
 };
 </script>
 
-<style scoped src="/src/assets/CSS Organizers/create-event.css"></style>
+<style scoped src="/src/assets/CSS Organizers/edit-event.css"></style>
