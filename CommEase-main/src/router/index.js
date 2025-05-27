@@ -84,9 +84,10 @@ const router = createRouter({
     },
 
     {
-      path: '/RegistrationVolunteers',
+      path: '/RegistrationVolunteers/:id',
       name: 'RegistrationVolunteers',
-      component: RegistrationVolunteers,
+      component: () => import('../views/Registration-Volunteers.vue'),
+      meta: { requiresAuth: true }
     },
 
     {
@@ -128,7 +129,7 @@ const router = createRouter({
     },
 
     {
-      path: '/EditEventOrganizers',
+      path: '/EditEventOrganizers/:id',
       name: 'EditEventOrganizers',
       component: EditEventOrganizers,
     },

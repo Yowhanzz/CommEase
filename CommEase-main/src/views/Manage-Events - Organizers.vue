@@ -197,9 +197,7 @@ const filteredEvents = computed(() => {
     event.barangay.toLowerCase().includes(query) ||
     event.date.toLowerCase().includes(query) ||
     `${event.start_time} - ${event.end_time}`.toLowerCase().includes(query) ||
-    event.organizer?.first_name?.toLowerCase().includes(query) ||
-    event.organizer?.last_name?.toLowerCase().includes(query) ||
-    event.status.toLowerCase().includes(query)
+    event.organizer?.first_name?.toLowerCase().includes(query)
   );
 });
 
@@ -215,9 +213,11 @@ const toggleSidebar = () => {
 const confirmLogout = async () => {
   try {
     await authService.logout();
+    showLogoutModal.value = false;
     router.push('/LoginOrganizers');
   } catch (error) {
     console.error('Logout failed:', error);
+    alert('Failed to logout. Please try again.');
   }
 };
 

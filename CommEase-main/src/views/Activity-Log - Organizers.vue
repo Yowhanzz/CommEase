@@ -224,14 +224,11 @@ export default {
     const confirmLogout = async () => {
       try {
         await authService.logout();
-        // Clear any local storage or state
-        localStorage.clear();
-        // Redirect to login page
+        showLogoutModal.value = false;
         router.push('/LoginOrganizers');
       } catch (error) {
         console.error('Logout failed:', error);
-        // Even if the API call fails, we should still redirect to login
-        router.push('/LoginOrganizers');
+        alert('Failed to logout. Please try again.');
       }
     };
 

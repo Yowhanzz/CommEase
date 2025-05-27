@@ -141,7 +141,7 @@
         <img src="" alt="shrek sample pic" class="picture-person" />
       </div>
       <div class="glasscard-titles">
-        <h1 class="volunteer-name">Hello, Johannes!</h1>
+        <h1 class="volunteer-name">Hello, {{ firstName }}!</h1>
         <h6 class="service-type">Volunteer</h6>
       </div>
     </div>
@@ -172,30 +172,49 @@
     </select>
 
     <div class="events-grid">
+      <div v-if="loading" class="loading-message">
+        Loading events...
+      </div>
+      <div v-else-if="error" class="error-message">
+        {{ error }}
+      </div>
+      <div v-else-if="filteredEvents.length === 0" class="no-events-message">
+        No events found matching your criteria.
+      </div>
       <div
+        v-else
         v-for="(event, index) in filteredEvents"
         :key="index"
         class="container-glasscard-events"
       >
         <div class="container-inputs">
           <div class="container-inputs-info">
-            <h1 class="container-event-title">{{ event.title }}</h1>
+            <h1 class="container-event-title">{{ event.event_title }}</h1>
             <h6 class="container-event-time">
-              {{ formatTime(event.start) }} - {{ formatTime(event.end) }} ·
-              {{ formatDate(event.start) }}
+              {{ formatTime(event.start_time) }} - {{ formatTime(event.end_time) }} ·
+              {{ formatDate(event.date) }}
             </h6>
             <h6 class="container-event-location">
-              {{ event.location }}
+              Barangay {{ event.barangay }}
             </h6>
-            <h6 class="container-event-location">
+            <h6 class="container-event-programs">
               For {{ (event.programs || []).join(", ") }} only
             </h6>
-            <h6 class="container-event-location">{{ event.organizer }}</h6>
+            <h6 class="container-event-organizer">
+              {{ event.organizer?.first_name }} {{ event.organizer?.last_name }}
+            </h6>
           </div>
           <div class="button">
-            <router-link to="/RegistrationVolunteers" class="button-enter"
-              >Enter</router-link
+            <button 
+              v-if="event.status === 'upcoming'"
+              @click="registerForEvent(event.id)" 
+              class="button-enter"
             >
+              Register
+            </button>
+            <span v-else class="button-enter disabled">
+              {{ event.status }}
+            </span>
           </div>
         </div>
       </div>
@@ -210,7 +229,8 @@ import { QrcodeStream } from "vue-qrcode-reader";
 import VueCal from "vue-cal";
 import VueQrcode from "@chenfengyuan/vue-qrcode";
 import "vue-cal/dist/vuecal.css";
-import { authService } from '../api/services';
+import { authService, eventService } from '../api/services';
+import axios from 'axios';
 
 export default {
   components: {
@@ -241,14 +261,12 @@ export default {
       selectedProgram: "",
       selectedStatus: "",
       events_test: [
-        /* ADDED */
         {
           start: "2025-05-05 6:25",
           end: "2025-05-05 8:20",
           title: "Clean up Drive",
         },
-      ], // start with empty events
-
+      ],
       notifications: [
         {
           message: "You completed the 'Update website content' task.",
@@ -263,67 +281,64 @@ export default {
           time: "5 hours ago",
         },
       ],
-
-      // 🔥 Cleared static events – dynamic only!
       events: [],
+      loading: false,
+      error: null,
+      firstName: '',
     };
   },
   computed: {
     filteredEvents() {
       return this.events.filter((event) => {
         const matchesSearch =
-          event.title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
-          event.location.toLowerCase().includes(this.searchQuery.toLowerCase());
-
-        const matchesProgram = this.selectedProgram
-          ? event.programs.includes(this.selectedProgram)
-          : true;
+          event.event_title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+          event.barangay.toLowerCase().includes(this.searchQuery.toLowerCase());
 
         const matchesStatus = this.selectedStatus
           ? event.status === this.selectedStatus
           : true;
 
-        return matchesSearch && matchesProgram && matchesStatus;
+        return matchesSearch && matchesStatus;
       });
     },
   },
-  mounted() {
-    // ✅ Now it's outside computed!
-    const storedEvents = JSON.parse(localStorage.getItem("events"));
-    if (storedEvents && storedEvents.length) {
-      this.events = storedEvents.map((event) => {
-        const [startTime, endTime] = event.time.split(" - ");
-        const startDateTime = `${event.date}T${startTime}`;
-        const endDateTime = `${event.date}T${endTime}`;
-        return {
-          start: startDateTime,
-          end: endDateTime,
-          title: event.title,
-          location: `Barangay ${event.barangay}`,
-          organizer: event.organizer,
-          status: event.status,
-          programs: event.programs || [],
-        };
-      });
-    }
+  async mounted() {
+    await this.fetchEvents();
+    await this.fetchUserData();
   },
-
   methods: {
+    async fetchEvents() {
+      try {
+        this.loading = true;
+        this.error = null;
+        const response = await eventService.getEvents();
+        this.events = response.data.data;
+      } catch (err) {
+        this.error = err.response?.data?.message || 'Failed to fetch events';
+        console.error('Error fetching events:', err);
+      } finally {
+        this.loading = false;
+      }
+    },
+    async fetchUserData() {
+      try {
+        const response = await axios.get('/api/user');
+        this.firstName = response.data.first_name;
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    },
     toggleSidebar() {
       this.isSidebarOpen = !this.isSidebarOpen;
       this.isOpen = !this.isOpen;
     },
-
     handleResize() {
-      /* ADDED */
       this.isMobile = window.innerWidth <= 928;
       if (this.isMobile) {
         this.isSidebarOpen = false;
       }
     },
-
     toggleDropdown() {
-      console.log("Dropdown toggled", this.showDropdown);
       this.showDropdown = !this.showDropdown;
     },
     closeQRCode() {
@@ -345,12 +360,15 @@ export default {
       this.showNotifications = !this.showNotifications;
     },
     formatTime(datetime) {
+      if (!datetime) return '';
       return new Date(datetime).toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
+        hour12: false
       });
     },
     formatDate(datetime) {
+      if (!datetime) return '';
       return new Date(datetime).toLocaleDateString([], {
         weekday: "short",
         year: "numeric",
@@ -360,26 +378,24 @@ export default {
     },
     onDateClick({ date }) {
       const selected = this.events.find((event) => {
-        const eventDate = new Date(event.start).toLocaleDateString();
+        const eventDate = new Date(event.date).toLocaleDateString();
         return eventDate === new Date(date).toLocaleDateString();
       });
       this.selectedEvent = selected || null;
-      console.log(
-        selected ? "Clicked Event:" : "No event on selected date.",
-        selected
-      );
     },
     async confirmLogout() {
       try {
         await authService.logout();
         this.showLogoutModal = false;
-        // Redirect to login page
         this.$router.push('/LoginVolunteers');
       } catch (error) {
         console.error('Logout failed:', error);
         alert('Failed to logout. Please try again.');
       }
     },
+    async registerForEvent(eventId) {
+      this.$router.push(`/RegistrationVolunteers/${eventId}`);
+    }
   },
 };
 </script>

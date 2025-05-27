@@ -209,7 +209,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { authService } from '@/api/services';
+import { eventService, authService } from '@/api/services';
 
 const route = useRoute();
 const router = useRouter();
@@ -263,14 +263,25 @@ onMounted(async () => {
     const response = await eventService.getEvent(eventId);
     const event = response.data;
 
+    // Format date and times
+    const eventDate = new Date(event.date);
+    const formattedDate = eventDate.toISOString().split('T')[0]; // YYYY-MM-DD format
+
+    // Format start and end times
+    const formatTime = (timeStr) => {
+      if (!timeStr) return '';
+      const time = new Date(timeStr);
+      return time.toTimeString().slice(0, 5); // HH:mm format
+    };
+
     // Populate form with event data
     event_id.value = event.id;
     title.value = event.event_title;
     barangay.value = event.barangay;
-    date.value = event.date;
-    startTime.value = event.start_time;
-    endTime.value = event.end_time;
-    organizer.value = event.organizer;
+    date.value = formattedDate;
+    startTime.value = formatTime(event.start_time);
+    endTime.value = formatTime(event.end_time);
+    organizer.value = 'Elites'; // Set organizer to 'Elites'
     status.value = event.status;
     objective.value = event.objective;
     description.value = event.description;
@@ -297,7 +308,6 @@ const addThing = () => {
   if (newThing.value.trim()) {
     thingsNeeded.value.push(newThing.value.trim());
     newThing.value = "";
-    newThing.value = "";
   }
 };
 
@@ -323,23 +333,67 @@ const saveChanges = async () => {
       throw new Error('Please select at least one program');
     }
 
+    // Validate date is after today
+    const selectedDate = new Date(date.value);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (selectedDate < today) {
+      throw new Error('Event date must be after today');
+    }
+
+    // Validate end time is after start time
+    if (startTime.value >= endTime.value) {
+      throw new Error('End time must be after start time');
+    }
+
+    // Validate programs
+    const validPrograms = ['BSIT', 'BSCS', 'BSEMC'];
+    const invalidPrograms = programs.value.filter(program => !validPrograms.includes(program));
+    if (invalidPrograms.length > 0) {
+      throw new Error(`Invalid programs: ${invalidPrograms.join(', ')}. Valid programs are: ${validPrograms.join(', ')}`);
+    }
+
+    // Format the date and times
+    const formattedDate = new Date(date.value).toISOString().split('T')[0];
+    const formatTimeForAPI = (time) => {
+      const [hours, minutes] = time.split(':');
+      return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
+    };
+
     const eventData = {
-      event_title: title.value,
+      eventTitle: title.value,
       barangay: barangay.value,
-      date: date.value,
-      start_time: startTime.value,
-      end_time: endTime.value,
+      date: formattedDate,
+      startTime: formatTimeForAPI(startTime.value),
+      endTime: formatTimeForAPI(endTime.value),
       objective: objective.value,
       description: description.value,
       programs: programs.value,
-      things_needed: thingsNeeded.value,
-      status: status.value
+      thingsNeeded: thingsNeeded.value,
+      status: status.value,
+      organizer: 'Elites'
     };
 
-    await eventService.updateEvent(event_id.value, eventData);
+    console.log('Sending event data:', JSON.stringify(eventData, null, 2));
+
+    const response = await eventService.updateEvent(event_id.value, eventData);
+    console.log('Update response:', response);
     router.push('/ManageEventsOrganizers');
   } catch (err) {
-    error.value = err.response?.data?.message || err.message || 'Failed to update event';
+    console.error('Error details:', {
+      message: err.message,
+      response: err.response?.data,
+      status: err.response?.status
+    });
+
+    if (err.response?.data?.errors) {
+      const errorMessages = Object.entries(err.response.data.errors)
+        .map(([field, messages]) => `${field}: ${Array.isArray(messages) ? messages.join(', ') : messages}`)
+        .join('\n');
+      error.value = errorMessages;
+    } else {
+      error.value = err.message || 'Failed to update event';
+    }
   } finally {
     loading.value = false;
   }

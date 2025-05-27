@@ -108,13 +108,20 @@ export const eventService = {
 
     async getEvent(eventId) {
         try {
+            console.log('Fetching event with ID:', eventId);
             const response = await api.get(`/events/${eventId}`, {
                 params: {
-                    include: 'organizer'
+                    include: 'organizer,volunteers'
                 }
             });
+            console.log('Event API response:', response);
             return response;
         } catch (error) {
+            console.error('Get event error details:', {
+                status: error.response?.status,
+                data: error.response?.data,
+                message: error.message
+            });
             if (error.response?.status === 403) {
                 throw new Error('You do not have access to this event. Only volunteers from the specified programs can view this event.');
             }
@@ -123,16 +130,77 @@ export const eventService = {
         }
     },
 
+    async register(eventId) {
+        try {
+            await ensureCsrfToken();
+            const response = await api.post(`/events/${eventId}/register`);
+            return response;
+        } catch (error) {
+            console.error('Failed to register for event:', error);
+            throw error;
+        }
+    },
+
+    async submitThingsBrought(eventId, data) {
+        try {
+            await ensureCsrfToken();
+            const response = await api.post(`/events/${eventId}/things-brought`, data);
+            return response;
+        } catch (error) {
+            console.error('Failed to submit things brought:', error);
+            throw error;
+        }
+    },
+
+    async submitSuggestion(eventId, data) {
+        try {
+            await ensureCsrfToken();
+            const response = await api.post(`/events/${eventId}/suggestions`, data);
+            return response;
+        } catch (error) {
+            console.error('Failed to submit suggestion:', error);
+            throw error;
+        }
+    },
+
     async updateEvent(eventId, eventData) {
         try {
             await ensureCsrfToken();
+            console.log('Updating event with data:', JSON.stringify(eventData, null, 2));
             const response = await api.put(`/events/${eventId}`, eventData);
+            console.log('Update response:', response);
             return response;
         } catch (error) {
+            console.error('Update event error details:', {
+                status: error.response?.status,
+                data: error.response?.data,
+                validationErrors: error.response?.data?.errors,
+                requestData: eventData
+            });
+
             if (error.response?.status === 403) {
                 throw new Error('You do not have access to this event. Only volunteers from the specified programs can view this event.');
             }
-            console.error('Failed to update event:', error);
+
+            if (error.response?.status === 422) {
+                const validationErrors = error.response.data.errors || {};
+                const errorMessage = Object.entries(validationErrors)
+                    .map(([field, messages]) => `${field}: ${Array.isArray(messages) ? messages.join(', ') : messages}`)
+                    .join('\n');
+                throw new Error(errorMessage || 'Validation failed');
+            }
+
+            throw error;
+        }
+    },
+
+    async deleteEvent(eventId) {
+        try {
+            await ensureCsrfToken();
+            const response = await api.delete(`/events/${eventId}`);
+            return response;
+        } catch (error) {
+            console.error('Delete event failed:', error);
             throw error;
         }
     }

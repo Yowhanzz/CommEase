@@ -7,6 +7,7 @@ use App\Models\Notification;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
 
@@ -57,14 +58,24 @@ class EventController extends Controller
         if ($user->role === 'organizer') {
             $query->where('organizer_id', $user->id);
         } else {
-            $query->whereHas('volunteers', function ($q) use ($user) {
-                $q->where('volunteer_id', $user->id);
-            });
+            // For volunteers, show all events that match their program
+            $query->whereJsonContains('programs', $user->program);
         }
 
         $events = $query->with(['organizer', 'volunteers'])
             ->orderBy('date')
             ->paginate($request->get('per_page', 10));
+
+        // Append formatted time attributes to each event
+        $events->getCollection()->transform(function ($event) {
+            $event->append([
+                'start_time_formatted',
+                'end_time_formatted',
+                'started_at_formatted',
+                'ended_at_formatted'
+            ]);
+            return $event;
+        });
 
         return response()->json($events);
     }
@@ -144,6 +155,12 @@ class EventController extends Controller
     public function show(Event $event)
     {
         $event->load(['organizer', 'volunteers']);
+        $event->append([
+            'start_time_formatted',
+            'end_time_formatted',
+            'started_at_formatted',
+            'ended_at_formatted'
+        ]);
         return response()->json($event);
     }
 
@@ -398,5 +415,114 @@ class EventController extends Controller
             'feedback' => $feedback,
             'stats' => $stats
         ]);
+    }
+
+    public function register(Request $request, Event $event)
+    {
+        $user = $request->user();
+
+        // Check if user is a volunteer
+        if ($user->role !== 'volunteer') {
+            return response()->json(['message' => 'Only volunteers can register for events'], 403);
+        }
+
+        // Check if event is still open for registration
+        if ($event->status !== 'upcoming') {
+            return response()->json(['message' => 'Event is no longer open for registration'], 422);
+        }
+
+        // Check if volunteer's program matches event requirements
+        if (!in_array($user->program, $event->programs)) {
+            return response()->json(['message' => 'Your program is not eligible for this event'], 403);
+        }
+
+        // Check if already registered
+        if ($event->volunteers()->where('volunteer_id', $user->id)->exists()) {
+            return response()->json(['message' => 'You are already registered for this event'], 422);
+        }
+
+        // Register volunteer
+        $event->volunteers()->attach($user->id);
+
+        // Notify organizer
+        Notification::create([
+            'user_id' => $event->organizer_id,
+            'event_id' => $event->id,
+            'type' => 'volunteer_registered',
+            'message' => "New volunteer registered: {$user->full_name}",
+        ]);
+
+        return response()->json(['message' => 'Successfully registered for the event']);
+    }
+
+    public function submitThingsBrought(Request $request, Event $event)
+    {
+        $user = $request->user();
+
+        // Check if user is registered for the event
+        if (!$event->volunteers()->where('volunteer_id', $user->id)->exists()) {
+            return response()->json(['message' => 'You must be registered for this event'], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'things_brought' => ['required', 'array'],
+            'things_brought.*' => ['required', 'string', 'max:255']
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Update things brought
+        $event->volunteers()->updateExistingPivot($user->id, [
+            'things_brought' => $request->things_brought
+        ]);
+
+        // Notify organizer
+        Notification::create([
+            'user_id' => $event->organizer_id,
+            'event_id' => $event->id,
+            'type' => 'things_brought_updated',
+            'message' => "Volunteer {$user->full_name} updated things they will bring",
+        ]);
+
+        return response()->json(['message' => 'Successfully updated things you will bring']);
+    }
+
+    public function submitSuggestion(Request $request, Event $event)
+    {
+        $user = $request->user();
+
+        // Check if user is registered for the event
+        if (!$event->volunteers()->where('volunteer_id', $user->id)->exists()) {
+            return response()->json(['message' => 'You must be registered for this event'], 403);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'suggestion' => ['required', 'string', 'min:10', 'max:1000'],
+            'category' => ['required', 'string', 'in:logistics,program,venue,other']
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Create suggestion
+        $suggestion = $event->suggestions()->create([
+            'volunteer_id' => $user->id,
+            'suggestion' => $request->suggestion,
+            'category' => $request->category,
+            'status' => 'pending'
+        ]);
+
+        // Notify organizer
+        Notification::create([
+            'user_id' => $event->organizer_id,
+            'event_id' => $event->id,
+            'type' => 'new_suggestion',
+            'message' => "New suggestion from {$user->full_name}",
+        ]);
+
+        return response()->json($suggestion, 201);
     }
 }

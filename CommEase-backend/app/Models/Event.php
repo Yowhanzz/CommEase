@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Carbon\Carbon;
 
 class Event extends Model
 {
@@ -103,5 +104,26 @@ class Event extends Model
 
         $averageMinutes = $totalMinutes / $volunteers->count();
         return round($averageMinutes) . ' minutes';
+    }
+
+    // Accessors for time formatting
+    public function getStartTimeFormattedAttribute(): string
+    {
+        return $this->start_time ? Carbon::parse($this->start_time)->format('H:i:s') : '';
+    }
+
+    public function getEndTimeFormattedAttribute(): string
+    {
+        return $this->end_time ? Carbon::parse($this->end_time)->format('H:i:s') : '';
+    }
+
+    public function getStartedAtFormattedAttribute(): string
+    {
+        return $this->started_at ? Carbon::parse($this->started_at)->format('H:i:s') : '';
+    }
+
+    public function getEndedAtFormattedAttribute(): string
+    {
+        return $this->ended_at ? Carbon::parse($this->ended_at)->format('H:i:s') : '';
     }
 }

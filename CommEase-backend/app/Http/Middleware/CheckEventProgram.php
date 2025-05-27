@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\Event;
+use Illuminate\Support\Facades\Auth;
 
 class CheckEventProgram
 {
@@ -17,15 +18,15 @@ class CheckEventProgram
     public function handle(Request $request, Closure $next): Response
     {
         $event = $request->route('event');
-        
+
         // If event is not found, let the controller handle the 404
         if (!$event) {
             return $next($request);
         }
 
         // Get the authenticated user's program
-        $userProgram = auth()->user()->program;
-        
+        $userProgram = Auth::user()->program;
+
         // Check if the user's program is in the event's programs array
         if (!in_array($userProgram, $event->programs)) {
             return response()->json([
@@ -35,4 +36,4 @@ class CheckEventProgram
 
         return $next($request);
     }
-} 
+}

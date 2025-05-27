@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Illuminate\Auth\Middleware\Authenticate as Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 
 class Authenticate extends Middleware
 {
@@ -16,10 +17,10 @@ class Authenticate extends Middleware
         Log::info('Authentication check:', [
             'session_id' => session()->getId(),
             'has_session' => session()->has('_token'),
-            'user' => auth()->user() ? [
-                'id' => auth()->user()->id,
-                'email' => auth()->user()->email,
-                'role' => auth()->user()->role
+            'user' => Auth::user() ? [
+                'id' => Auth::user()->id,
+                'email' => Auth::user()->email,
+                'role' => Auth::user()->role
             ] : null,
             'cookies' => $request->cookies->all(),
             'headers' => $request->headers->all()
@@ -27,4 +28,4 @@ class Authenticate extends Middleware
 
         return $request->expectsJson() ? null : route('login');
     }
-} 
+}

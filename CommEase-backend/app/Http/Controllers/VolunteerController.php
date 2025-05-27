@@ -7,12 +7,14 @@ use App\Models\Notification;
 use App\Models\Suggestion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\Controller;
+
 
 class VolunteerController extends Controller
 {
     public function __construct()
     {
-        $this->middleware(['auth:sanctum', 'role:volunteer']);
+        $this->middleware(['auth', 'role:volunteer']);
     }
 
     public function registerForEvent(Request $request, Event $event)

@@ -6,7 +6,7 @@ use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 
-class RateLimiter extends ServiceProvider
+class RateLimiterServiceProvider extends ServiceProvider
 {
     /**
      * Register services.
@@ -25,4 +25,4 @@ class RateLimiter extends ServiceProvider
             return Limit::perMinute(60)->by($request->user()?->id ?: $request->ip());
         });
     }
-} 
+}

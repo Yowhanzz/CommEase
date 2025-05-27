@@ -166,73 +166,73 @@
       class="container-event-objectives"
       :class="{ 'sidebar-collapsed-right-cont': !isOpen }"
     >
-      <h2 class="title-event-objectives">{{ registration.title }}</h2>
-      <p class="p-date"><span>Date Posted: </span>08/04/2005</p>
-      <p class="p-slots"><span>Time: </span>2:00pm - 5:00pm</p>
-      <p class="p-location">
-        <span>Location </span>#25 21st East Bajac-Bajac, Olongapo City
-      </p>
+      <div v-if="loading" class="loading-message">
+        Loading event details...
+      </div>
+      <div v-else-if="error" class="error-message">
+        {{ error }}
+      </div>
+      <div v-else-if="event" class="event-details">
+        <h2 class="title-event-objectives">{{ event.event_title }}</h2>
+        <p class="p-date"><span>Date Posted: </span>{{ formatDate(event.created_at) }}</p>
+        <p class="p-slots">
+          <span>Date: </span>{{ formatDate(event.date) }}
+        </p>
+        <p class="p-slots">
+          <span>Time: </span>{{ formatTime(event.start_time) }} - {{ formatTime(event.end_time) }}
+        </p>
+        <p class="p-location">
+          <span>Location: </span>Barangay {{ event.barangay }}
+        </p>
 
-      <h3 class="title-desc">Description</h3>
-      <hr class="hr-desc" />
+        <h3 class="title-desc">Description</h3>
+        <hr class="hr-desc" />
 
-      <p class="p-desc">
-        Lorem ipsum dolor sit amet consectetur adipisicing elit. Blanditiis
-        ipsam nemo dicta, veritatiLorem ipsum dolor sit amet consectetur
-        adipisicing elit. Blanditiis ipsam nemo dicta, veritatiLorem ipsum dolor
-        sit amet consectetur adipisicing elit. Blanditiis ipsam nemo dicta,
-        veritatiLorem ipsum dolor sit amet consectetur adipisicing elit.
-        Blanditiis ipsam nemo dicta, veritatiLorem ipsum dolor sit amet
-        consectetur adipisicing elit. Blanditiis ipsam nemo dicta, veritatiLorem
-        ipsum dolor sit amet consectetur adipisicing elit. Blanditiis ipsam nemo
-        dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit.
-        Blanditiis ipsam nemo dicta, veritatiLorem ipsum dolor sit amet
-        consectetur adipisicing elit. Blanditiis ipsam nemo dicta, veritatiLorem
-        ipsum dolor sit amet consectetur adipisicing elit. Blanditiis ipsam nemo
-        dicta, veritatiLorem ipsum dolor sit amet consectetur adipisicing elit.
-        Blanditiis ipsam nemo dicta, veritatiLorem ipsum dolor sit amet
-        consectetur adipisicing elit. Blanditiis ipsam nemo dicta, veritatiLorem
-        ipsum dolor
-      </p>
+        <p class="p-desc">
+          {{ event.description }}
+        </p>
 
-      <hr class="hr-task" />
-      <h3 class="title-task">Task Assignment</h3>
+        <hr class="hr-task" />
+        <h3 class="title-task">Objectives</h3>
 
-      <div class="task-separation">
-        <div class="task-bullet-points">
-          <p class="p-per-task">• Plant a tree</p>
-          <p class="p-per-task">• tanggalin ang mga dwende</p>
-          <p class="p-per-task">• hanapin ang sigarilyo ng kapre</p>
-          <p class="p-per-task">• mag sibak ng kahoy</p>
-          <p class="p-per-task">• makipag biruan sa unggoy</p>
+        <div class="task-separation">
+          <div class="task-bullet-points">
+            <p class="p-per-task">
+              • {{ event.objective }}
+            </p>
+          </div>
         </div>
 
-        <div class="task-bullet-points">
-          <p class="p-per-task">• Plant a tree</p>
-          <p class="p-per-task">• tanggalin ang mga dwende</p>
-          <p class="p-per-task">• hanapin ang sigarilyo ng kapre</p>
-          <p class="p-per-task">• mag sibak ng kahoy</p>
-          <p class="p-per-task">• makipag biruan sa unggoy</p>
+        <h3 class="title-task">Things Needed</h3>
+        <div class="task-separation">
+          <div class="task-bullet-points">
+            <p v-for="(item, index) in event.things_needed" :key="index" class="p-per-task">
+              • {{ item }}
+            </p>
+          </div>
+        </div>
+
+        <p class="task-note">
+          <i class="i-task-note">
+            <span class="span-take-note">Note: </span>
+            By clicking agree, you accept the invitation and be a part of this community service.
+          </i>
+        </p>
+        <hr class="hr-note" />
+
+        <div class="button-specific-event">
+          <button
+            class="button-things-back"
+            :disabled="!agreed"
+            @click="resetRegistration"
+          >
+            Back
+          </button>
+          <button class="button-things-submit" @click="handleAgree">Agree</button>
         </div>
       </div>
-
-      <p class="task-note">
-        <i class="i-task-note"
-          ><span class="span-take-note">Note: </span>By clicking agree, you
-          accept the invitation and be a part of this community service.</i
-        >
-      </p>
-      <hr class="hr-note" />
-
-      <div class="button-specific-event">
-        <button
-          class="button-things-back"
-          :disabled="!agreed"
-          @click="resetRegistration"
-        >
-          Back
-        </button>
-        <button class="button-things-submit" @click="handleAgree">Agree</button>
+      <div v-else class="no-event-message">
+        No event details available.
       </div>
     </div>
   </div>
@@ -241,26 +241,61 @@
 </template>
 
 <script setup>
-import { ref, computed } from "vue";
-import { useRouter } from "vue-router";
-import { authService } from '../api/services';
+import { ref, computed, onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
+import { authService, eventService } from '../api/services';
+import api from '../api/axios';
 
 // === Sidebar Toggle ===
 const isSidebarOpen = ref(true);
 const isOpen = ref(false);
 const isMobile = ref(false);
+const route = useRoute();
+const router = useRouter();
 
-const toggleSidebar = () => {
-  isSidebarOpen.value = !isSidebarOpen.value;
-  isOpen.value = !isOpen.value;
-};
+// === Event Data ===
+const event = ref(null);
+const loading = ref(true);
+const error = ref(null);
 
-const handleResize = () => {
-  isMobile.value = window.innerWidth <= 928;
-  if (isMobile.value) {
-    isSidebarOpen.value = false;
+const fetchEventDetails = async () => {
+  try {
+    loading.value = true;
+    error.value = null;
+    console.log('Fetching event details for ID:', route.params.id);
+    
+    // Direct API call to test
+    const response = await api.get(`/events/${route.params.id}`, {
+      params: {
+        include: 'organizer,volunteers'
+      }
+    });
+    
+    console.log('Event response:', response);
+    if (response.data && response.data.data) {
+      event.value = response.data.data;
+      console.log('Event data set:', event.value);
+    } else {
+      throw new Error('Invalid response format');
+    }
+  } catch (err) {
+    console.error('Error details:', err);
+    error.value = err.response?.data?.message || 'Failed to fetch event details';
+    console.error('Error fetching event:', err);
+  } finally {
+    loading.value = false;
   }
 };
+
+onMounted(async () => {
+  console.log('Component mounted, route params:', route.params);
+  if (route.params.id) {
+    await fetchEventDetails();
+  } else {
+    error.value = 'No event ID provided';
+    loading.value = false;
+  }
+});
 
 // === Notifications ===
 const showNotifications = ref(false);
@@ -283,13 +318,11 @@ const notifications = ref([
 
 // === Logout Modal ===
 const showLogoutModal = ref(false);
-const router = useRouter();
 
 const confirmLogout = async () => {
   try {
     await authService.logout();
     showLogoutModal.value = false;
-    // Redirect to login page
     router.push('/LoginVolunteers');
   } catch (error) {
     console.error('Logout failed:', error);
@@ -305,74 +338,17 @@ const registrationForm = ref([
     date_posted: "March 1, 2025",
     location: "Olongapo City",
     description: "lorem*4",
-    objectives: ["Hatdog", "Cheesedog"], // task assignment
-  },
-  {
-    id: 2,
-    title: "Clean up shit",
-    date_posted: "March 1, 2025",
-    location: "Olongapo City",
-    description: "lorem*4",
-    objectives: ["Hatdog", "Cheesedog"], // task assignment
-  },
-  {
-    id: 3,
-    title: "Clean Up Drive",
-    date_posted: "March 1, 2025",
-    location: "Olongapo City",
-    description: "lorem*4",
-    objectives: ["Hatdog", "Cheesedog"], // task assignment
-  },
-]);
-
-// === Events & Search ===
-const events = ref([
-  {
-    title: "Clean Up Drive",
-    barangay: "East Bajac - Bajac",
-    date: "08/06/2025",
-    time: "10:00 - 12:00",
-    organizer: "ELITES",
-  },
-  {
-    title: "Tree Planting",
-    barangay: "West Bajac - Bajac",
-    date: "09/10/2025",
-    time: "8:00 - 10:00",
-    organizer: "GREEN INITIATIVE",
-  },
-  {
-    title: "Feeding Program",
-    barangay: "North Bajac - Bajac",
-    date: "10/12/2025",
-    time: "2:00 - 4:00",
-    organizer: "HELPING HANDS",
-  },
-  {
-    title: "Blood Donation",
-    barangay: "South Bajac - Bajac",
-    date: "12/15/2025",
-    time: "9:00 - 1:00",
-    organizer: "HEALTH TEAM",
-  },
+    objectives: "lorem*4" // task assignment
+  }
 ]);
 
 // === Registration Form ===
 const agreed = ref(false);
 
-const rawItems = [
-  "Shovel",
-  "Rake",
-  "Gloves",
-  "Boots",
-  "Reusable Bottle",
-  "Extra Shirt",
-  "EWAN KO",
-  "BASTA",
-  "NUNO",
-  "ENGKANTO",
-];
-const itemsNeeded = ref([...new Set(rawItems)]); // Remove duplicates
+// Use the event's things_needed list
+const itemsNeeded = computed(() => {
+  return event.value?.things_needed || [];
+});
 const selectedItems = ref([]);
 
 const toggleItem = (item) => {
@@ -394,20 +370,68 @@ const handleAgree = () => {
 
 // === Ideas & Recommendations Form ===
 const ideaMessage = ref("");
-const handleSubmit = () => {
+
+const handleSubmit = async () => {
+  if (!agreed.value) {
+    alert("Please agree to the terms first.");
+    return;
+  }
+
   if (selectedItems.value.length === 0) {
     alert("Please select at least one item to bring.");
     return;
   }
 
-  // Optional lang ang ideaMessage, so no alert kung empty
-  alert("Form submitted successfully");
-  router.push("/dashboard_volunteers");
+  try {
+    // First register for the event
+    await api.post(`/events/${event.value.id}/register`);
+    
+    // Then submit the things they will bring
+    await api.post(`/events/${event.value.id}/things-brought`, {
+      thingsBrought: selectedItems.value
+    });
+
+    // If there's a recommendation, submit it as a suggestion
+    if (ideaMessage.value.trim()) {
+      await api.post(`/events/${event.value.id}/suggestions`, {
+        suggestion: ideaMessage.value
+      });
+    }
+
+    alert("Registration successful!");
+    router.push("/DashboardVolunteers");
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || "Failed to register for event";
+    alert(errorMessage);
+    console.error('Registration error:', error);
+  }
 };
 
 const resetRegistration = () => {
   agreed.value = false;
   selectedItems.value = [];
+  ideaMessage.value = "";
+};
+
+const formatDate = (dateStr) => {
+  if (!dateStr) return '';
+  const date = new Date(dateStr);
+  return date.toLocaleDateString('en-US', {
+    weekday: 'short',
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+};
+
+const formatTime = (timeStr) => {
+  if (!timeStr) return '';
+  const time = new Date(timeStr);
+  return time.toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  });
 };
 </script>
 
