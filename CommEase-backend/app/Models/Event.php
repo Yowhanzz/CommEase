@@ -44,10 +44,13 @@ class Event extends Model
         return $this->belongsTo(User::class, 'organizer_id');
     }
 
-    public function volunteers(): BelongsToMany
+    /**
+     * Get the volunteers participating in this event.
+     */
+    public function volunteers()
     {
-        return $this->belongsToMany(User::class, 'event_volunteer', 'event_id', 'volunteer_id')
-            ->withPivot(['things_brought', 'time_in', 'time_out', 'attendance_status', 'attendance_notes', 'attendance_marked_at'])
+        return $this->belongsToMany(User::class, 'event_volunteers')
+            ->withPivot(['things_brought', 'time_in', 'time_out'])
             ->withTimestamps();
     }
 

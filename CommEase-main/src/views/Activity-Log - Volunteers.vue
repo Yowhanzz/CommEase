@@ -113,17 +113,29 @@
             <th>Date</th>
             <th>Time</th>
             <th>Organizer</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr v-for="(event, index) in filteredEvents" :key="index">
             <td>{{ index + 1 }}</td>
-            <!-- No. column -->
-            <td>{{ event.title }}</td>
+            <td>{{ event.event_title || event.title }}</td>
             <td>{{ event.barangay }}</td>
-            <td>{{ event.date }}</td>
-            <td>{{ event.time }}</td>
+            <td>{{ formatDate(event.date) }}</td>
+            <td>
+              {{ formatTime(event.start_time) }} -
+              {{ formatTime(event.end_time) }}
+            </td>
             <td>{{ event.organizer }}</td>
+            <td>
+              <button
+                v-if="event.status === 'upcoming'"
+                @click="unregisterFromEvent(event.id)"
+                class="unregister-btn"
+              >
+                Unregister
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>
@@ -133,113 +145,155 @@
   <div class="overlay" v-if="!isMobile && isSidebarOpen"></div>
 </template>
 
-<script>
-import { ref } from "vue";
+<script setup>
+import { ref, onMounted, computed, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
-import { authService } from "../api/services";
+import {
+  authService,
+  formatTime,
+  formatDate,
+  eventService,
+} from "../api/services";
+import axios from "axios";
 
-export default {
-  data() {
-    return {
-      showNotifications: false,
-      showLogoutModal: false,
-      isOpen: false,
-      isSidebarOpen: false,
+// Configure axios default base URL (this might be better configured globally elsewhere)
+axios.defaults.baseURL = "http://localhost:8000";
 
-      //
-      isMobile: false,
+const router = useRouter();
 
-      searchQuery: "",
-      notifications: [
-        {
-          message: "You completed the 'Update website content' task.",
-          time: "2 hours ago",
-        },
-        {
-          message: "You completed the 'Clean up drive' task.",
-          time: "3 hours ago",
-        },
-        {
-          message: "You completed the 'Meeting with organizers' task.",
-          time: "5 hours ago",
-        },
-      ],
-      events: [
-        {
-          title: "Clean Up Drive",
-          barangay: "East Bajac - Bajac",
-          date: "08/06/2025",
-          time: "10:00 - 12:00",
-          organizer: "ELITES",
-        },
-        {
-          title: "Tree Planting",
-          barangay: "West Bajac - Bajac",
-          date: "09/10/2025",
-          time: "8:00 - 10:00",
-          organizer: "GREEN INITIATIVE",
-        },
-        {
-          title: "Feeding Program",
-          barangay: "North Bajac - Bajac",
-          date: "10/12/2025",
-          time: "2:00 - 4:00",
-          organizer: "HELPING HANDS",
-        },
-        {
-          title: "Blood Donation",
-          barangay: "South Bajac - Bajac",
-          date: "12/15/2025",
-          time: "9:00 - 1:00",
-          organizer: "HEALTH TEAM",
-        },
-      ],
-    };
+const showNotifications = ref(false);
+const showLogoutModal = ref(false);
+const isOpen = ref(false);
+const isSidebarOpen = ref(false);
+const isMobile = ref(false);
+const searchQuery = ref("");
+const events = ref([]);
+
+const notifications = ref([
+  {
+    message: "You completed the 'Update website content' task.",
+    time: "2 hours ago",
   },
-  computed: {
-    filteredEvents() {
-      const query = this.searchQuery.toLowerCase();
-      return this.events.filter(
-        (event) =>
-          event.title.toLowerCase().includes(query) ||
-          event.barangay.toLowerCase().includes(query) ||
-          event.date.toLowerCase().includes(query) ||
-          event.time.toLowerCase().includes(query) ||
-          event.organizer.toLowerCase().includes(query)
-      );
-    },
+  {
+    message: "You completed the 'Clean up drive' task.",
+    time: "3 hours ago",
   },
-  methods: {
-    toggleNotifications() {
-      this.showNotifications = !this.showNotifications;
-    },
-
-    handleResize() {
-      /* ADDED */
-      this.isMobile = window.innerWidth <= 928;
-      if (this.isMobile) {
-        this.isSidebarOpen = false;
-      }
-    },
-
-    toggleSidebar() {
-      this.isSidebarOpen = !this.isSidebarOpen;
-      this.isOpen = !this.isOpen;
-    },
-
-    async confirmLogout() {
-      try {
-        await authService.logout();
-        this.showLogoutModal = false;
-        // Redirect to login page
-        this.$router.push("/LoginVolunteers");
-      } catch (error) {
-        console.error("Logout failed:", error);
-        alert("Failed to logout. Please try again.");
-      }
-    },
+  {
+    message: "You completed the 'Meeting with organizers' task.",
+    time: "5 hours ago",
   },
-};
+]);
+
+const filteredEvents = computed(() => {
+  if (!Array.isArray(events.value)) {
+    return [];
+  }
+  const query = searchQuery.value.toLowerCase();
+  // Using the data structure returned by getEventHistory
+  return events.value.filter(
+    (event) =>
+      event.title?.toLowerCase().includes(query) ||
+      event.barangay?.toLowerCase().includes(query) || // Assuming barangay is still in the history data or you adjust the backend map
+      event.organizer?.toLowerCase().includes(query) ||
+      formatDate(event.date)?.toLowerCase().includes(query)
+    // Add time filtering if needed, but it might be complex with ranges
+  );
+});
+
+async function fetchEventHistory() {
+  try {
+    console.log("Fetching event history...");
+    // Use getEventHistory which is designed for volunteer's events
+    const response = await eventService.getEventHistory();
+    console.log("API Response for Event History:", response);
+
+    // The backend getEventHistory returns a direct array of event data in response.data
+    const eventsData = response.data;
+
+    // The data structure from getEventHistory is already mapped in the backend
+    events.value = Array.isArray(eventsData) ? eventsData : [];
+    console.log("Processed event history:", events.value);
+  } catch (error) {
+    console.error("Failed to fetch event history:", error);
+    console.error("Error details:", error.response?.data || error.message);
+    events.value = []; // Ensure events is an array even on error
+    alert("Failed to load event history. Please try again.");
+  }
+}
+
+async function unregisterFromEvent(eventId) {
+  if (!confirm("Are you sure you want to unregister from this event?")) {
+    return;
+  }
+
+  try {
+    await eventService.unregister(eventId);
+    await fetchEventHistory(); // Refresh the list
+    alert("Successfully unregistered from the event");
+  } catch (error) {
+    console.error("Failed to unregister:", error);
+    alert("Failed to unregister from the event. Please try again.");
+  }
+}
+
+function toggleNotifications() {
+  showNotifications.value = !showNotifications.value;
+}
+
+function handleResize() {
+  isMobile.value = window.innerWidth <= 928;
+  if (isMobile.value) {
+    isSidebarOpen.value = false;
+  }
+}
+
+function toggleSidebar() {
+  isSidebarOpen.value = !isSidebarOpen.value;
+  isOpen.value = !isOpen.value;
+}
+
+async function confirmLogout() {
+  try {
+    await authService.logout();
+    showLogoutModal.value = false;
+    router.push("/LoginVolunteers");
+  } catch (error) {
+    console.error("Logout failed:", error);
+    alert("Failed to logout. Please try again.");
+  }
+}
+
+onMounted(() => {
+  fetchEventHistory();
+  window.addEventListener("resize", handleResize);
+  handleResize();
+});
+
+onUnmounted(() => {
+  window.removeEventListener("resize", handleResize);
+});
 </script>
 
 <style scoped src="/src/assets/CSS Volunteers/Activitylog.css"></style>
+<style scoped>
+/* Add these styles to your existing CSS */
+.unregister-btn {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.2s;
+}
+
+.unregister-btn:hover {
+  background-color: #c82333;
+}
+
+.unregister-btn:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+</style>

@@ -216,7 +216,7 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { authService, eventService } from "@/api/services";
+import { authService, eventService, formatTime, formatDate } from "@/api/services";
 
 const route = useRoute();
 const router = useRouter();
@@ -272,8 +272,7 @@ onMounted(async () => {
       throw new Error("Event ID is required");
     }
 
-    const response = await eventService.getEvent(eventId);
-    const event = response.data;
+    const event = await eventService.getEvent(eventId);
 
     // Format date and times
     const eventDate = new Date(event.date);
@@ -302,7 +301,7 @@ onMounted(async () => {
   } catch (err) {
     error.value =
       err.response?.data?.message || err.message || "Failed to load event";
-    router.push("/ManageEventsOrganizers");
+    // router.push("/ManageEventsOrganizers"); // Commented out for debugging
   } finally {
     loading.value = false;
   }
@@ -340,11 +339,13 @@ const cancelEdit = () => {
 };
 
 const saveChanges = async () => {
+  console.log('saveChanges function called');
   try {
     loading.value = true;
     error.value = null;
 
     // Validate required fields
+    console.log('Validating required fields...');
     if (
       !title.value ||
       !barangay.value ||
@@ -356,32 +357,42 @@ const saveChanges = async () => {
     ) {
       throw new Error("Please fill in all required fields");
     }
+    console.log('Required fields valid.');
 
+    console.log('Checking programs...');
     if (programs.value.length === 0) {
       throw new Error("Please select at least one program");
     }
+    console.log('Programs selected.');
 
     // Validate date is after today
+    console.log('Validating date...');
     const selectedDate = new Date(date.value);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     if (selectedDate < today) {
       throw new Error('Event date must be after today');
     }
+    console.log('Date valid.');
 
     // Validate end time is after start time
+    console.log('Validating time...');
     if (startTime.value >= endTime.value) {
       throw new Error('End time must be after start time');
     }
+    console.log('Time valid.');
 
     // Validate programs
+    console.log('Validating program values...');
     const validPrograms = ['BSIT', 'BSCS', 'BSEMC'];
     const invalidPrograms = programs.value.filter(program => !validPrograms.includes(program));
     if (invalidPrograms.length > 0) {
       throw new Error(`Invalid programs: ${invalidPrograms.join(', ')}. Valid programs are: ${validPrograms.join(', ')}`);
     }
+    console.log('Program values valid.');
 
     // Format the date and times
+    console.log('Formatting date and time...');
     const formattedDate = new Date(date.value).toISOString().split('T')[0];
     const formatTimeForAPI = (time) => {
       const [hours, minutes] = time.split(':');
@@ -389,11 +400,11 @@ const saveChanges = async () => {
     };
 
     const eventData = {
-      eventTitle: title.value,
+      event_title: title.value,
       barangay: barangay.value,
       date: formattedDate,
-      startTime: formatTimeForAPI(startTime.value),
-      endTime: formatTimeForAPI(endTime.value),
+      start_time: formatTimeForAPI(startTime.value),
+      end_time: formatTimeForAPI(endTime.value),
       objective: objective.value,
       description: description.value,
       programs: programs.value,
@@ -401,13 +412,18 @@ const saveChanges = async () => {
       status: status.value,
     };
 
+    console.log('Sending update API request...', eventData);
     await eventService.updateEvent(event_id.value, eventData);
+    console.log('API request successful.');
     router.push("/ManageEventsOrganizers");
   } catch (err) {
+    console.error('Error during saveChanges:', err);
     error.value =
       err.response?.data?.message || err.message || "Failed to update event";
+    // router.push("/ManageEventsOrganizers"); // Commented out for debugging
   } finally {
     loading.value = false;
+    console.log('saveChanges function finished.');
   }
 };
 

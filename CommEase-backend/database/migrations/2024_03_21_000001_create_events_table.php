@@ -20,7 +20,7 @@ return new class extends Migration
             $table->text('objective');
             $table->text('description');
             $table->json('things_needed');
-            $table->enum('status', ['upcoming', 'ongoing', 'completed', 'cancelled'])->default('upcoming');
+            $table->enum('status', ['pending', 'active', 'completed', 'cancelled'])->default('pending');
             $table->timestamps();
         });
     }

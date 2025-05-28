@@ -109,7 +109,7 @@
 
         <div class="container-button-things">
           <button
-            v-for="(item, index) in itemsNeeded"
+            v-for="(item, index) in registration.things_needed"
             :key="index"
             :class="[
               'button-things',
@@ -147,14 +147,21 @@
           Is there anything that you could recommend for improving our event
           soon? (optional)
         </p>
-
+        <select
+          v-model="suggestionCategory"
+          class="suggestion-category-dropdown"
+        >
+          <option value="logistics">Logistics</option>
+          <option value="program">Program</option>
+          <option value="venue">Venue</option>
+          <option value="other">Other</option>
+        </select>
         <textarea
           v-model="ideaMessage"
           class="message-ideas"
           placeholder="Your message here..."
         >
         </textarea>
-
         <button class="button-ideas-submit" @click="handleSubmit">
           Submit
         </button>
@@ -170,72 +177,96 @@
       <div v-else-if="error" class="error-message">
         {{ error }}
       </div>
-      <div v-else-if="event" class="event-details">
-        <h2 class="title-event-objectives">{{ event.event_title }}</h2>
-        <p class="p-date">
-          <span>Date Posted: </span>{{ formatDate(event.created_at) }}
-        </p>
-        <p class="p-slots"><span>Date: </span>{{ formatDate(event.date) }}</p>
-        <p class="p-slots">
-          <span>Time: </span>{{ formatTime(event.start_time) }} -
-          {{ formatTime(event.end_time) }}
-        </p>
-        <p class="p-location">
-          <span>Location: </span>Barangay {{ event.barangay }}
-        </p>
-
-        <h3 class="title-desc">Description</h3>
-        <hr class="hr-desc" />
-
-        <p class="p-desc">
-          {{ event.description }}
-        </p>
-
-        <hr class="hr-task" />
-        <h3 class="title-task">Objectives</h3>
-
-        <div class="task-separation">
-          <div class="task-bullet-points">
-            <p class="p-per-task">• {{ event.objective }}</p>
+      <div v-else class="event-details">
+        <div class="event-info-container">
+          <div class="event-header">
+            <h2 class="title-event-objectives">{{ registration.title }}</h2>
+            <div class="event-meta">
+              <p class="p-date">
+                <span>Date Posted: </span
+                >{{ formatDate(registration.date_posted) }}
+              </p>
+              <p class="p-slots">
+                <span>Date: </span>{{ formatDate(registration.date) }}
+              </p>
+              <p class="p-slots">
+                <span>Time: </span>{{ formatTime(registration.start_time) }} -
+                {{ formatTime(registration.end_time) }}
+              </p>
+              <p class="p-location">
+                <span>Location: </span>Barangay {{ registration.location }}
+              </p>
+              <p class="p-programs">
+                <span>Programs: </span
+                >{{ (registration.programs || []).join(", ") }}
+              </p>
+              <p class="p-organizer">
+                <span>Organizer: </span
+                >{{ registration.organizer?.first_name }}
+                {{ registration.organizer?.last_name }}
+              </p>
+            </div>
           </div>
-        </div>
 
-        <h3 class="title-task">Things Needed</h3>
-        <div class="task-separation">
-          <div class="task-bullet-points">
-            <p
-              v-for="(item, index) in event.things_needed"
-              :key="index"
-              class="p-per-task"
-            >
-              • {{ item }}
+          <div class="event-content">
+            <div class="content-section">
+              <h3 class="title-desc">Description</h3>
+              <hr class="hr-desc" />
+              <p class="p-desc">{{ registration.description }}</p>
+            </div>
+
+            <div class="content-section">
+              <h3 class="title-task">Objectives</h3>
+              <hr class="hr-task" />
+              <div class="task-separation">
+                <div class="task-bullet-points">
+                  <p class="p-per-task">• {{ registration.objectives }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="content-section">
+              <h3 class="title-task">Things Needed</h3>
+              <hr class="hr-task" />
+              <div class="task-separation">
+                <div class="task-bullet-points">
+                  <p
+                    v-for="(item, index) in registration.things_needed"
+                    :key="index"
+                    class="p-per-task"
+                  >
+                    • {{ item }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="event-footer">
+            <p class="task-note">
+              <i class="i-task-note">
+                <span class="span-take-note">Note: </span>
+                By clicking agree, you accept the invitation and be a part of
+                this community service.
+              </i>
             </p>
+            <hr class="hr-note" />
+
+            <div class="button-specific-event">
+              <button
+                class="button-things-back"
+                :disabled="!agreed"
+                @click="resetRegistration"
+              >
+                Back
+              </button>
+              <button class="button-things-submit" @click="handleAgree">
+                Agree
+              </button>
+            </div>
           </div>
-        </div>
-
-        <p class="task-note">
-          <i class="i-task-note">
-            <span class="span-take-note">Note: </span>
-            By clicking agree, you accept the invitation and be a part of this
-            community service.
-          </i>
-        </p>
-        <hr class="hr-note" />
-
-        <div class="button-specific-event">
-          <button
-            class="button-things-back"
-            :disabled="!agreed"
-            @click="resetRegistration"
-          >
-            Back
-          </button>
-          <button class="button-things-submit" @click="handleAgree">
-            Agree
-          </button>
         </div>
       </div>
-      <div v-else class="no-event-message">No event details available.</div>
     </div>
   </div>
 
@@ -246,7 +277,6 @@
 import { ref, computed, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { authService, eventService } from "../api/services";
-import api from "../api/axios";
 
 // === Sidebar Toggle ===
 const isSidebarOpen = ref(true);
@@ -260,26 +290,34 @@ const event = ref(null);
 const loading = ref(true);
 const error = ref(null);
 
-const fetchEventDetails = async () => {
+const registrationForm = ref([]);
+
+const fetchRegistrationForm = async () => {
   try {
     loading.value = true;
     error.value = null;
     console.log("Fetching event details for ID:", route.params.id);
-
-    // Direct API call to test
-    const response = await api.get(`/events/${route.params.id}`, {
-      params: {
-        include: "organizer,volunteers",
+    const eventData = await eventService.getEvent(route.params.id);
+    console.log("Event data:", eventData);
+    event.value = eventData;
+    // Populate registrationForm with the real event data
+    registrationForm.value = [
+      {
+        id: eventData.id,
+        title: eventData.event_title,
+        date_posted: eventData.created_at,
+        location: eventData.barangay,
+        description: eventData.description,
+        objectives: eventData.objective,
+        programs: eventData.programs,
+        organizer: eventData.organizer,
+        start_time: eventData.start_time,
+        end_time: eventData.end_time,
+        date: eventData.date,
+        things_needed: eventData.things_needed,
       },
-    });
-
-    console.log("Event response:", response);
-    if (response.data && response.data.data) {
-      event.value = response.data.data;
-      console.log("Event data set:", event.value);
-    } else {
-      throw new Error("Invalid response format");
-    }
+    ];
+    console.log("Registration form set:", registrationForm.value);
   } catch (err) {
     console.error("Error details:", err);
     error.value =
@@ -292,12 +330,7 @@ const fetchEventDetails = async () => {
 
 onMounted(async () => {
   console.log("Component mounted, route params:", route.params);
-  if (route.params.id) {
-    await fetchEventDetails();
-  } else {
-    error.value = "No event ID provided";
-    loading.value = false;
-  }
+  await fetchRegistrationForm();
 });
 
 const toggleSidebar = () => {
@@ -337,18 +370,6 @@ const confirmLogout = async () => {
   }
 };
 
-const registrationForm = ref([
-  /* ADDED */
-  {
-    id: 1,
-    title: "Clean Up Drive",
-    date_posted: "March 1, 2025",
-    location: "Olongapo City",
-    description: "lorem*4",
-    objectives: "lorem*4", // task assignment
-  },
-]);
-
 // === Registration Form ===
 const agreed = ref(false);
 
@@ -359,11 +380,15 @@ const itemsNeeded = computed(() => {
 const selectedItems = ref([]);
 
 const toggleItem = (item) => {
-  if (selectedItems.value.includes(item)) {
-    selectedItems.value = selectedItems.value.filter((i) => i !== item);
-  } else {
+  const index = selectedItems.value.indexOf(item);
+  if (index === -1) {
+    // Item is not selected, add it
     selectedItems.value.push(item);
+  } else {
+    // Item is already selected, remove it
+    selectedItems.value.splice(index, 1);
   }
+  console.log("Selected items:", selectedItems.value); // Debug log
 };
 
 const handleAgree = () => {
@@ -377,6 +402,7 @@ const handleAgree = () => {
 
 // === Ideas & Recommendations Form ===
 const ideaMessage = ref("");
+const suggestionCategory = ref("other");
 
 const handleSubmit = async () => {
   if (!agreed.value) {
@@ -390,28 +416,53 @@ const handleSubmit = async () => {
   }
 
   try {
-    // First register for the event
-    await api.post(`/events/${event.value.id}/register`);
+    // Register for the event
+    const registerResponse = await eventService.register(event.value.id);
 
-    // Then submit the things they will bring
-    await api.post(`/events/${event.value.id}/things-brought`, {
-      thingsBrought: selectedItems.value,
-    });
-
-    // If there's a recommendation, submit it as a suggestion
-    if (ideaMessage.value.trim()) {
-      await api.post(`/events/${event.value.id}/suggestions`, {
-        suggestion: ideaMessage.value,
+    if (registerResponse.status === 200 || registerResponse.status === 201) {
+      // Then submit the things they will bring
+      await eventService.submitThingsBrought(event.value.id, {
+        thingsBrought: selectedItems.value,
       });
+
+      // If there's a recommendation, submit it as a suggestion
+      if (ideaMessage.value.trim()) {
+        await eventService.submitSuggestion(event.value.id, {
+          suggestion: ideaMessage.value,
+          category: suggestionCategory.value,
+        });
+      }
+
+      alert("Registration successful!");
+      router.push("/DashboardVolunteers");
+    }
+  } catch (error) {
+    let errorMessage = "Failed to register for event";
+
+    if (error.response?.status === 422) {
+      if (error.response.data.message?.includes("already registered")) {
+        errorMessage = "You are already registered for this event";
+      } else if (
+        error.response.data.message?.includes("not available for your program")
+      ) {
+        errorMessage = "This event is not available for your program";
+      } else if (
+        error.response.data.message?.includes("Cannot register for this event")
+      ) {
+        errorMessage = "This event is not in upcoming status";
+      } else if (error.response.data.errors) {
+        errorMessage = Object.values(error.response.data.errors)
+          .flat()
+          .join("\n");
+      } else {
+        errorMessage = error.response.data.message || errorMessage;
+      }
+    } else if (error.response?.status === 403) {
+      errorMessage = "You do not have permission to register for this event";
     }
 
-    alert("Registration successful!");
-    router.push("/DashboardVolunteers");
-  } catch (error) {
-    const errorMessage =
-      error.response?.data?.message || "Failed to register for event";
-    alert(errorMessage);
     console.error("Registration error:", error);
+    alert(errorMessage);
   }
 };
 

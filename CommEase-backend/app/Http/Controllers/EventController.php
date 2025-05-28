@@ -110,14 +110,19 @@ class EventController extends Controller
         }
 
         try {
+            // Format the date and times
+            $date = $request->date;
+            $startTime = $request->startTime;
+            $endTime = $request->endTime;
+
             $event = Event::create([
                 'event_title' => $request->eventTitle,
                 'barangay' => $request->barangay,
                 'organizer_id' => $request->user()->id,
                 'programs' => $request->programs,
-                'date' => $request->date,
-                'start_time' => $request->startTime,
-                'end_time' => $request->endTime,
+                'date' => $date,
+                'start_time' => $startTime,
+                'end_time' => $endTime,
                 'objective' => $request->objective,
                 'description' => $request->description,
                 'things_needed' => $request->thingsNeeded,
@@ -192,7 +197,22 @@ class EventController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $event->update($request->all());
+        // Format the date and times
+        $date = $request->date ?? $event->date;
+        $startTime = $request->startTime ?? $event->start_time;
+        $endTime = $request->endTime ?? $event->end_time;
+
+        $event->update([
+            'event_title' => $request->eventTitle ?? $event->event_title,
+            'barangay' => $request->barangay ?? $event->barangay,
+            'programs' => $request->programs ?? $event->programs,
+            'date' => $date,
+            'start_time' => $startTime,
+            'end_time' => $endTime,
+            'objective' => $request->objective ?? $event->objective,
+            'description' => $request->description ?? $event->description,
+            'things_needed' => $request->thingsNeeded ?? $event->things_needed,
+        ]);
 
         // Notify registered volunteers
         foreach ($event->volunteers as $volunteer) {
@@ -235,7 +255,7 @@ class EventController extends Controller
         }
 
         if ($event->status !== 'upcoming') {
-            return response()->json(['message' => 'Event must be in upcoming status to start'], 422);
+            return response()->json(['message' => 'Event can only be started when in upcoming status'], 422);
         }
 
         $event->update([
@@ -243,6 +263,7 @@ class EventController extends Controller
             'started_at' => now()
         ]);
 
+        // Notify registered volunteers
         foreach ($event->volunteers as $volunteer) {
             Notification::create([
                 'user_id' => $volunteer->id,
@@ -262,7 +283,7 @@ class EventController extends Controller
         }
 
         if ($event->status !== 'ongoing') {
-            return response()->json(['message' => 'Event must be in ongoing status to end'], 422);
+            return response()->json(['message' => 'Event can only be ended when in ongoing status'], 422);
         }
 
         $event->update([
@@ -270,6 +291,7 @@ class EventController extends Controller
             'ended_at' => now()
         ]);
 
+        // Notify registered volunteers
         foreach ($event->volunteers as $volunteer) {
             Notification::create([
                 'user_id' => $volunteer->id,
@@ -427,7 +449,7 @@ class EventController extends Controller
         }
 
         // Check if event is still open for registration
-        if ($event->status !== 'upcoming') {
+        if ($event->status !== 'pending') {
             return response()->json(['message' => 'Event is no longer open for registration'], 422);
         }
 

@@ -55,7 +55,7 @@
     <div class="dropdown">
       <button class="dropbtn" @click="toggleDropdown">Options ▼</button>
       <div class="dropdown-content" :class="{ active: showDropdown }">
-        <a @click="showQRCode = true">Show My QR Code</a>
+        <a @click="openQRCodeModal">Show My QR Code</a>
         <a @click="toggleCalendar">Calendar</a>
       </div>
     </div>
@@ -80,7 +80,12 @@
         <h3 class="modal-title">Your QR Code</h3>
         <button class="close-btn-qr" @click="closeQRCode">✕</button>
       </div>
-      <vue-qrcode :value="qrValue" :options="{ width: 200, height: 200 }" />
+      <img
+        v-if="qrValue"
+        :src="qrValue"
+        alt="QR Code"
+        style="width: 200px; height: 200px"
+      />
       <p class="qr-label">
         Scan this QR to attend quickly to the event you want
       </p>
@@ -96,7 +101,13 @@
       </div>
       <vue-cal
         style="height: 500px"
-        :events="events_test"
+        :events="
+          events.map((event) => ({
+            start: event.start_time,
+            end: event.end_time,
+            title: event.event_title,
+          }))
+        "
         @cell-click="onDateClick"
       />
     </div>
@@ -148,11 +159,26 @@
 
     <div class="glasscard-container-1">
       <div class="picture-1">
-        <img src="" alt="shrek sample pic" class="picture-person" />
+        <img
+          v-if="weather.icon"
+          :src="`http://openweathermap.org/img/wn/${weather.icon}@2x.png`"
+          :alt="weather.description"
+          class="weather-icon"
+        />
       </div>
       <div class="glasscard-titles">
-        <h1 class="volunteer-name">Mon, Mar 27, 2025</h1>
-        <h6 class="service-type">40 °C</h6>
+        <h1 class="volunteer-name">
+          {{
+            new Date().toLocaleDateString("en-US", {
+              weekday: "short",
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })
+          }}
+        </h1>
+        <h6 class="service-type">{{ weather.temperature }}°C</h6>
+        <p class="weather-description">{{ weather.description }}</p>
       </div>
     </div>
   </div>
@@ -205,14 +231,14 @@
           </div>
           <div class="button">
             <button
-              v-if="event.status === 'upcoming'"
+              v-if="event.status && event.status.toLowerCase() === 'upcoming'"
               @click="registerForEvent(event.id)"
               class="button-enter"
             >
               Register
             </button>
             <span v-else class="button-enter disabled">
-              {{ event.status }}
+              {{ event.status.charAt(0).toUpperCase() + event.status.slice(1) }}
             </span>
           </div>
         </div>
@@ -228,7 +254,13 @@ import { QrcodeStream } from "vue-qrcode-reader";
 import VueCal from "vue-cal";
 import VueQrcode from "@chenfengyuan/vue-qrcode";
 import "vue-cal/dist/vuecal.css";
-import { authService, eventService } from "../api/services";
+import {
+  authService,
+  eventService,
+  formatTime,
+  formatDate,
+  qrService,
+} from "../api/services";
 import axios from "axios";
 
 export default {
@@ -237,10 +269,17 @@ export default {
     VueCal,
     VueQrcode,
   },
+  setup() {
+    return {
+      formatTime,
+      formatDate,
+    };
+  },
   data() {
     return {
       // QR Code
       showQRCode: false,
+      qrValue: "",
       userEmail: "",
       userPassword: "",
 
@@ -261,8 +300,8 @@ export default {
       selectedStatus: "",
       events_test: [
         {
-          start: "2025-05-05 6:25",
-          end: "2025-05-05 8:20",
+          start: "2025-05-08 6:25",
+          end: "2025-05-08 8:20",
           title: "Clean up Drive",
         },
       ],
@@ -284,6 +323,11 @@ export default {
       loading: false,
       error: null,
       firstName: "",
+      weather: {
+        temperature: "",
+        description: "",
+        icon: "",
+      },
     };
   },
   computed: {
@@ -306,14 +350,17 @@ export default {
   async mounted() {
     await this.fetchEvents();
     await this.fetchUserData();
+    await this.fetchWeather();
   },
   methods: {
     async fetchEvents() {
       try {
         this.loading = true;
         this.error = null;
-        const response = await eventService.getEvents();
-        this.events = response.data.data;
+        const response = await eventService.getEventsVolunteer();
+        // Handle both possible response structures
+        const eventsData = response.data.data || response.data;
+        this.events = Array.isArray(eventsData) ? eventsData : [];
       } catch (err) {
         this.error = err.response?.data?.message || "Failed to fetch events";
         console.error("Error fetching events:", err);
@@ -342,8 +389,20 @@ export default {
     toggleDropdown() {
       this.showDropdown = !this.showDropdown;
     },
+    async openQRCodeModal() {
+      try {
+        // Fetch permanent user QR code from backend
+        const response = await qrService.getUserQR();
+        this.qrValue = response.qr_code;
+        this.showQRCode = true;
+      } catch (error) {
+        alert("Failed to generate QR code");
+        this.qrValue = "";
+      }
+    },
     closeQRCode() {
       this.showQRCode = false;
+      this.qrValue = "";
       localStorage.setItem("qrModalShown", "true");
     },
     toggleCalendar() {
@@ -359,23 +418,6 @@ export default {
     },
     toggleNotifications() {
       this.showNotifications = !this.showNotifications;
-    },
-    formatTime(datetime) {
-      if (!datetime) return "";
-      return new Date(datetime).toLocaleTimeString([], {
-        hour: "2-digit",
-        minute: "2-digit",
-        hour12: false,
-      });
-    },
-    formatDate(datetime) {
-      if (!datetime) return "";
-      return new Date(datetime).toLocaleDateString([], {
-        weekday: "short",
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      });
     },
     onDateClick({ date }) {
       const selected = this.events.find((event) => {
@@ -396,6 +438,24 @@ export default {
     },
     async registerForEvent(eventId) {
       this.$router.push(`/RegistrationVolunteers/${eventId}`);
+    },
+    async fetchWeather() {
+      try {
+        // Replace with your actual API key
+        const API_KEY = "476431119c6012c1e8cb59bb59fb3668";
+        const city = "Olongapo"; // Default city
+        const response = await axios.get(
+          `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${API_KEY}`
+        );
+
+        this.weather = {
+          temperature: Math.round(response.data.main.temp),
+          description: response.data.weather[0].description,
+          icon: response.data.weather[0].icon,
+        };
+      } catch (error) {
+        console.error("Error fetching weather:", error);
+      }
     },
   },
 };
