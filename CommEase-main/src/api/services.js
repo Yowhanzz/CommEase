@@ -330,7 +330,7 @@ export const qrService = {
     },
 
     // Scan QR code for attendance
-    async scanQR(eventId, userEmailId) {
+    async scanQR(eventId, userEmailId, scanType = 'time_in') {
         try {
             if (!eventId) {
                 throw new Error('Event ID is required');
@@ -340,7 +340,8 @@ export const qrService = {
             }
 
             const response = await api.post(`/events/${eventId}/scan-qr`, {
-                user_email_id: userEmailId
+                user_email_id: userEmailId,
+                scan_type: scanType
             });
             return response.data;
         } catch (error) {

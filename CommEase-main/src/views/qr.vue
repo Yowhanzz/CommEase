@@ -13,6 +13,7 @@ const isScanning = ref(false);
 const scanResult = ref(null);
 const scanError = ref(null);
 const currentEventId = ref("1"); // Replace with actual event ID from your context
+const scanType = ref("time_in"); // Add scan type ref
 
 const signUp = async () => {
   if (!name.value || !email.value) {
@@ -34,33 +35,31 @@ const signUp = async () => {
 
 const handleQRScan = async (result) => {
   try {
-    // Get the raw value from the scan result
     const scannedText = result[0].rawValue;
-    console.log("Scanned text:", scannedText); // Debug log
+    console.log("Scanned text:", scannedText);
 
-    // Extract user_email_id from the scanned text
-    // The scanned text should be in format: numbers@gordoncollege.edu.ph
     const userEmailId = scannedText.split('@')[0];
     
     if (!userEmailId) {
       throw new Error("Invalid QR code format: Could not extract user email ID");
     }
 
-    console.log("Extracted user_email_id:", userEmailId); // Debug log
+    console.log("Extracted user_email_id:", userEmailId);
+    console.log("Scan type:", scanType.value);
 
-    // Call the QR service to process the scan
-    const response = await qrService.scanQR(currentEventId.value, userEmailId);
-    console.log("API Response:", response); // Debug log
+    // Call the QR service to process the scan with scan type
+    const response = await qrService.scanQR(currentEventId.value, userEmailId, scanType.value);
+    console.log("API Response:", response);
     
     scanResult.value = {
       message: response.message,
       status: response.status,
       time: response.time,
-      eventStatus: response.event_status
+      eventStatus: response.event_status,
+      scanType: scanType.value
     };
     
-    // Show success message
-    alert(`Attendance recorded: ${response.message}`);
+    alert(`${scanType.value === 'time_in' ? 'Time In' : 'Time Out'} recorded: ${response.message}`);
     
   } catch (error) {
     console.error("QR scan processing failed:", error);
@@ -93,6 +92,26 @@ const onDetect = (result) => {
     <div class="scanner-section">
       <h2>QR Code Scanner</h2>
 
+      <!-- Add scan type selection -->
+      <div class="scan-type-selection">
+        <label>
+          <input 
+            type="radio" 
+            v-model="scanType" 
+            value="time_in"
+            :disabled="isScanning"
+          > Time In
+        </label>
+        <label>
+          <input 
+            type="radio" 
+            v-model="scanType" 
+            value="time_out"
+            :disabled="isScanning"
+          > Time Out
+        </label>
+      </div>
+
       <button v-if="!isScanning" @click="isScanning = true" class="btn">
         Start Scanning
       </button>
@@ -101,6 +120,7 @@ const onDetect = (result) => {
 
       <div v-if="scanResult" class="scan-result">
         <h3>Scan Result:</h3>
+        <p>Type: {{ scanResult.scanType === 'time_in' ? 'Time In' : 'Time Out' }}</p>
         <p>Status: {{ scanResult.status }}</p>
         <p>Time: {{ scanResult.time }}</p>
         <p>Message: {{ scanResult.message }}</p>
@@ -204,5 +224,35 @@ const onDetect = (result) => {
 .scan-result p, .scan-error p {
   margin: 5px 0;
   font-size: 0.9em;
+}
+
+.scan-type-selection {
+  margin: 15px 0;
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.scan-type-selection label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  padding: 8px 15px;
+  border-radius: 5px;
+  background: #f0f0f0;
+  transition: background-color 0.3s;
+}
+
+.scan-type-selection label:hover {
+  background: #e0e0e0;
+}
+
+.scan-type-selection input[type="radio"] {
+  margin: 0;
+}
+
+.scan-type-selection input[type="radio"]:disabled + span {
+  opacity: 0.5;
 }
 </style>

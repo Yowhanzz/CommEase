@@ -33,6 +33,24 @@ Route::prefix('auth')->middleware(['web'])->group(function () {
     Route::post('forgot-password', [ForgotPasswordController::class, 'sendOtp']);
     Route::post('verify-reset-otp', [ForgotPasswordController::class, 'verifyOtp']);
     Route::post('reset-password', [ForgotPasswordController::class, 'resetPassword']);
+
+    // Auth routes
+    Route::get('/check', function () {
+        return response()->json([
+            'authenticated' => auth()->check()
+        ]);
+    });
+
+    Route::get('/user', function () {
+        if (!auth()->check()) {
+            return response()->json(['error' => 'Unauthenticated'], 401);
+        }
+        return response()->json([
+            'id' => auth()->id(),
+            'email' => auth()->user()->email,
+            'role' => auth()->user()->role
+        ]);
+    });
 });
 
 // Event Routes

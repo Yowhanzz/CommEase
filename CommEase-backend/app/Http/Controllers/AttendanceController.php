@@ -13,7 +13,8 @@ class AttendanceController extends Controller
     public function scanQR(Request $request, Event $event)
     {
         $validator = Validator::make($request->all(), [
-            'user_email_id' => 'required|string'
+            'user_email_id' => 'required|string',
+            'scan_type' => 'required|in:time_in,time_out'
         ]);
 
         if ($validator->fails()) {
@@ -43,8 +44,12 @@ class AttendanceController extends Controller
         // Get the volunteer's record for this event
         $volunteerRecord = $event->volunteers()->where('user_id', $user->id)->first();
 
-        // Check if time_in exists
-        if (!$volunteerRecord->pivot->time_in) {
+        // Handle time in
+        if ($request->scan_type === 'time_in') {
+            if ($volunteerRecord->pivot->time_in) {
+                return response()->json(['message' => 'Time in already recorded for this event'], 422);
+            }
+
             // Record time in
             $event->volunteers()->updateExistingPivot($user->id, [
                 'time_in' => now()
@@ -61,11 +66,19 @@ class AttendanceController extends Controller
             return response()->json([
                 'message' => 'Time in recorded successfully',
                 'status' => 'time_in',
-                'time' => now()
+                'time' => now(),
+                'event_status' => $event->status
             ]);
-        } 
-        // Check if time_out exists
-        else if (!$volunteerRecord->pivot->time_out) {
+        }
+        // Handle time out
+        else if ($request->scan_type === 'time_out') {
+            if (!$volunteerRecord->pivot->time_in) {
+                return response()->json(['message' => 'Cannot record time out without time in'], 422);
+            }
+            if ($volunteerRecord->pivot->time_out) {
+                return response()->json(['message' => 'Time out already recorded for this event'], 422);
+            }
+
             // Record time out
             $event->volunteers()->updateExistingPivot($user->id, [
                 'time_out' => now()
@@ -82,10 +95,9 @@ class AttendanceController extends Controller
             return response()->json([
                 'message' => 'Time out recorded successfully',
                 'status' => 'time_out',
-                'time' => now()
+                'time' => now(),
+                'event_status' => $event->status
             ]);
-        } else {
-            return response()->json(['message' => 'Attendance already recorded for this event'], 422);
         }
     }
 

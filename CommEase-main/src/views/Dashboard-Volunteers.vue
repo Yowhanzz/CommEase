@@ -96,7 +96,11 @@
       </div>
       <vue-cal
         style="height: 500px"
-        :events="events_test"
+        :events="events.map(event => ({
+          start: event.start_time,
+          end: event.end_time,
+          title: event.event_title
+        }))"
         @cell-click="onDateClick"
       />
     </div>
@@ -148,11 +152,17 @@
 
     <div class="glasscard-container-1">
       <div class="picture-1">
-        <img src="" alt="shrek sample pic" class="picture-person" />
+        <img 
+          v-if="weather.icon" 
+          :src="`http://openweathermap.org/img/wn/${weather.icon}@2x.png`" 
+          :alt="weather.description" 
+          class="weather-icon"
+        />
       </div>
       <div class="glasscard-titles">
-        <h1 class="volunteer-name">Mon, Mar 27, 2025</h1>
-        <h6 class="service-type">40 °C</h6>
+        <h1 class="volunteer-name">{{ new Date().toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' }) }}</h1>
+        <h6 class="service-type">{{ weather.temperature }}°C</h6>
+        <p class="weather-description">{{ weather.description }}</p>
       </div>
     </div>
   </div>
@@ -269,8 +279,8 @@ export default {
       selectedStatus: "",
       events_test: [
         {
-          start: "2025-05-05 6:25",
-          end: "2025-05-05 8:20",
+          start: "2025-05-08 6:25",
+          end: "2025-05-08 8:20",
           title: "Clean up Drive",
         },
       ],
@@ -292,6 +302,11 @@ export default {
       loading: false,
       error: null,
       firstName: '',
+      weather: {
+        temperature: '',
+        description: '',
+        icon: ''
+      },
     };
   },
   computed: {
@@ -312,6 +327,7 @@ export default {
   async mounted() {
     await this.fetchEvents();
     await this.fetchUserData();
+    await this.fetchWeather();
   },
   methods: {
     async fetchEvents() {
@@ -399,7 +415,25 @@ export default {
     },
     async registerForEvent(eventId) {
       this.$router.push(`/RegistrationVolunteers/${eventId}`);
-    }
+    },
+    async fetchWeather() {
+      try {
+        // Replace with your actual API key
+        const API_KEY = '476431119c6012c1e8cb59bb59fb3668';
+        const city = 'Olongapo'; // Default city
+        const response = await axios.get(
+          `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${API_KEY}`
+        );
+        
+        this.weather = {
+          temperature: Math.round(response.data.main.temp),
+          description: response.data.weather[0].description,
+          icon: response.data.weather[0].icon
+        };
+      } catch (error) {
+        console.error('Error fetching weather:', error);
+      }
+    },
   },
 };
 </script>

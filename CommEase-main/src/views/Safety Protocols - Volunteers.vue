@@ -11,7 +11,7 @@
 
       <ul>
         <li>
-          <router-link to="/dashboard_volunteers">
+          <router-link to="/DashboardVolunteers">
             <i class="bx bxs-dashboard"></i>
             <span class="nav-item" v-show="isSidebarOpen">Dashboard</span>
           </router-link>

@@ -147,14 +147,18 @@
           Is there anything that you could recommend for improving our event
           soon? (optional)
         </p>
-
+        <select v-model="suggestionCategory" class="suggestion-category-dropdown">
+          <option value="logistics">Logistics</option>
+          <option value="program">Program</option>
+          <option value="venue">Venue</option>
+          <option value="other">Other</option>
+        </select>
         <textarea
           v-model="ideaMessage"
           class="message-ideas"
           placeholder="Your message here..."
         >
         </textarea>
-
         <button class="button-ideas-submit" @click="handleSubmit">
           Submit
         </button>
@@ -368,6 +372,7 @@ const handleAgree = () => {
 
 // === Ideas & Recommendations Form ===
 const ideaMessage = ref("");
+const suggestionCategory = ref('other');
 
 const handleSubmit = async () => {
   if (!agreed.value) {
@@ -393,7 +398,8 @@ const handleSubmit = async () => {
       // If there's a recommendation, submit it as a suggestion
       if (ideaMessage.value.trim()) {
         await eventService.submitSuggestion(event.value.id, {
-          suggestion: ideaMessage.value
+          suggestion: ideaMessage.value,
+          category: suggestionCategory.value
         });
       }
 
