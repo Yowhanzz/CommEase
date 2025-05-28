@@ -238,7 +238,6 @@ import { useRouter } from "vue-router";
 import { authService } from "@/api/services";
 import BarChart from "@/components/Barchart.vue";
 import PieChart from "@/components/PieChart.vue";
-
 const isSidebarOpen = ref(true);
 const isOpen = ref(false); // for sidebar icon animation toggle
 const showNotifications = ref(false);
@@ -310,11 +309,14 @@ const toggleNotifications = () => {
 const confirmLogout = async () => {
   try {
     await authService.logout();
-    showLogoutModal.value = false;
-    router.push('/LoginOrganizers');
+    // Clear any local storage or state
+    localStorage.clear();
+    // Redirect to login page
+    router.push("/LoginOrganizers");
   } catch (error) {
-    console.error('Logout failed:', error);
-    alert('Failed to logout. Please try again.');
+    console.error("Logout failed:", error);
+    // Even if the API call fails, we should still redirect to login
+    router.push("/LoginOrganizers");
   }
 };
 </script>

@@ -3,20 +3,17 @@
   padding: 0;
   box-sizing: border-box;
   font-family: Montserrat;
-  scroll-behavior: smooth;
 }
 
 body {
-  background-color: #e7f0dc;
+  background-color: #daf1de;
 }
 
 .whole-container {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 100%;
   height: 80vh;
-  position: relative;
 }
 
 /* Wrapper for the triangles */
@@ -48,7 +45,7 @@ body {
   clip-path: polygon(50% 0, 100% 100%, 0 100%);
   background: #436850;
   margin-left: -62%;
-  margin-top: -24%;
+  margin-top: -23%;
   transform: rotate(-15deg);
   position: absolute;
   left: 20%;
@@ -113,7 +110,19 @@ img {
   top: 12%;
   left: 13%;
   z-index: 1;
-  animation: slideinLeft2 1s ease-in-out forwards;
+  animation: slideinLeftImage 1s ease-in-out forwards;
+}
+
+@keyframes slideinLeftImage {
+  from {
+    opacity: 0.2;
+    transform: translateX(-180px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* Optional: add styling for login-container here if needed */
@@ -123,7 +132,7 @@ img {
 .login-container {
   background-color: #daf1de;
   width: 632px;
-  height: 560px;
+  height: 580px;
   margin-right: 4%;
   margin-top: 10%;
   text-align: center;
@@ -160,6 +169,7 @@ img {
   margin-bottom: 10%;
   font-size: 30px;
   color: #12372a;
+  font-weight: bold;
   animation-name: slideinTopTitle;
   animation-duration: 1s;
   animation-timing-function: ease-in-out;
@@ -234,29 +244,28 @@ input:focus {
   color: #000000; /* ✅ PURE BLACK TEXT ON FOCUS */
 }
 
-.button-separation {
-  display: grid;
-}
-
-.login-btn {
+.login-btn,
+.signup-btn {
   width: 80%;
-  padding-right: 200px;
-  text-decoration: none;
+  padding: 12px;
   border: none;
   font-size: 16px;
   font-weight: bold;
   border-radius: 60px;
   cursor: pointer;
-  margin-top: 10px;
   transition: 0.3s;
   height: 69px;
   margin-left: 10%;
-  text-align: center;
-  background: #12372a;
-  color: #daf1de;
-  margin-top: 5%;
-  margin-bottom: 20px;
   padding-left: 35%;
+}
+
+.login-btn {
+  background: #12372a;
+  color: white;
+  margin-top: 5%;
+  margin-left: 0%;
+  margin-bottom: 20px;
+  padding-left: 14px;
   animation-name: slideinTopLogin;
   animation-duration: 1s;
   animation-timing-function: ease-in-out;
@@ -274,18 +283,90 @@ input:focus {
   }
 }
 
+.signup-btn {
+  background: transparent;
+  border: 2px solid #3c3f32;
+  color: #3c3f32;
+  padding-left: 34%;
+  animation-name: slideinTopSignup;
+  animation-duration: 1s;
+  animation-timing-function: ease-in-out;
+}
+
+@keyframes slideinTopSignup {
+  from {
+    opacity: 0.2;
+    transform: translateY(120px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .login-btn:hover {
   background: #daf1de;
   color: #12372a;
   border: 2px solid #12372a;
 }
 
-/* RESPONSIVE PART */
+.signup-btn:hover {
+  background: #12372a;
+  color: #daf1de;
+}
 
-@media (max-width: 1342px) {
+.action-button {
+  display: grid;
+  grid-template-rows: 1fr;
+  row-gap: 10px;
+}
+
+.forgot-password {
+  color: black;
+  padding-left: 215px;
+  padding-top: 20px;
+  animation-name: slideinTopForgot;
+  animation-duration: 1s;
+  animation-timing-function: ease-in-out;
+}
+
+@keyframes slideinTopForgot {
+  from {
+    opacity: 0.2;
+    transform: translateY(11 5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.forgot-password:hover {
+  text-decoration: underline;
+}
+
+a {
+  display: flex;
+  align-items: center;
+  color: white;
+  text-decoration: none;
+  padding: 10px;
+  border-radius: 5px;
+  transition: background 0.3s;
+  cursor: pointer;
+}
+
+i {
+  font-size: 24px;
+}
+
+/* RESPONSIVE PART */
+@media (max-width: 1365px) {
   .triangle-light-green {
-    margin-left: -68%;
-    margin-top: -33%;
+    margin-left: -65%;
+    margin-top: -29%;
   }
 
   .triangle-green {
@@ -304,63 +385,158 @@ input:focus {
 @media (max-width: 1279px) {
   .triangle-fixed {
     position: fixed;
-    top: 0;
-    left: 50%;
+    top: -125%;
+    left: -8%;
     width: 880px;
-    transform: none; /* remove rotation here */
+    transform: none;
     z-index: 0;
     pointer-events: none;
+    transform: rotate(205deg);
   }
 
   .triangle-light-green {
     position: absolute;
-    top: -46%;
-    left: 13%;
-    transform: rotate(35deg);
+    top: -5%;
+    left: 10%;
+    animation: slideinLeft 1s ease-in-out forwards;
+  }
+
+  @keyframes slideinLeft {
+    from {
+      opacity: 0.2;
+      transform: translateY(-80px) rotate(20deg);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   .triangle-green {
     position: absolute;
-    top: -25%;
-    left: 15%;
-    transform: rotate(35deg);
+    left: 16%;
+    top: 19%;
+    animation: slideinLeft 1s ease-in-out forwards;
   }
 
   .image {
-    display: none; /* Or visibility: hidden if you still want its space reserved */
+    display: none;
   }
 
   .login-container {
     position: fixed;
-    top: 49%;
-    right: 10%;
-    transform: translateY(-50%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-53%, -50%);
     z-index: 1;
-    margin: 0; /* remove margin shifting */
+    margin: 0;
     scale: 0.8;
+    animation-name: slideinTopLogin;
+    animation-duration: 1s;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards;
+  }
+
+  @keyframes slideinTopLogin {
+    from {
+      opacity: 0.2;
+      transform: translate(-53%, -20%);
+    }
+
+    to {
+      opacity: 1;
+      transform: translate(-53%, -50%);
+    }
+  }
+
+  .login-btn {
+    animation-name: slideinTopLoinButton;
+    animation-duration: 1s;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards;
+  }
+
+  @keyframes slideinTopLoinButton {
+    from {
+      opacity: 0.2;
+      transform: translateY(110%);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0%);
+    }
   }
 }
 
-@media (max-width: 665px) {
+@media (max-width: 899px) {
   .login-container {
-    margin-right: -10%;
+    position: fixed;
+    top: 39%;
+    left: 40%;
+    transform: translate(-53%, -50%);
+    z-index: 1;
+    margin: 0;
     scale: 0.7;
-    top: 45%;
+  }
+
+  .triangle-fixed {
+    position: fixed;
+    top: -130%;
+    left: -27%;
+    width: 880px;
+    transform: none;
+    z-index: 0;
+    pointer-events: none;
+    transform: rotate(210deg);
   }
 }
 
-@media (max-width: 570px) {
+@media (max-width: 650px) {
   .login-container {
-    margin-right: -17%;
-    scale: 0.7;
-    top: 45%;
+    position: fixed;
+    top: 35%;
+    left: 35%;
+    transform: translate(-53%, -50%);
+    z-index: 1;
+    margin: 0;
+    scale: 0.65;
+  }
+
+  .triangle-fixed {
+    position: fixed;
+    top: -115%;
+    left: -55%;
+    width: 880px;
+    transform: none;
+    scale: 0.8;
+    z-index: 0;
+    pointer-events: none;
+    transform: rotate(210deg);
   }
 }
 
 @media (max-width: 515px) {
   .login-container {
-    margin-right: -23%;
-    scale: 0.625;
-    top: 40%;
+    position: fixed;
+    top: 33%;
+    left: 26%;
+    transform: translate(-53%, -50%);
+    z-index: 1;
+    margin: 0;
+    scale: 0.6;
+  }
+
+  .triangle-fixed {
+    position: fixed;
+    top: -115%;
+    left: -75%;
+    width: 880px;
+    transform: none;
+    scale: 0.8;
+    z-index: 0;
+    pointer-events: none;
+    transform: rotate(210deg);
   }
 }

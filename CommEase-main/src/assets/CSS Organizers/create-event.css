@@ -12,13 +12,26 @@
   z-index: 1000;
 }
 
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+  display: none;
+}
+
 .sidebar:not(.open) {
   width: 70px !important;
 }
+
 .top {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: space-between !important;
 }
 .logo {
   display: flex;
@@ -70,7 +83,6 @@ i {
 .sidebar:not(.open) ~ .main-content {
   margin-left: 70px;
 }
-
 /* Logout Modal */
 .logout-modal-overlay {
   position: fixed;
@@ -155,10 +167,10 @@ i {
   left: -300px; /* Initially off-screen to the left */
   width: 300px;
   height: 100%;
-  background: #12372a;
+  background: #c6c3bd;
   color: #daf1de;
   box-shadow: -4px 0 10px rgba(0, 0, 0, 0.3);
-  z-index: 1000;
+  z-index: 2000;
   padding: 15px;
   display: flex;
   flex-direction: column;
@@ -191,6 +203,7 @@ i {
   justify-content: space-between;
   align-items: center;
   margin-top: 25px;
+  color: black;
 }
 
 .close-btn {
@@ -208,16 +221,17 @@ i {
   border-radius: 10px;
   margin-bottom: 10px;
   cursor: pointer;
+  color: black;
   transition: 0.15s ease-in-out background-color, 0.15s ease-in-out color;
 }
 
 .notification-item:hover {
-  background-color: #e9e5d6;
-  color: black;
+  background-color: #859972;
+  color: #daf1de;
 }
 
 .notification-item:hover .time {
-  color: #313131; /* Change the color of the span.time on hover */
+  color: #daf1de; /* Change the color of the span.time on hover */
 }
 
 .notification-item h4 {
@@ -233,34 +247,23 @@ i {
 
 .notification-item .time {
   font-size: 10px;
-  color: #ccc;
+  color: black;
 }
 
 .notification-item .time:hover {
   color: #313131;
 }
 
-/* CREATE EVENT SECTION  */
-
 .sidebar-collapsed {
   /* REVISED COPY */
-  padding-left: 90px !important;
+  padding-left: 140px !important;
 }
 
-.hide-card {
-  /* TESTING */
-  /* margin-left: 8% !important; */
-  transition: all 0.3s ease;
-}
-
-.sidebar-collapsed-for-divider {
-  /* REVISED */
-  width: calc(100% - 270px) !important;
-}
+/* CREATE EVENT SECTION  */
 
 .event-container {
-  margin-left: 19%;
-  margin-top: 2%;
+  padding-left: 150px;
+  margin-top: 3%;
   padding-bottom: 40px;
 }
 
@@ -289,15 +292,23 @@ i {
 }
 
 .title-safety {
-  margin-left: 19%;
+  padding-left: 140px;
   margin-top: 4%;
   color: #12372a;
 }
 
 .safety-hr {
-  width: 79%;
   margin-top: 15px;
-  margin-left: 18%;
+  position: absolute;
+  width: calc(100% - 120px);
+  height: 1px;
+  right: 20px;
+  background-color: #0b2b26;
+}
+
+.sidebar-collapsed-for-divider {
+  /* REVISED */
+  width: calc(100% - 150px) !important;
 }
 
 .create-event-headers {
@@ -571,6 +582,12 @@ i {
   }
 }
 
+@media (max-width: 1068px) {
+  .event-container {
+    margin-top: 5%;
+  }
+}
+
 @media (max-width: 910px) {
   .button-container {
     margin-left: 50%;
@@ -604,6 +621,20 @@ i {
     margin-left: 65%;
     margin-top: -6%;
   }
+
+  .title-safety {
+    padding-left: 110px;
+  }
+
+  .sidebar-collapsed-for-divider {
+    /* REVISED */
+    width: calc(100% - 110px) !important;
+  }
+
+  .event-container {
+    margin-top: 6%;
+    padding-left: 95px;
+  }
 }
 
 /* 851px and below */
@@ -621,10 +652,49 @@ i {
     margin-top: -8%;
     scale: 0.95;
   }
+
+  .overlay {
+    display: block;
+  }
+
+  .sidebar-collapsed-for-divider {
+    /* REVISED */
+    width: calc(100% - 100px) !important;
+  }
+
+  .sidebar-collapsed {
+    padding-left: 90px !important;
+  }
+
+  .sidebar {
+    z-index: 2000 !important;
+  }
+
+  .event-container {
+    padding-left: 110px;
+  }
+
+  .title-safety {
+    padding-left: 90px;
+  }
 }
 
 /* 544px and below */
 @media (max-width: 544px) {
+  .title-safety {
+    padding-left: 110px;
+  }
+
+  .sidebar-collapsed-for-divider {
+    /* REVISED */
+    width: calc(100% - 110px) !important;
+  }
+
+  .event-container {
+    margin-top: 6%;
+    padding-left: 95px;
+  }
+
   .button-container {
     margin-left: 52%;
     margin-top: -9%;
@@ -632,12 +702,13 @@ i {
   }
 
   .create-event-input {
-    margin-top: 0.5rem;
+    margin-top: -0.5rem;
   }
 
   .create-event-checkbox-group {
-    margin: 0.5rem 0 0.5rem -4%;
-    scale: 0.9;
+    margin-top: -0.5rem;
+    scale: 0.85;
+    margin-left: -7%;
   }
 
   .add-inside-button {
@@ -645,6 +716,6 @@ i {
   }
 
   .modal-textarea {
-    margin-top: 0.5rem;
+    margin-top: -0.5rem;
   }
 }

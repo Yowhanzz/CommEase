@@ -1,6 +1,6 @@
 <template>
   <header>
-    <div :class="['sidebar', { open: isSidebarOpen }]">
+    <div class="sidebar" :class="{ open: isSidebarOpen }">
       <div class="top">
         <div class="logo">
           <i class="bx bxl-codeopen"></i>
@@ -11,25 +11,19 @@
 
       <ul>
         <li>
-          <router-link to="/DashboardOrganizers">
+          <router-link to="/dashboard_volunteers">
             <i class="bx bxs-dashboard"></i>
             <span class="nav-item" v-show="isSidebarOpen">Dashboard</span>
           </router-link>
         </li>
         <li>
-          <router-link to="/ManageEventsOrganizers">
-            <i class="bx bx-calendar-check"></i>
-            <span class="nav-item" v-show="isSidebarOpen">Manage Events</span>
-          </router-link>
-        </li>
-        <li>
-          <router-link to="/ActivityLogOrganizers">
+          <router-link to="/ActivityLogVolunteers">
             <i class="bx bx-history"></i>
             <span class="nav-item" v-show="isSidebarOpen">Event History</span>
           </router-link>
         </li>
         <li>
-          <router-link to="SafetyProtocolsOrganizers">
+          <router-link to="safety_protocol">
             <i class="bx bxs-shield-plus"></i>
             <span class="nav-item" v-show="isSidebarOpen"
               >Safety & Protocols</span
@@ -339,48 +333,75 @@
 <script>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { authService } from '@/api/services';
+import { authService } from "../api/services";
 
-// === Sidebar Toggle ===
-const isSidebarOpen = ref(true);
-const toggleSidebar = () => {
-	isSidebarOpen.value = !isSidebarOpen.value;
-};
+export default {
+  name: "YourComponentName",
 
-// === Notification Functionality ===
-const showNotifications = ref(false);
-const notifications = ref([
-	{
-		message: 'You completed the "Update website content" task.',
-		time: "2 hours ago",
-	},
-	{
-		message: 'You completed the "Clean up drive" task.',
-		time: "3 hours ago",
-	},
-	{
-		message: 'You completed the "Meeting with organizers" task.',
-		time: "5 hours ago",
-	},
-]);
+  data() {
+    return {
+      isOpen: false, // you requested this
+      isSidebarOpen: false, // toggle sidebar
+      showNotifications: false,
 
-const toggleNotifications = () => {
-	showNotifications.value = !showNotifications.value;
-};
+      //
+      isMobile: false,
 
-// === Logout Modal ===
-const showLogoutModal = ref(false);
-const router = useRouter();
+      showLogoutModal: false,
+      notifications: [
+        {
+          message: 'You completed the "Update website content" task.',
+          time: "2 hours ago",
+        },
+        {
+          message: 'You completed the "Clean up drive" task.',
+          time: "3 hours ago",
+        },
+        {
+          message: 'You completed the "Meeting with organizers" task.',
+          time: "5 hours ago",
+        },
+      ],
+    };
+  },
 
-const confirmLogout = async () => {
-	try {
-		await authService.logout();
-		showLogoutModal.value = false;
-		router.push('/LoginOrganizers');
-	} catch (error) {
-		console.error('Logout failed:', error);
-		alert('Failed to logout. Please try again.');
-	}
+  setup() {
+    const router = useRouter();
+    return { router };
+  },
+
+  methods: {
+    toggleSidebar() {
+      this.isSidebarOpen = !this.isSidebarOpen;
+      this.isOpen = !this.isOpen; // toggle the titles
+    },
+
+    handleResize() {
+      /* ADDED */
+      this.isMobile = window.innerWidth <= 928;
+      if (this.isMobile) {
+        this.isSidebarOpen = false;
+      }
+    },
+
+    toggleNotifications() {
+      this.showNotifications = !this.showNotifications;
+    },
+
+    async confirmLogout() {
+      try {
+        await authService.logout();
+        this.showLogoutModal = false;
+        // Clear any local storage or state
+        localStorage.clear();
+        // Redirect to login page
+        this.$router.push("/LoginVolunteers");
+      } catch (error) {
+        console.error("Logout failed:", error);
+        alert("Failed to logout. Please try again.");
+      }
+    },
+  },
 };
 </script>
 

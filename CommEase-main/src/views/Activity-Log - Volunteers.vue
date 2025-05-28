@@ -13,7 +13,7 @@
 
         <ul>
           <li>
-            <router-link to="/dashboard_volunteers">
+            <router-link to="/DashboardVolunteers">
               <i class="bx bxs-dashboard"></i>
               <span class="nav-item" v-show="isSidebarOpen">Dashboard</span>
             </router-link>
@@ -134,9 +134,9 @@
 </template>
 
 <script>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
-import { authService } from '../api/services';
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { authService } from "../api/services";
 
 export default {
   data() {
@@ -224,21 +224,21 @@ export default {
 
     toggleSidebar() {
       this.isSidebarOpen = !this.isSidebarOpen;
-      this.isOpen = !this.isOpen; 
-    }, 
+      this.isOpen = !this.isOpen;
+    },
 
     async confirmLogout() {
       try {
         await authService.logout();
         this.showLogoutModal = false;
         // Redirect to login page
-        this.$router.push('/LoginVolunteers');
+        this.$router.push("/LoginVolunteers");
       } catch (error) {
-        console.error('Logout failed:', error);
-        alert('Failed to logout. Please try again.');
+        console.error("Logout failed:", error);
+        alert("Failed to logout. Please try again.");
       }
-    }
-  }
+    },
+  },
 };
 </script>
 

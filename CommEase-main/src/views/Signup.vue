@@ -7,228 +7,248 @@
 
     <!-- Left Side (Only Illustration/Image) -->
     <div class="left-side">
-      <img src="/public/signup_login.svg" alt="Volunteers Illustration" class="image">
+      <img
+        src="/public/signup_login.svg"
+        alt="Volunteers Illustration"
+        class="image"
+      />
     </div>
 
     <!-- SIGNUP PART -->
     <div class="signup-container">
       <h1 class="signup-title">Signup Form</h1>
-      <p class="signup-paragraph">Please fill in all required fields to create your account.</p>
+      <p class="signup-paragraph">
+        Please fill in all required fields to create your account.
+      </p>
 
       <div class="signup-hiwalay">
         <div class="signup-separation">
           <h5 class="title">First Name <span class="required">*</span></h5>
-          <input 
-            v-model="firstName" 
-            type="text" 
+          <input
+            v-model="firstName"
+            type="text"
             class="singup-input"
-            :class="{ 'error': errors.firstName }"
+            :class="{ error: errors.firstName }"
             @input="clearError('firstName')"
-          >
-          <span v-if="errors.firstName" class="error-message">{{ errors.firstName }}</span>
+          />
+          <span v-if="errors.firstName" class="error-message">{{
+            errors.firstName
+          }}</span>
 
           <h5 class="title">Last Name <span class="required">*</span></h5>
-          <input 
-            v-model="lastName" 
-            type="text" 
+          <input
+            v-model="lastName"
+            type="text"
             class="singup-input"
-            :class="{ 'error': errors.lastName }"
+            :class="{ error: errors.lastName }"
             @input="clearError('lastName')"
-          >
-          <span v-if="errors.lastName" class="error-message">{{ errors.lastName }}</span>
+          />
+          <span v-if="errors.lastName" class="error-message">{{
+            errors.lastName
+          }}</span>
         </div>
 
         <div class="signup-separation">
           <h5 class="title">Middle Initial <span class="required">*</span></h5>
-          <input 
-            v-model="middleInitial" 
-            type="text" 
+          <input
+            v-model="middleInitial"
+            type="text"
             class="singup-input"
-            :class="{ 'error': errors.middleInitial }"
+            :class="{ error: errors.middleInitial }"
             @input="clearError('middleInitial')"
             maxlength="1"
-          >
-          <span v-if="errors.middleInitial" class="error-message">{{ errors.middleInitial }}</span>
+          />
+          <span v-if="errors.middleInitial" class="error-message">{{
+            errors.middleInitial
+          }}</span>
 
           <h5 class="title">Program <span class="required">*</span></h5>
-          <input 
-            v-model="program" 
-            type="text" 
+          <input
+            v-model="program"
+            type="text"
             class="singup-input"
-            :class="{ 'error': errors.program }"
+            :class="{ error: errors.program }"
             @input="clearError('program')"
-          >
-          <span v-if="errors.program" class="error-message">{{ errors.program }}</span>
+          />
+          <span v-if="errors.program" class="error-message">{{
+            errors.program
+          }}</span>
         </div>
 
         <div class="signup-separation">
           <h5 class="title">Email <span class="required">*</span></h5>
-          <input 
-            v-model="email" 
-            type="email" 
+          <input
+            v-model="email"
+            type="email"
             class="singup-input"
-            :class="{ 'error': errors.email }"
+            :class="{ error: errors.email }"
             @input="clearError('email')"
-          >
-          <span v-if="errors.email" class="error-message">{{ errors.email }}</span>
+          />
+          <span v-if="errors.email" class="error-message">{{
+            errors.email
+          }}</span>
         </div>
-      </div>  
+      </div>
     </div>
   </div>
 
   <div class="footer">
-    <button 
+    <!--     <button class="prev">Previous</button>
+ -->
+    <button
       class="next"
       :class="{ 'disabled-btn': !isFormValid || isLoading }"
       :disabled="!isFormValid || isLoading"
       @click="handleRegister"
     >
-      {{ isLoading ? 'Processing...' : 'Next' }}
+      {{ isLoading ? "Processing..." : "Next" }}
     </button>
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
-import { authService } from '../api/services'
+import { ref, computed } from "vue";
+import { useRouter } from "vue-router";
+import { authService } from "../api/services";
 
-const router = useRouter()
+const router = useRouter();
 
 // Reactive values
-const firstName = ref('')
-const lastName = ref('')
-const middleInitial = ref('')
-const program = ref('')
-const email = ref('')
-const isLoading = ref(false)
+const firstName = ref("");
+const lastName = ref("");
+const middleInitial = ref("");
+const program = ref("");
+const email = ref("");
+const isLoading = ref(false);
 const errors = ref({
-    firstName: '',
-    lastName: '',
-    middleInitial: '',
-    program: '',
-    email: ''
-})
+  firstName: "",
+  lastName: "",
+  middleInitial: "",
+  program: "",
+  email: "",
+});
 
 // Validation
 const isFormValid = computed(() => {
-    return firstName.value.trim() && 
-           lastName.value.trim() && 
-           middleInitial.value.trim() && 
-           program.value.trim() && 
-           email.value.trim() &&
-           !Object.values(errors.value).some(error => error !== '')
-})
+  return (
+    firstName.value.trim() &&
+    lastName.value.trim() &&
+    middleInitial.value.trim() &&
+    program.value.trim() &&
+    email.value.trim() &&
+    !Object.values(errors.value).some((error) => error !== "")
+  );
+});
 
 // Clear error when user types
 const clearError = (field) => {
-    errors.value[field] = ''
-}
+  errors.value[field] = "";
+};
 
 // Validate email format
 const validateEmail = (email) => {
-    const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    return re.test(email)
-}
+  const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return re.test(email);
+};
 
 // Handle registration
 const handleRegister = async () => {
-    // Reset errors
-    errors.value = {
-        firstName: '',
-        lastName: '',
-        middleInitial: '',
-        program: '',
-        email: ''
-    }
+  // Reset errors
+  errors.value = {
+    firstName: "",
+    lastName: "",
+    middleInitial: "",
+    program: "",
+    email: "",
+  };
 
-    // Validate all fields
-    if (!firstName.value.trim()) {
-        errors.value.firstName = 'First name is required'
-    }
-    if (!lastName.value.trim()) {
-        errors.value.lastName = 'Last name is required'
-    }
-    if (!middleInitial.value.trim()) {
-        errors.value.middleInitial = 'Middle initial is required'
-    }
-    if (!program.value.trim()) {
-        errors.value.program = 'Program is required'
-    }
-    if (!email.value.trim()) {
-        errors.value.email = 'Email is required'
-    } else if (!validateEmail(email.value)) {
-        errors.value.email = 'Please enter a valid email address'
-    }
+  // Validate all fields
+  if (!firstName.value.trim()) {
+    errors.value.firstName = "First name is required";
+  }
+  if (!lastName.value.trim()) {
+    errors.value.lastName = "Last name is required";
+  }
+  if (!middleInitial.value.trim()) {
+    errors.value.middleInitial = "Middle initial is required";
+  }
+  if (!program.value.trim()) {
+    errors.value.program = "Program is required";
+  }
+  if (!email.value.trim()) {
+    errors.value.email = "Email is required";
+  } else if (!validateEmail(email.value)) {
+    errors.value.email = "Please enter a valid email address";
+  }
 
-    // If there are any errors, don't proceed
-    if (Object.values(errors.value).some(error => error !== '')) {
-        return
+  // If there are any errors, don't proceed
+  if (Object.values(errors.value).some((error) => error !== "")) {
+    return;
+  }
+
+  isLoading.value = true;
+
+  try {
+    const userData = {
+      firstName: firstName.value.trim(),
+      lastName: lastName.value.trim(),
+      middleInitial: middleInitial.value.trim(),
+      program: program.value.trim(),
+      email: email.value.trim(),
+    };
+
+    console.log("Sending registration data:", userData);
+
+    const response = await authService.register(userData);
+
+    // Store email for OTP verification
+    sessionStorage.setItem("temp_email", email.value.trim());
+
+    // Redirect to OTP verification
+    router.push("/OTPVolunteers");
+  } catch (error) {
+    console.error("Signup failed:", error);
+
+    // Handle validation errors from the server
+    if (error.response?.status === 422) {
+      console.log("Server validation errors:", error.response.data);
+      const serverErrors = error.response.data.errors;
+      if (serverErrors) {
+        Object.keys(serverErrors).forEach((key) => {
+          if (errors.value.hasOwnProperty(key)) {
+            errors.value[key] = serverErrors[key][0];
+          }
+        });
+      }
+    } else {
+      alert("Signup failed. Please try again.");
     }
-
-    isLoading.value = true
-
-    try {
-        const userData = {
-            firstName: firstName.value.trim(),
-            lastName: lastName.value.trim(),
-            middleInitial: middleInitial.value.trim(),
-            program: program.value.trim(),
-            email: email.value.trim()
-        }
-
-        console.log('Sending registration data:', userData)
-
-        const response = await authService.register(userData)
-
-        // Store email for OTP verification
-        sessionStorage.setItem('temp_email', email.value.trim())
-        
-        // Redirect to OTP verification
-        router.push('/OTPVolunteers')
-    } catch (error) {
-        console.error('Signup failed:', error)
-        
-        // Handle validation errors from the server
-        if (error.response?.status === 422) {
-            console.log('Server validation errors:', error.response.data)
-            const serverErrors = error.response.data.errors
-            if (serverErrors) {
-                Object.keys(serverErrors).forEach(key => {
-                    if (errors.value.hasOwnProperty(key)) {
-                        errors.value[key] = serverErrors[key][0]
-                    }
-                })
-            }
-        } else {
-            alert('Signup failed. Please try again.')
-        }
-    } finally {
-        isLoading.value = false
-    }
-}
+  } finally {
+    isLoading.value = false;
+  }
+};
 </script>
 
 <style scoped>
 .required {
-    color: red;
-    margin-left: 4px;
+  color: red;
+  margin-left: 4px;
 }
 
 .error {
-    border-color: red !important;
+  border-color: red !important;
 }
 
 .error-message {
-    color: red;
-    font-size: 0.8rem;
-    margin-top: 4px;
-    display: block;
+  color: red;
+  font-size: 0.8rem;
+  margin-top: 4px;
+  display: block;
 }
 
 .disabled-btn {
-    opacity: 0.7;
-    cursor: not-allowed;
+  opacity: 0.7;
+  cursor: not-allowed;
 }
 </style>
 

@@ -110,7 +110,19 @@ img {
   position: absolute;
   top: 12%;
   left: 13%;
-  animation: slideinLeft2 1s ease-in-out forwards;
+  animation: slideinLeftImage 1s ease-in-out forwards;
+}
+
+@keyframes slideinLeftImage {
+  from {
+    opacity: 0.2;
+    transform: translateX(-180px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* SIGNUP PART  */
@@ -152,8 +164,9 @@ img {
   display: grid;
   grid-template-columns: 1fr 1fr;
   column-gap: 30px;
-  margin-top: 10%;
+  margin-top: 5%;
   text-align: left;
+  align-items: start;
 }
 
 .signup-separation {
@@ -287,6 +300,7 @@ a {
   background-color: #12372a;
   border-radius: 5px;
   font-size: 14px;
+  padding-top: 15px;
   font-weight: 500;
   border: none;
   transition: 0.15s ease-in-out;
@@ -312,7 +326,7 @@ a {
 	margin-left: 88%; */
   display: flex;
   justify-content: flex-end;
-  padding-right: 90px;
+  margin-right: 6%;
 }
 
 .footer router-link {
@@ -357,7 +371,7 @@ a {
   }
 
   .footer {
-    margin-left: 90%;
+    margin-left: 89%;
   }
 }
 
@@ -368,27 +382,31 @@ a {
 
   .triangle-fixed {
     position: fixed;
-    top: -40%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(0deg);
+    top: -30%;
+    left: 65%;
+    transform: translate(-50%, -50%) rotate(90deg);
     z-index: 0;
     pointer-events: none;
-  }
-
-  .triangle-light-green {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(35deg);
-    z-index: 0;
+    animation: slideinLeft 1s ease-in-out forwards;
   }
 
   .triangle-green {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(35deg);
-    z-index: 0;
+    position: absolute;
+    left: 25%;
+    top: 16%;
+    animation: slideinLeft 1s ease-in-out forwards;
+  }
+
+  @keyframes slideinLeft {
+    from {
+      opacity: 0.2;
+      transform: translateY(-10px) rotate(-20deg) rotate(80deg);
+    }
+
+    to {
+      opacity: 1;
+      transform: translate(-37%, -20%) rotate(20deg);
+    }
   }
 
   .signup-container {
@@ -398,6 +416,22 @@ a {
     transform: translateX(-50%);
     z-index: 1;
     scale: 0.8;
+    animation-name: slideinTopLogin;
+    animation-duration: 1s;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards;
+  }
+
+  @keyframes slideinTopLogin {
+    from {
+      opacity: 0.2;
+      transform: translate(-53%, -20%);
+    }
+
+    to {
+      opacity: 1;
+      transform: translate(-53%, 10%);
+    }
   }
 
   .footer {
@@ -405,18 +439,44 @@ a {
     bottom: 18%;
     left: -26%;
     scale: 0.8;
+    animation-name: slideinTopLoinButton;
+    animation-duration: 1s;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards;
+  }
+
+  @keyframes slideinTopLoinButton {
+    from {
+      opacity: 0.2;
+      transform: translateY(80px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(50px);
+    }
   }
 }
 
 @media (max-width: 773px) {
   .triangle-fixed {
     position: fixed;
-    top: -40%;
+    top: -30%;
     left: 50%;
-    transform: translate(-50%, -50%) rotate(0deg);
+    transform: translate(-50%, -50%) rotate(90deg);
     z-index: 0;
+    scale: 0.7;
     pointer-events: none;
+    animation: slideinLeft 1s ease-in-out forwards;
   }
+
+  .triangle-green {
+    position: absolute;
+    left: 25%;
+    top: 16%;
+    animation: slideinLeft 1s ease-in-out forwards;
+  }
+
   .signup-container {
     position: fixed;
     bottom: 20%;
@@ -437,11 +497,13 @@ a {
 @media (max-width: 570px) {
   .triangle-fixed {
     position: fixed;
-    top: -45%;
-    left: 45%;
-    transform: translate(-50%, -50%) rotate(0deg);
+    top: -30%;
+    left: 40%;
+    transform: translate(-50%, -50%) rotate(90deg);
     z-index: 0;
+    scale: 0.65;
     pointer-events: none;
+    animation: slideinLeft 1s ease-in-out forwards;
   }
   .signup-container {
     position: fixed;

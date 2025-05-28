@@ -95,7 +95,19 @@ img {
   position: absolute;
   top: 12%;
   left: 13%;
-  animation: slideinLeft2 1s ease-in-out forwards;
+  animation: slideinLeftImage 1s ease-in-out forwards;
+}
+
+@keyframes slideinLeftImage {
+  from {
+    opacity: 0.2;
+    transform: translateX(-180px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* OTP PART */
@@ -367,11 +379,85 @@ a {
 
   .triangle-fixed {
     position: fixed;
-    top: -80%;
-    left: 7%;
+    top: -100%;
+    left: 90%;
     transform: none;
     z-index: 0;
     pointer-events: none;
+    transform: rotate(85deg);
+  }
+
+  .triangle-light-green {
+    position: absolute;
+    top: -10%;
+    left: 12%;
+    transform: rotate(35deg);
+    animation: slideinLeft 1s ease-in-out forwards;
+  }
+
+  @keyframes slideinLeft {
+    from {
+      opacity: 0.2;
+      transform: translateY(-80px) rotate(20deg);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .triangle-green {
+    position: absolute;
+    top: -25%;
+    left: 15%;
+    transform: rotate(95deg);
+    animation: slideinLeft 1s ease-in-out forwards;
+  }
+
+  .OTP-container {
+    position: fixed;
+    top: 30%;
+    left: 42%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    scale: 0.7;
+    animation-name: slideinTopLogin;
+    animation-duration: 1s;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards;
+  }
+
+  @keyframes slideinTopLogin {
+    from {
+      opacity: 0.2;
+      transform: translate(-53%, -20%);
+    }
+
+    to {
+      opacity: 1;
+      transform: translate(-53%, -50%);
+    }
+  }
+
+  /* Optional Footer (Uncomment if needed) */
+  .footer {
+    position: fixed;
+    top: 79%;
+    left: 40%;
+    column-gap: 130%;
+  }
+}
+
+@media (max-width: 926px) {
+  .triangle-fixed {
+    position: fixed;
+    top: -100%;
+    left: 110%;
+    transform: none;
+    z-index: 0;
+    pointer-events: none;
+    transform: rotate(85deg);
   }
 
   .triangle-light-green {
@@ -385,63 +471,85 @@ a {
     position: absolute;
     top: -25%;
     left: 15%;
-    transform: rotate(35deg);
+    transform: rotate(95deg);
   }
 
-  .OTP-container {
-    position: fixed;
-    top: 35%;
-    left: 42%;
-    transform: translate(-50%, -50%);
-    z-index: 1;
-    scale: 0.7;
-  }
-
-  /* Optional Footer (Uncomment if needed) */
   .footer {
     position: fixed;
-    top: 82%;
-    left: 40%;
+    top: 75%;
+    left: 39%;
     column-gap: 130%;
   }
 }
 
 @media (max-width: 696px) {
   .triangle-fixed {
-    top: -65%;
+    position: fixed;
+    top: -75%;
+    left: 110%;
+    transform: none;
     z-index: 0;
     scale: 0.8;
     pointer-events: none;
+    transform: rotate(85deg);
+  }
+
+  .triangle-light-green {
+    position: absolute;
+    top: -10%;
+    left: 12%;
+    transform: rotate(35deg);
+  }
+
+  .triangle-green {
+    position: absolute;
+    top: -25%;
+    left: 15%;
+    transform: rotate(95deg);
+  }
+
+  .footer {
+    position: fixed;
+    top: 71%;
+    scale: 0.9;
+    left: 32%;
+    column-gap: 130%;
   }
 
   .OTP-container {
     position: fixed;
     top: 33%;
     left: 33%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -60%);
     z-index: 1;
     scale: 0.65;
-  }
-
-  /* Optional Footer (Uncomment if needed) */
-  .footer {
-    position: fixed;
-    top: 78%;
-    left: 29%;
-    column-gap: 170%;
-    scale: 0.8;
   }
 }
 
 @media (max-width: 541px) {
   .triangle-fixed {
     position: fixed;
-    top: -70%;
-    scale: 0.8;
-    left: -20%;
+    top: -82%;
+    left: 130%;
     transform: none;
     z-index: 0;
+    scale: 0.8;
     pointer-events: none;
+    transform: rotate(85deg);
+  }
+
+  .triangle-light-green {
+    position: absolute;
+    top: -10%;
+    left: 12%;
+    transform: rotate(35deg);
+  }
+
+  .triangle-green {
+    position: absolute;
+    top: -25%;
+    left: 15%;
+    transform: rotate(95deg);
   }
 
   .OTP-container {
@@ -455,8 +563,8 @@ a {
 
   .footer {
     position: fixed;
-    top: 73%;
-    left: 22%;
+    top: 72%;
+    left: 18%;
     column-gap: 170%;
     scale: 0.75;
   }

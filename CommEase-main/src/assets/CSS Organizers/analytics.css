@@ -405,10 +405,10 @@ i {
   left: -300px; /* Initially off-screen to the left */
   width: 300px;
   height: 100%;
-  background: #12372a;
+  background: #c6c3bd;
   color: #daf1de;
   box-shadow: -4px 0 10px rgba(0, 0, 0, 0.3);
-  z-index: 1000;
+  z-index: 2000;
   padding: 15px;
   display: flex;
   flex-direction: column;
@@ -441,6 +441,7 @@ i {
   justify-content: space-between;
   align-items: center;
   margin-top: 25px;
+  color: black;
 }
 
 .close-btn {
@@ -458,16 +459,17 @@ i {
   border-radius: 10px;
   margin-bottom: 10px;
   cursor: pointer;
+  color: black;
   transition: 0.15s ease-in-out background-color, 0.15s ease-in-out color;
 }
 
 .notification-item:hover {
-  background-color: #e9e5d6;
-  color: black;
+  background-color: #859972;
+  color: #daf1de;
 }
 
 .notification-item:hover .time {
-  color: #313131; /* Change the color of the span.time on hover */
+  color: #daf1de; /* Change the color of the span.time on hover */
 }
 
 .notification-item h4 {
@@ -483,7 +485,7 @@ i {
 
 .notification-item .time {
   font-size: 10px;
-  color: #ccc;
+  color: black;
 }
 
 .notification-item .time:hover {

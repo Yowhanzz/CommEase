@@ -166,20 +166,19 @@
       class="container-event-objectives"
       :class="{ 'sidebar-collapsed-right-cont': !isOpen }"
     >
-      <div v-if="loading" class="loading-message">
-        Loading event details...
-      </div>
+      <div v-if="loading" class="loading-message">Loading event details...</div>
       <div v-else-if="error" class="error-message">
         {{ error }}
       </div>
       <div v-else-if="event" class="event-details">
         <h2 class="title-event-objectives">{{ event.event_title }}</h2>
-        <p class="p-date"><span>Date Posted: </span>{{ formatDate(event.created_at) }}</p>
-        <p class="p-slots">
-          <span>Date: </span>{{ formatDate(event.date) }}
+        <p class="p-date">
+          <span>Date Posted: </span>{{ formatDate(event.created_at) }}
         </p>
+        <p class="p-slots"><span>Date: </span>{{ formatDate(event.date) }}</p>
         <p class="p-slots">
-          <span>Time: </span>{{ formatTime(event.start_time) }} - {{ formatTime(event.end_time) }}
+          <span>Time: </span>{{ formatTime(event.start_time) }} -
+          {{ formatTime(event.end_time) }}
         </p>
         <p class="p-location">
           <span>Location: </span>Barangay {{ event.barangay }}
@@ -197,16 +196,18 @@
 
         <div class="task-separation">
           <div class="task-bullet-points">
-            <p class="p-per-task">
-              • {{ event.objective }}
-            </p>
+            <p class="p-per-task">• {{ event.objective }}</p>
           </div>
         </div>
 
         <h3 class="title-task">Things Needed</h3>
         <div class="task-separation">
           <div class="task-bullet-points">
-            <p v-for="(item, index) in event.things_needed" :key="index" class="p-per-task">
+            <p
+              v-for="(item, index) in event.things_needed"
+              :key="index"
+              class="p-per-task"
+            >
               • {{ item }}
             </p>
           </div>
@@ -215,7 +216,8 @@
         <p class="task-note">
           <i class="i-task-note">
             <span class="span-take-note">Note: </span>
-            By clicking agree, you accept the invitation and be a part of this community service.
+            By clicking agree, you accept the invitation and be a part of this
+            community service.
           </i>
         </p>
         <hr class="hr-note" />
@@ -228,12 +230,12 @@
           >
             Back
           </button>
-          <button class="button-things-submit" @click="handleAgree">Agree</button>
+          <button class="button-things-submit" @click="handleAgree">
+            Agree
+          </button>
         </div>
       </div>
-      <div v-else class="no-event-message">
-        No event details available.
-      </div>
+      <div v-else class="no-event-message">No event details available.</div>
     </div>
   </div>
 
@@ -243,8 +245,8 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
-import { authService, eventService } from '../api/services';
-import api from '../api/axios';
+import { authService, eventService } from "../api/services";
+import api from "../api/axios";
 
 // === Sidebar Toggle ===
 const isSidebarOpen = ref(true);
@@ -262,41 +264,46 @@ const fetchEventDetails = async () => {
   try {
     loading.value = true;
     error.value = null;
-    console.log('Fetching event details for ID:', route.params.id);
-    
+    console.log("Fetching event details for ID:", route.params.id);
+
     // Direct API call to test
     const response = await api.get(`/events/${route.params.id}`, {
       params: {
-        include: 'organizer,volunteers'
-      }
+        include: "organizer,volunteers",
+      },
     });
-    
-    console.log('Event response:', response);
+
+    console.log("Event response:", response);
     if (response.data && response.data.data) {
       event.value = response.data.data;
-      console.log('Event data set:', event.value);
+      console.log("Event data set:", event.value);
     } else {
-      throw new Error('Invalid response format');
+      throw new Error("Invalid response format");
     }
   } catch (err) {
-    console.error('Error details:', err);
-    error.value = err.response?.data?.message || 'Failed to fetch event details';
-    console.error('Error fetching event:', err);
+    console.error("Error details:", err);
+    error.value =
+      err.response?.data?.message || "Failed to fetch event details";
+    console.error("Error fetching event:", err);
   } finally {
     loading.value = false;
   }
 };
 
 onMounted(async () => {
-  console.log('Component mounted, route params:', route.params);
+  console.log("Component mounted, route params:", route.params);
   if (route.params.id) {
     await fetchEventDetails();
   } else {
-    error.value = 'No event ID provided';
+    error.value = "No event ID provided";
     loading.value = false;
   }
 });
 
+const toggleSidebar = () => {
+  isSidebarOpen.value = !isSidebarOpen.value;
+  isOpen.value = !isOpen.value;
+};
 // === Notifications ===
 const showNotifications = ref(false);
 const toggleNotifications = () => {
@@ -323,10 +330,10 @@ const confirmLogout = async () => {
   try {
     await authService.logout();
     showLogoutModal.value = false;
-    router.push('/LoginVolunteers');
+    router.push("/LoginVolunteers");
   } catch (error) {
-    console.error('Logout failed:', error);
-    alert('Failed to logout. Please try again.');
+    console.error("Logout failed:", error);
+    alert("Failed to logout. Please try again.");
   }
 };
 
@@ -338,8 +345,8 @@ const registrationForm = ref([
     date_posted: "March 1, 2025",
     location: "Olongapo City",
     description: "lorem*4",
-    objectives: "lorem*4" // task assignment
-  }
+    objectives: "lorem*4", // task assignment
+  },
 ]);
 
 // === Registration Form ===
@@ -385,25 +392,26 @@ const handleSubmit = async () => {
   try {
     // First register for the event
     await api.post(`/events/${event.value.id}/register`);
-    
+
     // Then submit the things they will bring
     await api.post(`/events/${event.value.id}/things-brought`, {
-      thingsBrought: selectedItems.value
+      thingsBrought: selectedItems.value,
     });
 
     // If there's a recommendation, submit it as a suggestion
     if (ideaMessage.value.trim()) {
       await api.post(`/events/${event.value.id}/suggestions`, {
-        suggestion: ideaMessage.value
+        suggestion: ideaMessage.value,
       });
     }
 
     alert("Registration successful!");
     router.push("/DashboardVolunteers");
   } catch (error) {
-    const errorMessage = error.response?.data?.message || "Failed to register for event";
+    const errorMessage =
+      error.response?.data?.message || "Failed to register for event";
     alert(errorMessage);
-    console.error('Registration error:', error);
+    console.error("Registration error:", error);
   }
 };
 
@@ -414,23 +422,23 @@ const resetRegistration = () => {
 };
 
 const formatDate = (dateStr) => {
-  if (!dateStr) return '';
+  if (!dateStr) return "";
   const date = new Date(dateStr);
-  return date.toLocaleDateString('en-US', {
-    weekday: 'short',
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
+  return date.toLocaleDateString("en-US", {
+    weekday: "short",
+    year: "numeric",
+    month: "short",
+    day: "numeric",
   });
 };
 
 const formatTime = (timeStr) => {
-  if (!timeStr) return '';
+  if (!timeStr) return "";
   const time = new Date(timeStr);
-  return time.toLocaleTimeString('en-US', {
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true
+  return time.toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
   });
 };
 </script>

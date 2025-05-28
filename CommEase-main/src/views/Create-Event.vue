@@ -97,110 +97,126 @@
   </h1>
   <hr class="safety-hr" :class="{ 'sidebar-collapsed-for-divider': isOpen }" />
 
-  <div class="event-container">
-    <div class="create-event-separation">
-      <h2 class="create-event-headers">Event Title</h2>
-      <input class="create-event-input" v-model="eventTitle" type="text" />
+  <div :class="{ 'sidebar-collapsed': !isOpen }">
+    <div class="event-container">
+      <div class="create-event-separation">
+        <h2 class="create-event-headers">Event Title</h2>
+        <input class="create-event-input" v-model="eventTitle" type="text" />
 
-      <h2 class="create-event-headers">Barangay</h2>
-      <select class="create-event-input" v-model="barangay">
-        <option disabled value="">Select Barangay</option>
-        <option>New Banicain</option>
-        <option>Baretto</option>
-        <option>Mabayuan</option>
-        <option>Kalalake</option>
-        <option>New Ilalim</option>
-        <option>New Kababae</option>
-        <option>New Asinan</option>
-        <option>New Cabalan</option>
-        <option>Kalaklan</option>
-        <option>Pag Asa</option>
-        <option>Gordon Heights</option>
-        <option>East Tapinac</option>
-        <option>West Tapinac</option>
-        <option>Old Cabalan</option>
-        <option>Sta. Rita</option>
-        <option>East Bajac-Bajac</option>
-        <option>West Bajac-Bajac</option>
-      </select>
+        <h2 class="create-event-headers">Barangay</h2>
+        <select class="create-event-input" v-model="barangay">
+          <option disabled value="">Select Barangay</option>
+          <option>New Banicain</option>
+          <option>Baretto</option>
+          <option>Mabayuan</option>
+          <option>Kalalake</option>
+          <option>New Ilalim</option>
+          <option>New Kababae</option>
+          <option>New Asinan</option>
+          <option>New Cabalan</option>
+          <option>Kalaklan</option>
+          <option>Pag Asa</option>
+          <option>Gordon Heights</option>
+          <option>East Tapinac</option>
+          <option>West Tapinac</option>
+          <option>Old Cabalan</option>
+          <option>Sta. Rita</option>
+          <option>East Bajac-Bajac</option>
+          <option>West Bajac-Bajac</option>
+        </select>
 
-      <h2 class="create-event-headers">Organizer</h2>
-      <input class="create-event-input" v-model="organizer" type="text" />
+        <h2 class="create-event-headers">Organizer</h2>
+        <input class="create-event-input" v-model="organizer" type="text" />
 
-      <h2 class="create-event-headers">Programs</h2>
-      <div class="create-event-checkbox-group">
-        <label>
-          <input type="checkbox" value="BSIT" v-model="programs" /> BSIT
-        </label>
-        <label>
-          <input type="checkbox" value="BSCS" v-model="programs" /> BSCS
-        </label>
-        <label>
-          <input type="checkbox" value="BSEMC" v-model="programs" /> BSEMC
-        </label>
-      </div>
-
-      <h2 class="create-event-headers">Date</h2>
-      <input class="create-event-input" v-model="date" type="date" />
-
-      <h2 class="create-event-headers">Start Time</h2>
-      <input class="create-event-input" v-model="startTime" type="time" />
-
-      <h2 class="create-event-headers">End Time</h2>
-      <input class="create-event-input" v-model="endTime" type="time" />
-
-      <h2 class="create-event-title">Objective of the event</h2>
-      <textarea class="modal-textarea" v-model="objective"></textarea>
-
-      <h2 class="create-event-title">Description of the event</h2>
-      <textarea class="modal-textarea" v-model="description"></textarea>
-
-      <h2 class="create-event-headers">Things needed:</h2>
-
-      <div class="things-needed-container">
-        <div class="things-separation">
-          <button
-            v-for="(item, index) in thingsNeeded"
-            :key="index"
-            class="things-button"
-            @click="removeThing(index)"
-          >
-            <span>{{ item }}</span>
-            <span class="thing-x">✖</span>
-          </button>
+        <h2 class="create-event-headers">Programs</h2>
+        <div class="create-event-checkbox-group">
+          <label>
+            <input type="checkbox" value="BSIT" v-model="programs" /> BSIT
+          </label>
+          <label>
+            <input type="checkbox" value="BSCS" v-model="programs" /> BSCS
+          </label>
+          <label>
+            <input type="checkbox" value="BSEMC" v-model="programs" /> BSEMC
+          </label>
         </div>
 
-        <div class="input-and-buttons">
-          <div class="input-container">
-            <input
-              v-model="newThing"
-              class="things-input"
-              type="text"
-              placeholder="Things needed"
-            />
-            <button @click="addThing" class="add-inside-button">Add</button>
+        <h2 class="create-event-headers">Date</h2>
+        <input class="create-event-input" v-model="date" type="date" />
+
+        <h2 class="create-event-headers">Start Time</h2>
+        <input class="create-event-input" v-model="startTime" type="time" />
+
+        <h2 class="create-event-headers">End Time</h2>
+        <input class="create-event-input" v-model="endTime" type="time" />
+
+        <h2 class="create-event-title">Objective of the event</h2>
+        <textarea class="modal-textarea" v-model="objective"></textarea>
+
+        <h2 class="create-event-title">Description of the event</h2>
+        <textarea class="modal-textarea" v-model="description"></textarea>
+
+        <h2 class="create-event-headers">Things needed:</h2>
+
+        <div class="things-needed-container">
+          <div class="things-separation">
+            <button
+              v-for="(item, index) in thingsNeeded"
+              :key="index"
+              class="things-button"
+              @click="removeThing(index)"
+            >
+              <span>{{ item }}</span>
+              <span class="thing-x">✖</span>
+            </button>
           </div>
 
-          <div class="button-container">
-            <button @click="cancelEvent" class="create-cancel">Cancel</button>
-            <button @click="saveEvent" class="create-submit">Submit</button>
+          <div class="input-and-buttons">
+            <div class="input-container">
+              <input
+                v-model="newThing"
+                class="things-input"
+                type="text"
+                placeholder="Things needed"
+              />
+              <button @click="addThing" class="add-inside-button">Add</button>
+            </div>
+
+            <div class="button-container">
+              <button @click="cancelEvent" class="create-cancel">Cancel</button>
+              <button @click="saveEvent" class="create-submit">Submit</button>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+
+  <div class="overlay" v-if="!isMobile && isSidebarOpen"></div>
 </template>
 
 <script setup>
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
-import { eventService } from '../api/services';
-import { authService } from '../api/services';
+import { eventService } from "../api/services";
+import { authService } from "../api/services";
 
 // === Sidebar Toggle ===
+const isOpen = ref(false); // sidebar animation or icon toggle
+const isMobile = ref(false);
 const isSidebarOpen = ref(true);
+
+// Already existing inside your script:
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value;
+  isOpen.value = !isOpen.value;
+};
+
+const handleResize = () => {
+  isMobile.value = window.innerWidth <= 928;
+  if (isMobile.value) {
+    isSidebarOpen.value = false;
+  }
 };
 
 // === Data for the Component ===
@@ -309,7 +325,7 @@ const removeThing = (index) => {
 };
 
 const cancelEvent = () => {
-  router.push('/ManageEventsOrganizers');
+  router.push("/ManageEventsOrganizers");
 };
 
 const saveEvent = async () => {
@@ -318,12 +334,20 @@ const saveEvent = async () => {
     error.value = null;
 
     // Validate required fields
-    if (!eventTitle.value || !barangay.value || !date.value || !startTime.value || !endTime.value || !objective.value || !description.value) {
-      throw new Error('Please fill in all required fields');
+    if (
+      !eventTitle.value ||
+      !barangay.value ||
+      !date.value ||
+      !startTime.value ||
+      !endTime.value ||
+      !objective.value ||
+      !description.value
+    ) {
+      throw new Error("Please fill in all required fields");
     }
 
     if (programs.value.length === 0) {
-      throw new Error('Please select at least one program');
+      throw new Error("Please select at least one program");
     }
 
     const eventData = {
@@ -335,27 +359,29 @@ const saveEvent = async () => {
       objective: objective.value,
       description: description.value,
       programs: programs.value,
-      thingsNeeded: thingsNeeded.value
+      thingsNeeded: thingsNeeded.value,
     };
 
     const response = await eventService.createEvent(eventData);
-    
+
     if (response.status === 201) {
-      router.push('/ManageEventsOrganizers');
+      router.push("/ManageEventsOrganizers");
     } else {
-      throw new Error('Failed to create event');
+      throw new Error("Failed to create event");
     }
   } catch (err) {
     if (err.response?.status === 401) {
-      error.value = 'Please log in to create an event';
-      router.push('/LoginOrganizers');
+      error.value = "Please log in to create an event";
+      router.push("/LoginOrganizers");
     } else if (err.response?.status === 403) {
-      error.value = 'You do not have permission to create events. Please log in as an organizer.';
-      router.push('/LoginOrganizers');
+      error.value =
+        "You do not have permission to create events. Please log in as an organizer.";
+      router.push("/LoginOrganizers");
     } else {
-      error.value = err.response?.data?.message || err.message || 'Failed to create event';
+      error.value =
+        err.response?.data?.message || err.message || "Failed to create event";
     }
-    console.error('Event creation error:', err);
+    console.error("Event creation error:", err);
   } finally {
     loading.value = false;
   }
@@ -364,9 +390,9 @@ const saveEvent = async () => {
 const confirmLogout = async () => {
   try {
     await authService.logout();
-    router.push('/LoginOrganizers');
+    router.push("/LoginOrganizers");
   } catch (error) {
-    console.error('Logout failed:', error);
+    console.error("Logout failed:", error);
   }
 };
 

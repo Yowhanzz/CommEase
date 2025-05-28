@@ -110,7 +110,19 @@ img {
   position: absolute;
   top: 12%;
   left: 13%;
-  animation: slideinLeft2 1s ease-in-out forwards;
+  animation: slideinLeftImage 1s ease-in-out forwards;
+}
+
+@keyframes slideinLeftImage {
+  from {
+    opacity: 0.2;
+    transform: translateX(-180px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 /* SIGNUP PART  */
@@ -298,6 +310,7 @@ a {
 
 .next {
   margin-left: 10%;
+  padding-top: 16px;
 }
 
 .footer {
@@ -358,9 +371,95 @@ a {
 
   .triangle-fixed {
     position: fixed;
-    top: -40%;
+    top: -100%;
+    left: 100%;
+    transform: rotate(85deg);
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .triangle-light-green {
+    position: fixed;
+    top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%) rotate(0deg);
+    transform: translate(-50%, -50%) rotate(35deg);
+    z-index: 0;
+    animation: slideinLeft 1s ease-in-out forwards;
+  }
+
+  @keyframes slideinLeft {
+    from {
+      opacity: 0.2;
+      transform: translateY(-80px) rotate(20deg);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .triangle-green {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(35deg);
+    z-index: 0;
+    animation: slideinLeft 1s ease-in-out forwards;
+  }
+
+  .signup-container {
+    position: fixed;
+    bottom: 20%;
+    left: -5%;
+    transform: translateX(-50%);
+    z-index: 1;
+    scale: 0.8;
+    animation-name: slideinTopLogin;
+    animation-duration: 1s;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards;
+  }
+
+  @keyframes slideinTopLogin {
+    from {
+      opacity: 0.2;
+      transform: translate(-53%, -20%);
+    }
+
+    to {
+      opacity: 1;
+      transform: translate(-53%, 0%);
+    }
+  }
+
+  .footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    scale: 0.8;
+    /* padding: 1rem; */ /* optional */
+    margin-left: -41%;
+    margin-top: -2%;
+    gap: 4rem; /* para may pagitan ang items */
+    animation-name: slideinTopLoinButton;
+    animation-duration: 1s;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards;
+  }
+
+  .prev {
+    margin-right: 12%;
+  }
+}
+
+@media (max-width: 944px) {
+  .triangle-fixed {
+    position: fixed;
+    top: -80%;
+    scale: 0.8;
+    left: 95%;
+    transform: rotate(85deg);
     z-index: 0;
     pointer-events: none;
   }
@@ -392,7 +491,7 @@ a {
 
   .footer {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: center;
     align-items: center;
     scale: 0.8;
     /* padding: 1rem; */ /* optional */
@@ -400,63 +499,112 @@ a {
     margin-top: -3%;
     gap: 4rem; /* para may pagitan ang items */
   }
+
+  .prev {
+    margin-right: 20%;
+  }
 }
 
 @media (max-width: 773px) {
   .triangle-fixed {
     position: fixed;
-    top: -40%;
-    left: 50%;
-    transform: translate(-50%, -50%) rotate(0deg);
+    top: -80%;
+    scale: 0.8;
+    left: 105%;
+    transform: rotate(85deg);
     z-index: 0;
     pointer-events: none;
   }
+
+  .triangle-light-green {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(35deg);
+    z-index: 0;
+  }
+
+  .triangle-green {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(35deg);
+    z-index: 0;
+  }
+
   .signup-container {
     position: fixed;
     bottom: 20%;
-    left: -11%;
+    left: -5%;
     transform: translateX(-50%);
     z-index: 1;
-    scale: 0.7;
+    scale: 0.8;
   }
+
   .footer {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: center;
     align-items: center;
-    scale: 0.75;
+    scale: 0.8;
     /* padding: 1rem; */ /* optional */
-    margin-left: -33%;
-    margin-top: -9%;
-    gap: 13rem; /* para may pagitan ang items */
+    margin-left: -36%;
+    margin-top: -3%;
+    gap: 4rem; /* para may pagitan ang items */
+  }
+
+  .prev {
+    margin-right: 27%;
   }
 }
 
 @media (max-width: 570px) {
   .triangle-fixed {
     position: fixed;
-    top: -45%;
-    left: 45%;
-    transform: translate(-50%, -50%) rotate(0deg);
+    top: -75%;
+    scale: 0.75;
+    left: 126%;
+    transform: rotate(85deg);
     z-index: 0;
     pointer-events: none;
   }
+
+  .triangle-light-green {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(35deg);
+    z-index: 0;
+  }
+
+  .triangle-green {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(35deg);
+    z-index: 0;
+  }
+
   .signup-container {
     position: fixed;
     bottom: 20%;
-    left: -23%;
+    left: -16%;
     transform: translateX(-50%);
     z-index: 1;
-    scale: 0.65;
+    scale: 0.7;
   }
 
   .footer {
     display: flex;
-    justify-content: space-evenly;
+    justify-content: center;
     align-items: center;
-    scale: 0.75;
+    scale: 0.8;
     /* padding: 1rem; */ /* optional */
-    margin-left: -43%;
-    margin-top: -14%;
-    gap: 14rem; /* para may pagitan ang items */
+    margin-left: -40%;
+    margin-top: -10%;
+    gap: 4rem; /* para may pagitan ang items */
+  }
+
+  .prev {
+    margin-right: 33%;
   }
 }

@@ -11,7 +11,7 @@
 
       <ul>
         <li>
-          <router-link to="/dashboard_volunteers">
+          <router-link to="/DashboardVolunteers">
             <i class="bx bxs-dashboard"></i>
             <span class="nav-item" v-show="isSidebarOpen">Dashboard</span>
           </router-link>
@@ -333,7 +333,7 @@
 <script>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { authService } from '../api/services';
+import { authService } from "../api/services";
 
 export default {
   name: "YourComponentName",
@@ -395,10 +395,10 @@ export default {
         // Clear any local storage or state
         localStorage.clear();
         // Redirect to login page
-        this.$router.push('/LoginVolunteers');
+        this.$router.push("/LoginVolunteers");
       } catch (error) {
-        console.error('Logout failed:', error);
-        alert('Failed to logout. Please try again.');
+        console.error("Logout failed:", error);
+        alert("Failed to logout. Please try again.");
       }
     },
   },

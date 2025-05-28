@@ -24,7 +24,7 @@
           </router-link>
         </li>
         <li>
-          <router-link to="SafetyProtocols">
+          <router-link to="/safety_protocol">
             <i class="bx bxs-shield-plus"></i>
             <span class="nav-item" v-show="isSidebarOpen"
               >Safety & Protocols</span
@@ -172,9 +172,7 @@
     </select>
 
     <div class="events-grid">
-      <div v-if="loading" class="loading-message">
-        Loading events...
-      </div>
+      <div v-if="loading" class="loading-message">Loading events...</div>
       <div v-else-if="error" class="error-message">
         {{ error }}
       </div>
@@ -191,7 +189,8 @@
           <div class="container-inputs-info">
             <h1 class="container-event-title">{{ event.event_title }}</h1>
             <h6 class="container-event-time">
-              {{ formatTime(event.start_time) }} - {{ formatTime(event.end_time) }} ·
+              {{ formatTime(event.start_time) }} -
+              {{ formatTime(event.end_time) }} ·
               {{ formatDate(event.date) }}
             </h6>
             <h6 class="container-event-location">
@@ -205,9 +204,9 @@
             </h6>
           </div>
           <div class="button">
-            <button 
+            <button
               v-if="event.status === 'upcoming'"
-              @click="registerForEvent(event.id)" 
+              @click="registerForEvent(event.id)"
               class="button-enter"
             >
               Register
@@ -229,8 +228,8 @@ import { QrcodeStream } from "vue-qrcode-reader";
 import VueCal from "vue-cal";
 import VueQrcode from "@chenfengyuan/vue-qrcode";
 import "vue-cal/dist/vuecal.css";
-import { authService, eventService } from '../api/services';
-import axios from 'axios';
+import { authService, eventService } from "../api/services";
+import axios from "axios";
 
 export default {
   components: {
@@ -284,14 +283,16 @@ export default {
       events: [],
       loading: false,
       error: null,
-      firstName: '',
+      firstName: "",
     };
   },
   computed: {
     filteredEvents() {
       return this.events.filter((event) => {
         const matchesSearch =
-          event.event_title.toLowerCase().includes(this.searchQuery.toLowerCase()) ||
+          event.event_title
+            .toLowerCase()
+            .includes(this.searchQuery.toLowerCase()) ||
           event.barangay.toLowerCase().includes(this.searchQuery.toLowerCase());
 
         const matchesStatus = this.selectedStatus
@@ -314,18 +315,18 @@ export default {
         const response = await eventService.getEvents();
         this.events = response.data.data;
       } catch (err) {
-        this.error = err.response?.data?.message || 'Failed to fetch events';
-        console.error('Error fetching events:', err);
+        this.error = err.response?.data?.message || "Failed to fetch events";
+        console.error("Error fetching events:", err);
       } finally {
         this.loading = false;
       }
     },
     async fetchUserData() {
       try {
-        const response = await axios.get('/api/user');
+        const response = await axios.get("/api/user");
         this.firstName = response.data.first_name;
       } catch (error) {
-        console.error('Error fetching user data:', error);
+        console.error("Error fetching user data:", error);
       }
     },
     toggleSidebar() {
@@ -360,15 +361,15 @@ export default {
       this.showNotifications = !this.showNotifications;
     },
     formatTime(datetime) {
-      if (!datetime) return '';
+      if (!datetime) return "";
       return new Date(datetime).toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
-        hour12: false
+        hour12: false,
       });
     },
     formatDate(datetime) {
-      if (!datetime) return '';
+      if (!datetime) return "";
       return new Date(datetime).toLocaleDateString([], {
         weekday: "short",
         year: "numeric",
@@ -387,15 +388,15 @@ export default {
       try {
         await authService.logout();
         this.showLogoutModal = false;
-        this.$router.push('/LoginVolunteers');
+        this.$router.push("/LoginVolunteers");
       } catch (error) {
-        console.error('Logout failed:', error);
-        alert('Failed to logout. Please try again.');
+        console.error("Logout failed:", error);
+        alert("Failed to logout. Please try again.");
       }
     },
     async registerForEvent(eventId) {
       this.$router.push(`/RegistrationVolunteers/${eventId}`);
-    }
+    },
   },
 };
 </script>

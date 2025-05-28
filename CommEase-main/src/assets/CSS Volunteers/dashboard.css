@@ -428,12 +428,15 @@ img {
 }
 
 .button-enter {
-  cursor: pointer;
-  font-weight: 600;
+  background-color: #12372a;
+  color: white;
+  font-weight: 550;
+  border: none;
   width: 75px;
   height: 40px;
-  padding-left: 15px;
-  background-color: #12372a;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
 }
 
 .button-enter:hover {
@@ -443,8 +446,9 @@ img {
   border: 1px solid #12372a;
 }
 
-.button-enter:active {
-  opacity: 0.7;
+.button-enter:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
 }
 
 /* NOTIFICATION PANEL */
@@ -454,10 +458,10 @@ img {
   left: -300px; /* Initially off-screen to the left */
   width: 300px;
   height: 100%;
-  background: #12372a;
-  color: white;
+  background: #c6c3bd;
+  color: #daf1de;
   box-shadow: -4px 0 10px rgba(0, 0, 0, 0.3);
-  z-index: 1000;
+  z-index: 2000;
   padding: 15px;
   display: flex;
   flex-direction: column;
@@ -490,6 +494,7 @@ img {
   justify-content: space-between;
   align-items: center;
   margin-top: 25px;
+  color: black;
 }
 
 .close-btn {
@@ -507,16 +512,17 @@ img {
   border-radius: 10px;
   margin-bottom: 10px;
   cursor: pointer;
+  color: black;
   transition: 0.15s ease-in-out background-color, 0.15s ease-in-out color;
 }
 
 .notification-item:hover {
-  background-color: #e9e5d6;
-  color: black;
+  background-color: #859972;
+  color: #daf1de;
 }
 
 .notification-item:hover .time {
-  color: #313131; /* Change the color of the span.time on hover */
+  color: #daf1de; /* Change the color of the span.time on hover */
 }
 
 .notification-item h4 {
@@ -532,7 +538,7 @@ img {
 
 .notification-item .time {
   font-size: 10px;
-  color: #ccc;
+  color: black;
 }
 
 .notification-item .time:hover {
@@ -771,6 +777,10 @@ img {
   .sidebar {
     z-index: 2000 !important;
   }
+
+  .notification-panel {
+    z-index: 2000;
+  }
 }
 
 @media (max-width: 979px) {
@@ -780,6 +790,10 @@ img {
 
   .calendar-modal {
     scale: 0.9;
+  }
+
+  .notification-panel {
+    z-index: 2000;
   }
 }
 
@@ -798,6 +812,10 @@ img {
     color: #464e2e;
     position: relative;
   }
+
+  .notification-panel {
+    z-index: 2000;
+  }
 }
 
 @media (max-width: 578px) {
@@ -808,6 +826,10 @@ img {
   .modal-content {
     scale: 0.85;
     margin-left: 60px;
+  }
+
+  .notification-panel {
+    z-index: 2000;
   }
 }
 
@@ -821,6 +843,9 @@ img {
 
   .container-glasscard-events {
     width: 96%;
+  }
+  .notification-panel {
+    z-index: 2000;
   }
 }
 
@@ -842,23 +867,4 @@ img {
   background-color: #6c757d;
   cursor: not-allowed;
   opacity: 0.7;
-}
-
-.button-enter {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.button-enter:hover {
-  background-color: #0056b3;
-}
-
-.button-enter:disabled {
-  background-color: #6c757d;
-  cursor: not-allowed;
 }
