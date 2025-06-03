@@ -1,16 +1,16 @@
 <template>
-	<routerView> </routerView>
+  <routerView> </routerView>
 </template>
 
 <style>
 * {
-	margin: 0;
-	padding: 0;
-	box-sizing: border-box;
-	font-family: Montserrat;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: Montserrat;
 }
 
 body {
-	background-color: #DAF1DE;
+  background-color: #f2f4ec;
 }
 </style>

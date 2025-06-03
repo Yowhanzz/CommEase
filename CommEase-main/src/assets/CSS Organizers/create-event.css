@@ -2,7 +2,7 @@
   position: fixed;
   width: 230px !important;
   height: 100vh;
-  background: #436850;
+  background: #435739;
   color: #e8f4ea;
   transition: width 0.3s ease;
   left: 0;
@@ -112,17 +112,18 @@ i {
   border-radius: 10px;
   text-align: center;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  width: 300px;
+  width: 350px;
   scale: 1.1;
 }
 
 .logout-modal h2 {
   margin-bottom: 10px;
-  color: #e9e5d6;
+  color: #f2f4ec;
 }
 
 .logout-modal p {
-  color: #e9e5d6;
+  color: #f2f4ec;
+  padding-bottom: 10px;
 }
 
 .logout-modal-buttons {
@@ -132,32 +133,34 @@ i {
 }
 
 .logout-btn {
-  background: #59692a;
-  color: white;
+  background: #435739;
+  color: #f2f4ec;
   padding: 8px 15px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-weight: 550;
   transition: 0.15s ease-in-out background-color, 0.15s ease-in-out color;
 }
 
 .cancel-btn {
-  background: #bdc3c7;
-  color: white;
+  background: #f2f4ec;
+  color: #435739;
   padding: 8px 15px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: 0.15s ease-in-out background-color;
+  font-weight: 550;
 }
 
 .logout-btn:hover {
-  background-color: #e9e5d6;
-  color: #464e2e;
+  background-color: #f2f4ec;
+  color: #435739;
 }
 
 .cancel-btn:hover {
-  background: #95a5a6;
+  background: #d8dada;
 }
 
 /* NOTIFICATION PANEL */
@@ -313,7 +316,7 @@ i {
 
 .create-event-headers {
   font-size: 20px;
-  color: #436850;
+  color: #435739;
   font-weight: 700;
 }
 
@@ -322,8 +325,8 @@ i {
   height: 40px;
   border-radius: 8px;
   border-style: none;
-  background-color: #daf1de;
-  box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.3);
+  background-color: #f2f4ec;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
   padding-left: 20px;
   transition: 0.15s ease-in-out outline, 0.15s ease-in-out border-color,
     0.15s ease-in-out box-shadow;
@@ -331,7 +334,7 @@ i {
 
 .create-event-input:focus {
   outline: none;
-  border-color: #daf1de;
+  border-color: #f2f4ec;
   box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.8);
 }
 
@@ -348,7 +351,7 @@ i {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background-color: #daf1de;
+  background-color: #f2f4ec;
   box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.3);
   padding: 0.5rem 1rem;
   border-radius: 8px;
@@ -362,7 +365,7 @@ i {
 }
 
 .create-event-checkbox-group input[type="checkbox"] {
-  accent-color: #436850; /* Tailwind blue-500 */
+  accent-color: #435739; /* Tailwind blue-500 */
   width: 16px;
   height: 16px;
 }
@@ -377,7 +380,7 @@ i {
   font-size: 13px;
   resize: none;
   margin-top: 5%;
-  background-color: #daf1de;
+  background-color: #f2f4ec;
   box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.3);
   transition: 0.15s ease-in-out outline, 0.15s ease-in-out border-color,
     0.15s ease-in-out box-shadow;
@@ -397,7 +400,7 @@ i {
 }
 
 .things-needed-container {
-  background-color: #daf1de;
+  background-color: #f2f4ec;
   box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.3);
   width: 90%;
   height: auto;
@@ -439,7 +442,7 @@ i {
   gap: 10px;
   padding: 5px 10px;
   font-weight: 600;
-  margin-bottom: 5px; /* changed from margin-top to margin-bottom */
+  margin-bottom: 5px;
   width: 90%;
   margin-left: 5%;
   height: 41px;
@@ -493,7 +496,7 @@ i {
   margin-left: 10px;
   border-radius: 5px;
   border-style: none;
-  background-color: #12372a;
+  background-color: #435739;
   color: #daf1de;
   cursor: pointer;
   font-weight: 600;
@@ -502,9 +505,9 @@ i {
 
 .create-submit:hover,
 .create-cancel:hover {
-  background-color: #daf1de;
-  color: #12372a;
-  border: 1px solid #12372a;
+  background-color: #f2f4ec;
+  color: #435739;
+  border: 2px solid #435739;
 }
 
 .create-cancel:active,
@@ -522,8 +525,8 @@ i {
   padding: 5px 10px;
   font-weight: 600;
   margin-top: 10%;
-  background-color: #436850;
-  color: #daf1de;
+  background-color: #435739;
+  color: #f2f4ec;
 }
 
 .thing-x {
@@ -546,17 +549,17 @@ i {
   margin-top: 3%;
   border-radius: 5px;
   border-style: none;
-  background-color: #12372a;
-  color: #daf1de;
+  background-color: #435739;
+  color: #f2f4ec;
   cursor: pointer;
   font-weight: 500;
   transition: 0.15s ease-in-out background-color, 0.15s ease-in-out color;
 }
 
 .add-inside-button:hover {
-  background-color: #daf1de;
-  color: #12372a;
-  border: 1px solid #12372a;
+  background-color: #f2f4ec;
+  color: #435739;
+  border: 1px solid #435739;
 }
 
 .add-inside-button:active {

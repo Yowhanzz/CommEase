@@ -25,10 +25,13 @@
         </li>
         <li>
           <router-link to="/ActivityLogOrganizers">
-            <i class="bx bx-history"></i>
-            <span class="nav-item" v-show="isSidebarOpen">Event History</span>
+            <i class="bx bx-file report"></i>
+            <span class="nav-item" v-show="isSidebarOpen"
+              >Attendance Report</span
+            >
           </router-link>
         </li>
+
         <li>
           <router-link to="SafetyProtocolsOrganizers">
             <i class="bx bxs-shield-plus"></i>
@@ -153,6 +156,14 @@
         </label>
       </div>
 
+      <h2 class="create-event-headers">Participants Needed:</h2>
+      <input class="create-event-input" type="number" />
+      <!-- v-model="participant limitation" -->
+
+      <h2 class="create-event-headers">Target Participants:</h2>
+      <input class="create-event-input" type="number" />
+      <!-- v-model="participant limitation" -->
+
       <h2 class="create-event-headers">Date</h2>
       <input class="create-event-input" v-model="date" type="date" />
 
@@ -216,7 +227,12 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { authService, eventService, formatTime, formatDate } from "@/api/services";
+import {
+  authService,
+  eventService,
+  formatTime,
+  formatDate,
+} from "@/api/services";
 
 const route = useRoute();
 const router = useRouter();
@@ -276,11 +292,11 @@ onMounted(async () => {
 
     // Format date and times
     const eventDate = new Date(event.date);
-    const formattedDate = eventDate.toISOString().split('T')[0]; // YYYY-MM-DD format
+    const formattedDate = eventDate.toISOString().split("T")[0]; // YYYY-MM-DD format
 
     // Format start and end times
     const formatTime = (timeStr) => {
-      if (!timeStr) return '';
+      if (!timeStr) return "";
       const time = new Date(timeStr);
       return time.toTimeString().slice(0, 5); // HH:mm format
     };
@@ -292,7 +308,7 @@ onMounted(async () => {
     date.value = formattedDate;
     startTime.value = formatTime(event.start_time);
     endTime.value = formatTime(event.end_time);
-    organizer.value = 'Elites'; // Set organizer to 'Elites'
+    organizer.value = "Elites"; // Set organizer to 'Elites'
     status.value = event.status;
     objective.value = event.objective;
     description.value = event.description;
@@ -339,13 +355,13 @@ const cancelEdit = () => {
 };
 
 const saveChanges = async () => {
-  console.log('saveChanges function called');
+  console.log("saveChanges function called");
   try {
     loading.value = true;
     error.value = null;
 
     // Validate required fields
-    console.log('Validating required fields...');
+    console.log("Validating required fields...");
     if (
       !title.value ||
       !barangay.value ||
@@ -357,46 +373,52 @@ const saveChanges = async () => {
     ) {
       throw new Error("Please fill in all required fields");
     }
-    console.log('Required fields valid.');
+    console.log("Required fields valid.");
 
-    console.log('Checking programs...');
+    console.log("Checking programs...");
     if (programs.value.length === 0) {
       throw new Error("Please select at least one program");
     }
-    console.log('Programs selected.');
+    console.log("Programs selected.");
 
     // Validate date is after today
-    console.log('Validating date...');
+    console.log("Validating date...");
     const selectedDate = new Date(date.value);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     if (selectedDate < today) {
-      throw new Error('Event date must be after today');
+      throw new Error("Event date must be after today");
     }
-    console.log('Date valid.');
+    console.log("Date valid.");
 
     // Validate end time is after start time
-    console.log('Validating time...');
+    console.log("Validating time...");
     if (startTime.value >= endTime.value) {
-      throw new Error('End time must be after start time');
+      throw new Error("End time must be after start time");
     }
-    console.log('Time valid.');
+    console.log("Time valid.");
 
     // Validate programs
-    console.log('Validating program values...');
-    const validPrograms = ['BSIT', 'BSCS', 'BSEMC'];
-    const invalidPrograms = programs.value.filter(program => !validPrograms.includes(program));
+    console.log("Validating program values...");
+    const validPrograms = ["BSIT", "BSCS", "BSEMC"];
+    const invalidPrograms = programs.value.filter(
+      (program) => !validPrograms.includes(program)
+    );
     if (invalidPrograms.length > 0) {
-      throw new Error(`Invalid programs: ${invalidPrograms.join(', ')}. Valid programs are: ${validPrograms.join(', ')}`);
+      throw new Error(
+        `Invalid programs: ${invalidPrograms.join(
+          ", "
+        )}. Valid programs are: ${validPrograms.join(", ")}`
+      );
     }
-    console.log('Program values valid.');
+    console.log("Program values valid.");
 
     // Format the date and times
-    console.log('Formatting date and time...');
-    const formattedDate = new Date(date.value).toISOString().split('T')[0];
+    console.log("Formatting date and time...");
+    const formattedDate = new Date(date.value).toISOString().split("T")[0];
     const formatTimeForAPI = (time) => {
-      const [hours, minutes] = time.split(':');
-      return `${hours.padStart(2, '0')}:${minutes.padStart(2, '0')}`;
+      const [hours, minutes] = time.split(":");
+      return `${hours.padStart(2, "0")}:${minutes.padStart(2, "0")}`;
     };
 
     const eventData = {
@@ -412,18 +434,18 @@ const saveChanges = async () => {
       status: status.value,
     };
 
-    console.log('Sending update API request...', eventData);
+    console.log("Sending update API request...", eventData);
     await eventService.updateEvent(event_id.value, eventData);
-    console.log('API request successful.');
+    console.log("API request successful.");
     router.push("/ManageEventsOrganizers");
   } catch (err) {
-    console.error('Error during saveChanges:', err);
+    console.error("Error during saveChanges:", err);
     error.value =
       err.response?.data?.message || err.message || "Failed to update event";
     // router.push("/ManageEventsOrganizers"); // Commented out for debugging
   } finally {
     loading.value = false;
-    console.log('saveChanges function finished.');
+    console.log("saveChanges function finished.");
   }
 };
 

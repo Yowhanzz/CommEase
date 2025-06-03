@@ -53,7 +53,7 @@
     :class="{ 'sidebar-collapsed': !isOpen }"
   >
     <div class="dropdown">
-      <button class="dropbtn" @click="toggleDropdown">Options ▼</button>
+      <button class="dropbtn" @click="toggleDropdown">Menu ▼</button>
       <div class="dropdown-content" :class="{ active: showDropdown }">
         <a @click="openQRCodeModal">Show My QR Code</a>
         <a @click="toggleCalendar">Calendar</a>
@@ -84,6 +84,7 @@
         v-if="qrValue"
         :src="qrValue"
         alt="QR Code"
+        class="qr-code"
         style="width: 200px; height: 200px"
       />
       <p class="qr-label">
@@ -149,7 +150,11 @@
   <div class="container" :class="{ 'sidebar-collapsed': !isOpen }">
     <div class="glasscard-container">
       <div class="picture-1">
-        <img src="" alt="shrek sample pic" class="picture-person" />
+        <img
+          src="/public/Profile.jpg"
+          alt="shrek sample pic"
+          class="picture-person"
+        />
       </div>
       <div class="glasscard-titles">
         <h1 class="volunteer-name">Hello, {{ firstName }}!</h1>

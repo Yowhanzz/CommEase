@@ -25,10 +25,13 @@
         </li>
         <li>
           <router-link to="/ActivityLogOrganizers">
-            <i class="bx bx-history"></i>
-            <span class="nav-item" v-show="isSidebarOpen">Event History</span>
+            <i class="bx bx-file report"></i>
+            <span class="nav-item" v-show="isSidebarOpen"
+              >Attendance Report</span
+            >
           </router-link>
         </li>
+
         <li>
           <router-link to="SafetyProtocolsOrganizers">
             <i class="bx bxs-shield-plus"></i>
@@ -59,7 +62,7 @@
     :class="{ 'sidebar-collapsed': !isOpen }"
   >
     <div class="dropdown">
-      <button class="dropbtn" @click="toggleDropdown">Options ▼</button>
+      <button class="dropbtn" @click="toggleDropdown">Menu ▼</button>
       <div class="dropdown-content" :class="{ active: showDropdown }">
         <a @click="showQRCode = true">Show My QR Scanner</a>
         <a @click="toggleCalendar">Calendar</a>
@@ -84,7 +87,7 @@
     <div class="qr-modal-content">
       <button class="close-btn" @click="showQRCode = false">X</button>
       <h3>Record Attendance</h3>
-      
+
       <!-- Event Selection -->
       <div class="event-selection">
         <select v-model="selectedEvent" class="event-select">
@@ -97,35 +100,27 @@
 
       <div v-if="selectedEvent" class="scanner-container">
         <h3>Selected Event: {{ selectedEvent.event_title }}</h3>
-        
+
         <!-- Scan type selection -->
         <div class="scan-type-selection">
           <label>
-            <input 
-              type="radio" 
-              v-model="scanType" 
-              value="time_in"
-            > Time In
+            <input type="radio" v-model="scanType" value="time_in" /> Time In
           </label>
           <label>
-            <input 
-              type="radio" 
-              v-model="scanType" 
-              value="time_out"
-            > Time Out
+            <input type="radio" v-model="scanType" value="time_out" /> Time Out
           </label>
         </div>
 
         <!-- Toggle between QR Scanner and Manual Input -->
         <div class="input-method-toggle">
-          <button 
-            :class="['toggle-btn', { active: !useManualInput }]" 
+          <button
+            :class="['toggle-btn', { active: !useManualInput }]"
             @click="useManualInput = false"
           >
             QR Scanner
           </button>
-          <button 
-            :class="['toggle-btn', { active: useManualInput }]" 
+          <button
+            :class="['toggle-btn', { active: useManualInput }]"
             @click="useManualInput = true"
           >
             Manual Input
@@ -134,16 +129,16 @@
 
         <!-- QR Scanner -->
         <div v-if="!useManualInput" class="scanner-section">
-        <qrcode-stream
-          @detect="onDetect"
-          class="scanner-box"
-          :constraints="{
-            video: {
-              facingMode: 'environment',
-              frameRate: { ideal: 60, max: 60 },
-            },
-          }"
-        />
+          <qrcode-stream
+            @detect="onDetect"
+            class="scanner-box"
+            :constraints="{
+              video: {
+                facingMode: 'environment',
+                frameRate: { ideal: 60, max: 60 },
+              },
+            }"
+          />
         </div>
 
         <!-- Manual Input -->
@@ -152,14 +147,12 @@
             v-model="studentID"
             type="text"
             placeholder="Enter Student ID"
-            class="event-select"
+            class="event-select-id"
           />
-          <button @click="submitID" class="btn">Submit ID</button>
+          <button @click="submitID" class="submit-btn">Submit ID</button>
         </div>
       </div>
-      <div v-else class="no-event-selected">
-        Please select an event first
-      </div>
+      <div v-else class="no-event-selected">Please select an event first</div>
     </div>
   </div>
 
@@ -206,11 +199,11 @@
         :class="{ unread: !notif.read }"
       >
         <div class="notification-content">
-        <h4>{{ notif.message }}</h4>
-        <p class="time">{{ notif.time }}</p>
+          <h4>{{ notif.message }}</h4>
+          <p class="time">{{ notif.time }}</p>
         </div>
         <div class="notification-type" :class="notif.type">
-          {{ notif.type === 'volunteer_time_in' ? 'Time In' : 'Time Out' }}
+          {{ notif.type === "volunteer_time_in" ? "Time In" : "Time Out" }}
         </div>
       </div>
       <div v-if="notifications.length === 0" class="no-notifications">
@@ -223,7 +216,11 @@
   <div class="container" :class="{ 'sidebar-collapsed': !isOpen }">
     <div class="glasscard-container">
       <div class="picture-1">
-        <img src="" alt="profile-pic" class="picture-person" />
+        <img
+          src="/public/Profile.jpg"
+          alt="profile-pic"
+          class="picture-person"
+        />
       </div>
       <div class="glasscard-titles">
         <h1 class="volunteer-name">Hello, Ridley!</h1>
@@ -233,7 +230,7 @@
 
     <div class="glasscard-container-1">
       <div class="picture-1">
-        <img src="" alt="weather" class="picture-person" />
+        <img src="/public/Profile.jpg" alt="weather" class="picture-person" />
       </div>
       <div class="glasscard-titles">
         <h1 class="volunteer-name">Mon, Mar 27, 2025</h1>
@@ -277,7 +274,8 @@
           <div class="container-inputs-info">
             <h1 class="container-event-title">{{ event.event_title }}</h1>
             <h6 class="container-event-time">
-              {{ formatTime(event.start_time) }} - {{ formatTime(event.end_time) }} ·
+              {{ formatTime(event.start_time) }} -
+              {{ formatTime(event.end_time) }} ·
               {{ formatDate(event.date) }}
             </h6>
             <h6 class="container-event-location">
@@ -291,7 +289,6 @@
             </h6>
           </div>
           <div class="button">
-            <button class="button-start">Start</button>
             <router-link to="/AnalyticsOrganizers" class="button-enter"
               >Enter</router-link
             >
@@ -305,12 +302,12 @@
 </template>
 
 <script>
-import 'vue-cal/dist/vuecal.css';
-import VueCal from 'vue-cal';
-import { QrcodeStream } from 'vue-qrcode-reader';
-import { ref, computed, onMounted } from 'vue';
-import { useRouter } from 'vue-router';
-import { authService, qrService, eventService } from '@/api/services';
+import "vue-cal/dist/vuecal.css";
+import VueCal from "vue-cal";
+import { QrcodeStream } from "vue-qrcode-reader";
+import { ref, computed, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { authService, qrService, eventService } from "@/api/services";
 
 export default {
   components: {
@@ -319,18 +316,18 @@ export default {
   },
   setup() {
     const router = useRouter();
-    const searchQuery = ref('');
-    const selectedStatus = ref('');
-    const selectedProgram = ref('');
-    const studentID = ref('');
-    const scanType = ref('time_in');
+    const searchQuery = ref("");
+    const selectedStatus = ref("");
+    const selectedProgram = ref("");
+    const studentID = ref("");
+    const scanType = ref("time_in");
     const timedIDs = new Set();
     const showDropdown = ref(false);
     const showNotifications = ref(false);
     const showLogoutModal = ref(false);
     const isSidebarOpen = ref(false);
     const isOpen = ref(false);
-    const qrData = ref('sample-qr-data');
+    const qrData = ref("sample-qr-data");
     const calendarVisible = ref(false);
     const selectedEvent = ref(null);
     const showQRCode = ref(false);
@@ -339,26 +336,30 @@ export default {
     const events = ref([]);
 
     // Only show ongoing events in the QR scanner dropdown
-    const ongoingEvents = computed(() => events.value.filter(e => e.status && e.status.toLowerCase() === 'ongoing'));
+    const ongoingEvents = computed(() =>
+      events.value.filter(
+        (e) => e.status && e.status.toLowerCase() === "ongoing"
+      )
+    );
 
     // Fetch events from backend
     const fetchEvents = async () => {
       try {
         const response = await eventService.getEventsOrganizer();
         events.value = response.data;
-        console.log('Fetched organizer events:', events.value);
+        console.log("Fetched organizer events:", events.value);
       } catch (err) {
-        console.error('Failed to fetch organizer events:', err);
+        console.error("Failed to fetch organizer events:", err);
       }
     };
 
     // Fetch notifications
     const fetchNotifications = async () => {
       try {
-        const response = await api.get('/notifications');
+        const response = await api.get("/notifications");
         notifications.value = response.data;
       } catch (error) {
-        console.error('Failed to fetch notifications:', error);
+        console.error("Failed to fetch notifications:", error);
       }
     };
 
@@ -370,14 +371,18 @@ export default {
     const filteredEvents = computed(() => {
       return events.value.filter((event) => {
         const matchesSearch =
-          (event.event_title?.toLowerCase() || '').includes(searchQuery.value.toLowerCase()) ||
-          (event.barangay?.toLowerCase() || '').includes(searchQuery.value.toLowerCase());
+          (event.event_title?.toLowerCase() || "").includes(
+            searchQuery.value.toLowerCase()
+          ) ||
+          (event.barangay?.toLowerCase() || "").includes(
+            searchQuery.value.toLowerCase()
+          );
 
         const matchesStatus =
-          selectedStatus.value === '' || event.status === selectedStatus.value;
+          selectedStatus.value === "" || event.status === selectedStatus.value;
 
         const matchesProgram =
-          selectedProgram.value === '' ||
+          selectedProgram.value === "" ||
           (event.programs && event.programs.includes(selectedProgram.value));
 
         return matchesSearch && matchesStatus && matchesProgram;
@@ -401,8 +406,8 @@ export default {
     const onDetect = async (result) => {
       try {
         const scannedText = result[0].rawValue;
-        const userEmailId = scannedText.split('@')[0];
-        
+        const userEmailId = scannedText.split("@")[0];
+
         if (!userEmailId) {
           throw new Error("Invalid QR code format");
         }
@@ -411,18 +416,34 @@ export default {
           throw new Error("No event selected");
         }
 
-        const response = await qrService.scanQR(selectedEvent.value.id, userEmailId, scanType.value);
-        
-        // Update notifications
-        await updateNotifications(
-          `${scanType.value === 'time_in' ? 'Time In' : 'Time Out'} recorded for ${selectedEvent.value.event_title}`,
-          scanType.value === 'time_in' ? 'volunteer_time_in' : 'volunteer_time_out'
+        const response = await qrService.scanQR(
+          selectedEvent.value.id,
+          userEmailId,
+          scanType.value
         );
 
-        alert(`${scanType.value === 'time_in' ? 'Time In' : 'Time Out'} recorded: ${response.message}`);
+        // Update notifications
+        await updateNotifications(
+          `${
+            scanType.value === "time_in" ? "Time In" : "Time Out"
+          } recorded for ${selectedEvent.value.event_title}`,
+          scanType.value === "time_in"
+            ? "volunteer_time_in"
+            : "volunteer_time_out"
+        );
+
+        alert(
+          `${scanType.value === "time_in" ? "Time In" : "Time Out"} recorded: ${
+            response.message
+          }`
+        );
       } catch (error) {
-        console.error('QR scan failed:', error);
-        alert(error.response?.data?.message || error.message || 'Failed to process QR code');
+        console.error("QR scan failed:", error);
+        alert(
+          error.response?.data?.message ||
+            error.message ||
+            "Failed to process QR code"
+        );
       }
     };
 
@@ -442,19 +463,35 @@ export default {
           throw new Error("No event selected");
         }
 
-        const response = await qrService.scanQR(selectedEvent.value.id, id, scanType.value);
-        
-        // Update notifications
-        await updateNotifications(
-          `${scanType.value === 'time_in' ? 'Time In' : 'Time Out'} recorded for ${selectedEvent.value.event_title}`,
-          scanType.value === 'time_in' ? 'volunteer_time_in' : 'volunteer_time_out'
+        const response = await qrService.scanQR(
+          selectedEvent.value.id,
+          id,
+          scanType.value
         );
 
-        alert(`${scanType.value === 'time_in' ? 'Time In' : 'Time Out'} recorded: ${response.message}`);
-        studentID.value = '';
+        // Update notifications
+        await updateNotifications(
+          `${
+            scanType.value === "time_in" ? "Time In" : "Time Out"
+          } recorded for ${selectedEvent.value.event_title}`,
+          scanType.value === "time_in"
+            ? "volunteer_time_in"
+            : "volunteer_time_out"
+        );
+
+        alert(
+          `${scanType.value === "time_in" ? "Time In" : "Time Out"} recorded: ${
+            response.message
+          }`
+        );
+        studentID.value = "";
       } catch (error) {
-        console.error('Manual ID submission failed:', error);
-        alert(error.response?.data?.message || error.message || 'Failed to process ID');
+        console.error("Manual ID submission failed:", error);
+        alert(
+          error.response?.data?.message ||
+            error.message ||
+            "Failed to process ID"
+        );
       }
     };
 
@@ -491,10 +528,10 @@ export default {
       try {
         await authService.logout();
         showLogoutModal.value = false;
-        router.push('/LoginOrganizers');
+        router.push("/LoginOrganizers");
       } catch (error) {
-        console.error('Logout failed:', error);
-        alert('Failed to logout. Please try again.');
+        console.error("Logout failed:", error);
+        alert("Failed to logout. Please try again.");
       }
     };
 
@@ -505,8 +542,8 @@ export default {
         notifications.value.unshift({
           message,
           type,
-          time: 'Just now',
-          read: false
+          time: "Just now",
+          read: false,
         });
 
         // Keep only the latest 10 notifications
@@ -514,7 +551,7 @@ export default {
           notifications.value = notifications.value.slice(0, 10);
         }
       } catch (error) {
-        console.error('Failed to update notifications:', error);
+        console.error("Failed to update notifications:", error);
       }
     };
 
@@ -564,18 +601,51 @@ export default {
 }
 
 .event-select {
-  width: 90%;
+  width: 100%;
   padding: 10px;
   border-radius: 5px;
   border: 1px solid #12372a;
+  background-color: #435739;
   background-color: white;
   font-size: 14px;
+}
+
+.event-select-id {
+  width: 127%;
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #12372a;
+  background-color: #435739;
+  background-color: white;
+  font-size: 14px;
+  margin-bottom: 10px;
 }
 
 .scanner-container {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+.submit-btn {
+  height: 40px;
+  width: 127%;
+  border-radius: 5px;
+  border: 1px solid #12372a;
+  border-radius: 5px;
+  background: #f0f0f0;
+  background-color: #435739;
+  color: white;
+  font-weight: 550;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.submit-btn:hover {
+  background-color: #f2f4ec;
+  color: #435739;
+  border: 2px solid #435739;
+  font-weight: 550;
 }
 
 .no-event-selected {
@@ -612,7 +682,8 @@ export default {
 }
 
 .input-method-toggle {
-  margin-top: 10px;
+  margin-top: 5px;
+  margin-bottom: 5px;
   display: flex;
   gap: 10px;
   justify-content: center;
@@ -620,14 +691,20 @@ export default {
 
 .toggle-btn {
   padding: 8px 15px;
-  border: 1px solid #12372a;
+  background-color: #435739;
   border-radius: 5px;
   background: #f0f0f0;
   transition: background-color 0.3s;
+  cursor: pointer;
+  border-style: none;
+}
+.toggle-btn:hover {
+  background-color: #e0e0e0;
+  color: black;
 }
 
 .toggle-btn.active {
-  background: #12372a;
+  background-color: #435739;
   color: white;
 }
 

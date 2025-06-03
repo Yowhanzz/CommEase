@@ -1,9 +1,9 @@
 .sidebar {
   position: fixed;
-  width: 230px;
+  width: 230px !important;
   height: 100vh;
-  background: #436850;
-  color: #daf1de;
+  background: #435739;
+  color: #e8f4ea;
   transition: width 0.3s ease;
   left: 0;
   top: 0;
@@ -118,17 +118,18 @@ i {
   border-radius: 10px;
   text-align: center;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  width: 300px;
+  width: 350px;
   scale: 1.1;
 }
 
 .logout-modal h2 {
   margin-bottom: 10px;
-  color: #daf1de;
+  color: #f2f4ec;
 }
 
 .logout-modal p {
-  color: #daf1de;
+  color: #f2f4ec;
+  padding-bottom: 10px;
 }
 
 .logout-modal-buttons {
@@ -138,32 +139,34 @@ i {
 }
 
 .logout-btn {
-  background: #59692a;
-  color: white;
+  background: #435739;
+  color: #f2f4ec;
   padding: 8px 15px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-weight: 550;
   transition: 0.15s ease-in-out background-color, 0.15s ease-in-out color;
 }
 
 .cancel-btn {
-  background: #bdc3c7;
-  color: white;
+  background: #f2f4ec;
+  color: #435739;
   padding: 8px 15px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: 0.15s ease-in-out background-color;
+  font-weight: 550;
 }
 
 .logout-btn:hover {
-  background-color: #e9e5d6;
-  color: #464e2e;
+  background-color: #f2f4ec;
+  color: #435739;
 }
 
 .cancel-btn:hover {
-  background: #95a5a6;
+  background: #d8dada;
 }
 
 /* ACTIVITY LOG */
@@ -260,8 +263,8 @@ i {
   height: 40px;
   text-align: center;
   font-size: 14px;
-  background-color: #12372a;
-  margin-left: 87%;
+  background-color: #435739;
+  margin-left: 88%;
   margin-top: 40px;
   animation-name: slideinTopThTd;
   animation-duration: 1s;
@@ -272,9 +275,9 @@ i {
 
 .create-event-button:hover {
   opacity: 0.9;
-  background-color: #daf1de;
-  color: #464e2e;
-  border: 2px solid #12372a;
+  background-color: #f2f4ec;
+  color: #435739;
+  border: 2px solid #435739;
 }
 
 .create-event-button:active {
@@ -296,6 +299,7 @@ i {
   animation-timing-function: ease-in-out;
   animation-delay: 0s;
   animation-iteration-count: 1;
+  margin-top: 20px;
 }
 
 /* Adjusting table spacing */
@@ -303,20 +307,34 @@ i {
   width: 100%;
   /* max-width: 1200px; */
   border-collapse: collapse;
-  border-radius: 10px;
+  border-radius: 8px;
   overflow: hidden;
+  background-color: #f2f4ec;
+  box-shadow: 3px 0px 15px rgba(0, 0, 0, 0.2);
+}
+
+.users-table thead th {
+  background-color: #435739; /* or any color for header */
+  color: #daf1de;
+  font-size: 16px;
+  font-weight: 600;
+  padding: 20px;
 }
 
 .users-table th,
 .users-table td {
   padding: 15px;
   text-align: center;
-  border-bottom: 2px solid #464e2e;
   animation-name: slideinTopThTd;
   animation-duration: 1s;
   animation-timing-function: ease-in-out;
   animation-delay: 0s;
   animation-iteration-count: 1;
+  color: black;
+}
+
+.users-table tr:nth-child(odd) {
+  background-color: #d8d8d8; /* Replace with your desired color */
 }
 
 @keyframes slideinTopThTd {
@@ -341,7 +359,7 @@ i {
   text-decoration: none;
   padding: 15px 18px;
   border-radius: 5px;
-  background-color: #12372a;
+  background-color: #435739;
   color: #daf1de;
   font-weight: 550;
   cursor: pointer;
@@ -364,8 +382,8 @@ i {
 }
 
 .entries-edit:hover {
-  color: #464e2e;
-  background-color: #e7f0dc;
+  color: #435739;
+  background-color: #f2f4ec;
   border-color: #464e2e; /* Change border color only */
   box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.5);
 }

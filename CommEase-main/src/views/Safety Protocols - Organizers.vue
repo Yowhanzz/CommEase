@@ -1,6 +1,7 @@
 <template>
   <header>
-    <div class="sidebar" :class="{ open: isSidebarOpen }">
+    <!-- Sidebar -->
+    <div :class="['sidebar', { open: isSidebarOpen }]">
       <div class="top">
         <div class="logo">
           <i class="bx bxl-codeopen"></i>
@@ -11,19 +12,28 @@
 
       <ul>
         <li>
-          <router-link to="/dashboard_volunteers">
+          <router-link to="/DashboardOrganizers">
             <i class="bx bxs-dashboard"></i>
             <span class="nav-item" v-show="isSidebarOpen">Dashboard</span>
           </router-link>
         </li>
         <li>
-          <router-link to="/ActivityLogVolunteers">
-            <i class="bx bx-history"></i>
-            <span class="nav-item" v-show="isSidebarOpen">Event History</span>
+          <router-link to="/ManageEventsOrganizers">
+            <i class="bx bx-calendar-check"></i>
+            <span class="nav-item" v-show="isSidebarOpen">Manage Events</span>
           </router-link>
         </li>
         <li>
-          <router-link to="safety_protocol">
+          <router-link to="/ActivityLogOrganizers">
+            <i class="bx bx-file report"></i>
+            <span class="nav-item" v-show="isSidebarOpen"
+              >Attendance Report</span
+            >
+          </router-link>
+        </li>
+
+        <li>
+          <router-link to="SafetyProtocolsOrganizers">
             <i class="bx bxs-shield-plus"></i>
             <span class="nav-item" v-show="isSidebarOpen"
               >Safety & Protocols</span

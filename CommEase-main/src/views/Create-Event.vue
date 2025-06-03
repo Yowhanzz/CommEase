@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!-- Sidebar -->
     <div :class="['sidebar', { open: isSidebarOpen }]">
       <div class="top">
         <div class="logo">
@@ -24,10 +25,13 @@
         </li>
         <li>
           <router-link to="/ActivityLogOrganizers">
-            <i class="bx bx-history"></i>
-            <span class="nav-item" v-show="isSidebarOpen">Event History</span>
+            <i class="bx bx-file report"></i>
+            <span class="nav-item" v-show="isSidebarOpen"
+              >Attendance Report</span
+            >
           </router-link>
         </li>
+
         <li>
           <router-link to="SafetyProtocolsOrganizers">
             <i class="bx bxs-shield-plus"></i>
@@ -92,10 +96,10 @@
   </div>
 
   <!-- CREATE EVENT SECTION -->
-  <h1 class="title-safety" :class="{ 'sidebar-collapsed': !isOpen }">
-    Create Event
-  </h1>
-  <hr class="safety-hr" :class="{ 'sidebar-collapsed-for-divider': isOpen }" />
+  <div :class="{ 'sidebar-collapsed': !isOpen }">
+    <h1 class="title-safety">Create Event</h1>
+  </div>
+  <hr class="safety-hr" :class="{ 'sidebar-collapsed-for-divider': !isOpen }" />
 
   <div :class="{ 'sidebar-collapsed': !isOpen }">
     <div class="event-container">
@@ -140,6 +144,14 @@
             <input type="checkbox" value="BSEMC" v-model="programs" /> BSEMC
           </label>
         </div>
+
+        <h2 class="create-event-headers">Participants Needed:</h2>
+        <input class="create-event-input" type="number" />
+        <!-- v-model="participant limitation" -->
+
+        <h2 class="create-event-headers">Target Participants:</h2>
+        <input class="create-event-input" type="number" />
+        <!-- v-model="participant limitation" -->
 
         <h2 class="create-event-headers">Date</h2>
         <input class="create-event-input" v-model="date" type="date" />
@@ -402,18 +414,6 @@ const toggleNotifications = () => {
   showNotifications.value = !showNotifications.value;
 };
 
-const toggleSidebar = () => {
-  isSidebarOpen.value = !isSidebarOpen.value;
-  isOpen.value = !isOpen.value;
-};
-
-const handleResize = () => {
-  isMobile.value = window.innerWidth <= 928;
-  if (isMobile.value) {
-    isSidebarOpen.value = false;
-  }
-};
-
 onMounted(() => {
   window.addEventListener("resize", handleResize);
   handleResize();
@@ -425,39 +425,3 @@ onUnmounted(() => {
 </script>
 
 <style scoped src="/src/assets/CSS Organizers/create-event.css"></style>
-
-<style scoped>
-/* Add these styles */
-.thing-item {
-  margin: 5px;
-  display: inline-block;
-}
-
-.things-button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  background: white;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.things-button:hover {
-  background: #f8f8f8;
-}
-
-.thing-x {
-  color: #dc3545;
-  font-size: 14px;
-}
-
-.things-separation {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 15px;
-}
-</style>

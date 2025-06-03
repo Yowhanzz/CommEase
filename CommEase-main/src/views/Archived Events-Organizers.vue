@@ -26,13 +26,10 @@
           </li>
           <li>
             <router-link to="/ActivityLogOrganizers">
-              <i class="bx bx-file report"></i>
-              <span class="nav-item" v-show="isSidebarOpen"
-                >Attendance Report</span
-              >
+              <i class="bx bx-history"></i>
+              <span class="nav-item" v-show="isSidebarOpen">Event History</span>
             </router-link>
           </li>
-
           <li>
             <router-link to="SafetyProtocolsOrganizers">
               <i class="bx bxs-shield-plus"></i>
@@ -100,7 +97,7 @@
     <!-- ACTIVITY LOG HEADER -->
     <div class="header-container" :class="{ 'sidebar-collapsed': !isOpen }">
       <h1 class="lists-events" :class="{ 'header-closed': isOpen }">
-        ATENDANCE REPORT
+        EVENT HISTORY
       </h1>
       <input
         v-model="searchQuery"
@@ -117,8 +114,6 @@
         <thead>
           <tr>
             <th>No.</th>
-            <th>Name</th>
-            <th>Program</th>
             <th>Event Title</th>
             <th>Barangay</th>
             <th>Date</th>
@@ -129,8 +124,6 @@
         <tbody>
           <tr v-for="(event, index) in filteredEvents" :key="index">
             <td>{{ index + 1 }}</td>
-            <td>{{ event.name }}</td>
-            <td>{{ event.program }}</td>
             <td>{{ event.title }}</td>
             <td>{{ event.barangay }}</td>
             <td>{{ event.date }}</td>
@@ -174,8 +167,6 @@ export default {
     ]);
     const events = ref([
       {
-        name: "Johannes Rhandall De Jesus",
-        program: "BSIT",
         title: "Clean Up Drive",
         barangay: "East Bajac - Bajac",
         date: "08/06/2025",
@@ -184,43 +175,27 @@ export default {
         status: "Pending",
       },
       {
-        name: "Ridley Angeles",
-        program: "BSIT",
         title: "Tree Planting",
         barangay: "West Bajac - Bajac",
         date: "09/10/2025",
         time: "8:00 - 10:00",
-        organizer: "SPECS",
+        organizer: "GREEN INITIATIVE",
         status: "Pending",
       },
       {
-        name: "Nikolai Nepomuceno",
-        program: "BSEMC",
         title: "Feeding Program",
         barangay: "North Bajac - Bajac",
         date: "10/12/2025",
         time: "2:00 - 4:00",
-        organizer: "IMAGES",
+        organizer: "HELPING HANDS",
         status: "Pending",
       },
       {
-        name: "Marina Camaso",
-        program: "BSCS",
         title: "Blood Donation",
         barangay: "South Bajac - Bajac",
         date: "12/15/2025",
         time: "9:00 - 1:00",
-        organizer: "SPECS",
-        status: "Pending",
-      },
-      {
-        name: "Aaron Paul Sario",
-        program: "BSIT",
-        title: "Blood Donation",
-        barangay: "South Bajac - Bajac",
-        date: "12/15/2025",
-        time: "9:00 - 1:00",
-        organizer: "ELITES",
+        organizer: "HEALTH TEAM",
         status: "Pending",
       },
     ]);

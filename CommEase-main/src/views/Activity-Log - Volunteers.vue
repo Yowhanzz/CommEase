@@ -278,18 +278,15 @@ onUnmounted(() => {
 <style scoped>
 /* Add these styles to your existing CSS */
 .unregister-btn {
-  background-color: #dc3545;
+  background-color: #ae0707;
   color: white;
   border: none;
-  padding: 6px 12px;
+  padding: 12px 12px;
   border-radius: 4px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: 550;
   transition: background-color 0.2s;
-}
-
-.unregister-btn:hover {
-  background-color: #c82333;
 }
 
 .unregister-btn:disabled {

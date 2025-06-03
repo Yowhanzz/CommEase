@@ -100,6 +100,111 @@
     v-for="registration in registrationForm"
     :key="registration.id"
   >
+    <!-- SPECIFIC EVENT -->
+    <div
+      class="container-event-objectives"
+      :class="{ 'sidebar-collapsed-right-cont': !isOpen }"
+    >
+      <div v-if="loading" class="loading-message">Loading event details...</div>
+      <div v-else-if="error" class="error-message">
+        {{ error }}
+      </div>
+      <div v-else class="event-details">
+        <div class="event-info-container">
+          <div class="event-header">
+            <h2 class="title-event-objectives">{{ registration.title }}</h2>
+            <div class="event-meta">
+              <p class="p-date">
+                <span>Date Posted: </span
+                >{{ formatDate(registration.date_posted) }}
+              </p>
+              <p class="p-slots">
+                <span>Date: </span>{{ formatDate(registration.date) }}
+              </p>
+              <p class="p-slots">
+                <span>Time: </span>{{ formatTime(registration.start_time) }} -
+                {{ formatTime(registration.end_time) }}
+              </p>
+              <p class="p-location">
+                <span>Location: </span>Barangay {{ registration.location }}
+              </p>
+
+              <p class="p-location">
+                <span>Slots left: </span>Only 25 Volunteers left
+                <!-- registration.slots -->
+              </p>
+
+              <p class="p-programs">
+                <span>Programs: </span
+                >{{ (registration.programs || []).join(", ") }}
+              </p>
+              <p class="p-organizer">
+                <span>Organizer: </span>{{ registration.organizer?.first_name }}
+                {{ registration.organizer?.last_name }}
+              </p>
+            </div>
+          </div>
+
+          <div class="event-content">
+            <div class="content-section">
+              <h3 class="title-desc">Description</h3>
+              <hr class="hr-desc" />
+              <p class="p-desc">{{ registration.description }}</p>
+            </div>
+
+            <div class="content-section">
+              <h3 class="title-task">Objectives</h3>
+              <hr class="hr-task" />
+              <div class="task-separation">
+                <div class="task-bullet-points">
+                  <p class="p-per-task">• {{ registration.objectives }}</p>
+                </div>
+              </div>
+            </div>
+
+            <!--  <div class="content-section">
+              <h3 class="title-task">Things Needed</h3>
+              <hr class="hr-task" />
+              <div class="task-separation">
+                <div class="task-bullet-points">
+                  <p
+                    v-for="(item, index) in registration.things_needed"
+                    :key="index"
+                    class="p-per-task"
+                  >
+                    • {{ item }}
+                  </p>
+                </div>
+              </div>
+            </div> -->
+          </div>
+
+          <div class="event-footer">
+            <p class="task-note">
+              <i class="i-task-note">
+                <span class="span-take-note">Note: </span>
+                By clicking agree, you accept the invitation and be a part of
+                this community service.
+              </i>
+            </p>
+            <hr class="hr-note" />
+
+            <div class="button-specific-event">
+              <button
+                class="button-things-back"
+                :disabled="!agreed"
+                @click="resetRegistration"
+              >
+                Back
+              </button>
+              <button class="button-things-submit" @click="handleAgree">
+                Agree
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="left-cont" :class="{ 'sidebar-collapsed-left-cont': !isOpen }">
       <div
         class="container-things-needed"
@@ -162,110 +267,9 @@
           placeholder="Your message here..."
         >
         </textarea>
-        <button class="button-ideas-submit" @click="handleSubmit">
+        <!--       <button class="button-ideas-submit" @click="handleSubmit">
           Submit
-        </button>
-      </div>
-    </div>
-
-    <!-- SPECIFIC EVENT -->
-    <div
-      class="container-event-objectives"
-      :class="{ 'sidebar-collapsed-right-cont': !isOpen }"
-    >
-      <div v-if="loading" class="loading-message">Loading event details...</div>
-      <div v-else-if="error" class="error-message">
-        {{ error }}
-      </div>
-      <div v-else class="event-details">
-        <div class="event-info-container">
-          <div class="event-header">
-            <h2 class="title-event-objectives">{{ registration.title }}</h2>
-            <div class="event-meta">
-              <p class="p-date">
-                <span>Date Posted: </span
-                >{{ formatDate(registration.date_posted) }}
-              </p>
-              <p class="p-slots">
-                <span>Date: </span>{{ formatDate(registration.date) }}
-              </p>
-              <p class="p-slots">
-                <span>Time: </span>{{ formatTime(registration.start_time) }} -
-                {{ formatTime(registration.end_time) }}
-              </p>
-              <p class="p-location">
-                <span>Location: </span>Barangay {{ registration.location }}
-              </p>
-              <p class="p-programs">
-                <span>Programs: </span
-                >{{ (registration.programs || []).join(", ") }}
-              </p>
-              <p class="p-organizer">
-                <span>Organizer: </span
-                >{{ registration.organizer?.first_name }}
-                {{ registration.organizer?.last_name }}
-              </p>
-            </div>
-          </div>
-
-          <div class="event-content">
-            <div class="content-section">
-              <h3 class="title-desc">Description</h3>
-              <hr class="hr-desc" />
-              <p class="p-desc">{{ registration.description }}</p>
-            </div>
-
-            <div class="content-section">
-              <h3 class="title-task">Objectives</h3>
-              <hr class="hr-task" />
-              <div class="task-separation">
-                <div class="task-bullet-points">
-                  <p class="p-per-task">• {{ registration.objectives }}</p>
-                </div>
-              </div>
-            </div>
-
-            <div class="content-section">
-              <h3 class="title-task">Things Needed</h3>
-              <hr class="hr-task" />
-              <div class="task-separation">
-                <div class="task-bullet-points">
-                  <p
-                    v-for="(item, index) in registration.things_needed"
-                    :key="index"
-                    class="p-per-task"
-                  >
-                    • {{ item }}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="event-footer">
-            <p class="task-note">
-              <i class="i-task-note">
-                <span class="span-take-note">Note: </span>
-                By clicking agree, you accept the invitation and be a part of
-                this community service.
-              </i>
-            </p>
-            <hr class="hr-note" />
-
-            <div class="button-specific-event">
-              <button
-                class="button-things-back"
-                :disabled="!agreed"
-                @click="resetRegistration"
-              >
-                Back
-              </button>
-              <button class="button-things-submit" @click="handleAgree">
-                Agree
-              </button>
-            </div>
-          </div>
-        </div>
+        </button> -->
       </div>
     </div>
   </div>

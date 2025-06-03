@@ -4,33 +4,37 @@
     <!-- Labels section below the pie chart -->
     <div class="labels-container">
       <div class="label-item">
-        <span class="label-color" style="background-color: #DAF1DE;"></span> Attended
+        <span class="label-color" style="background-color: #435739"></span>
+        Attended
       </div>
       <div class="label-item">
-        <span class="label-color" style="background-color: #235347;"></span> Did Not Attend
+        <span class="label-color" style="background-color: #6b7c61"></span> Did
+        Not Attend
       </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import Chart from 'chart.js/auto';
+import { ref, onMounted } from "vue";
+import Chart from "chart.js/auto";
 
 const pieChartRef = ref(null);
 
 onMounted(() => {
   new Chart(pieChartRef.value, {
-    type: 'pie',
+    type: "pie",
     data: {
-      datasets: [{
-        data: [50, 10],
-        backgroundColor: ['#235347', '#DAF1DE']
-      }]
+      datasets: [
+        {
+          data: [20, 40],
+          backgroundColor: ["#435739", "#6B7C61"],
+        },
+      ],
     },
     options: {
       responsive: false, // Disable responsive to keep fixed size
-    }
+    },
   });
 });
 </script>
@@ -38,32 +42,31 @@ onMounted(() => {
 <style scoped>
 .pie-chart-container {
   display: flex;
-  flex-direction: column;  /* Align content vertically */
-  justify-content: center;  /* Center content */
-  align-items: center;      /* Center content */
+  flex-direction: column; /* Align content vertically */
+  justify-content: center; /* Center content */
+  align-items: center; /* Center content */
   width: 100%;
 }
 
 .pie-chart {
-  width: 200px;             /* Fixed size for the pie chart */
+  width: 200px; /* Fixed size for the pie chart */
   height: 200px;
 }
 
 .labels-container {
   display: flex;
-  justify-content: space-around;  /* Space between labels */
-  align-items: center;            /* Center labels vertically */
+  justify-content: space-around; /* Space between labels */
+  align-items: center; /* Center labels vertically */
   width: 100%;
-  margin-top: 20px;               /* Space between chart and labels */
+  margin-top: 20px; /* Space between chart and labels */
 }
 
 .label-item {
   display: flex;
   align-items: center;
   margin-top: 5%;
-  color: #DAF1DE; /* ← ito ang nadagdag */
+  color: black; /* ← ito ang nadagdag */
 }
-
 
 .label-color {
   width: 20px;

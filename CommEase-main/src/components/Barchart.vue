@@ -5,25 +5,33 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
-import Chart from 'chart.js/auto';
+import { ref, onMounted } from "vue";
+import Chart from "chart.js/auto";
 
 const barChartRef = ref(null);
 
 onMounted(() => {
   new Chart(barChartRef.value, {
-    type: 'bar',
+    type: "bar",
     data: {
       labels: [
-        'Volunteer A', 'Volunteer B', 'Volunteer C',
-        'Volunteer A', 'Volunteer B', 'Volunteer C',
-        'Volunteer A', 'Volunteer B', 'Volunteer C'
+        "Volunteer A",
+        "Volunteer B",
+        "Volunteer C",
+        "Volunteer A",
+        "Volunteer B",
+        "Volunteer C",
+        "Volunteer A",
+        "Volunteer B",
+        "Volunteer C",
       ],
-      datasets: [{
-        label: 'Hours Volunteered',
-        data: [2, 3.5, 1.75, 2, 3.5, 1.75, 2, 3.5, 1.75],
-        backgroundColor: '#ADBC9F'
-      }]
+      datasets: [
+        {
+          label: "Hours Volunteered",
+          data: [2, 3.5, 1.75, 2, 3.5, 1.75, 2, 3.5, 1.75],
+          backgroundColor: "#435739",
+        },
+      ],
     },
     options: {
       responsive: true,
@@ -34,16 +42,16 @@ onMounted(() => {
       scales: {
         x: {
           ticks: {
-            color: 'white'  // X-axis label color
-          }
+            color: "black", // X-axis label color
+          },
         },
         y: {
           ticks: {
-            color: 'white'  // Y-axis label color
-          }
-        }
-      }
-    }
+            color: "black", // Y-axis label color
+          },
+        },
+      },
+    },
   });
 });
 </script>

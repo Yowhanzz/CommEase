@@ -1,9 +1,9 @@
 .sidebar {
   position: fixed;
-  width: 230px;
+  width: 230px !important;
   height: 100vh;
-  background: #436850;
-  color: #daf1de;
+  background: #435739;
+  color: #e8f4ea;
   transition: width 0.3s ease;
   left: 0;
   top: 0;
@@ -118,17 +118,18 @@ i {
   border-radius: 10px;
   text-align: center;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  width: 300px;
+  width: 350px;
   scale: 1.1;
 }
 
 .logout-modal h2 {
   margin-bottom: 10px;
-  color: #e9e5d6;
+  color: #f2f4ec;
 }
 
 .logout-modal p {
-  color: #e9e5d6;
+  color: #f2f4ec;
+  padding-bottom: 10px;
 }
 
 .logout-modal-buttons {
@@ -138,32 +139,34 @@ i {
 }
 
 .logout-btn {
-  background: #59692a;
-  color: white;
+  background: #435739;
+  color: #f2f4ec;
   padding: 8px 15px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-weight: 550;
   transition: 0.15s ease-in-out background-color, 0.15s ease-in-out color;
 }
 
 .cancel-btn {
-  background: #bdc3c7;
-  color: white;
+  background: #f2f4ec;
+  color: #435739;
   padding: 8px 15px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: 0.15s ease-in-out background-color;
+  font-weight: 550;
 }
 
 .logout-btn:hover {
-  background-color: #e9e5d6;
-  color: #464e2e;
+  background-color: #f2f4ec;
+  color: #435739;
 }
 
 .cancel-btn:hover {
-  background: #95a5a6;
+  background: #d8dada;
 }
 
 /* ACTIVITY LOG */
@@ -181,7 +184,7 @@ i {
 }
 
 .lists-events {
-  color: #436850;
+  color: #435739;
   /* margin-left: 15%; */
   /* padding-left: 250px; */
   padding-left: 14px;
@@ -274,20 +277,31 @@ i {
   width: 100%;
   /* max-width: 1200px; */
   border-collapse: collapse;
-  border-radius: 10px;
+  border-radius: 8px;
   overflow: hidden;
+  background-color: #f2f4ec;
+  box-shadow: 3px 0px 15px rgba(0, 0, 0, 0.2);
+}
+
+.users-table thead th {
+  background-color: #435739; /* or any color for header */
+  color: #daf1de;
 }
 
 .users-table th,
 .users-table td {
   padding: 15px;
   text-align: center;
-  border-bottom: 2px solid #464e2e;
   animation-name: slideinTopThTd;
   animation-duration: 1s;
   animation-timing-function: ease-in-out;
   animation-delay: 0s;
   animation-iteration-count: 1;
+  color: black;
+}
+
+.users-table tr:nth-child(odd) {
+  background-color: #d8d8d8; /* Replace with your desired color */
 }
 
 @keyframes slideinTopThTd {
@@ -418,7 +432,7 @@ i {
 
   .users-table {
     width: 100%; /* Ensure the table fills the container */
-    border-collapse: collapse; /* Ensures borders are collapsed into single lines */
+    border-collapse: collapse;
   }
 
   .users-table thead {
@@ -428,7 +442,6 @@ i {
   }
 
   .users-table tr {
-    display: block;
     margin-bottom: 2rem;
     border: 1px solid #ddd;
   }
