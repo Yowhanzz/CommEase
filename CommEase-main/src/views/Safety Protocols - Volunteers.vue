@@ -89,7 +89,7 @@
   <!-- SAFETY PROTOCOLS SECTIONS -->
 
   <div class="safety-prot-upper" :class="{ 'title-closed': !isOpen }">
-    <h1 class="title-safety">Safety Protcols & Guides</h1>
+    <h1 class="title-safety">SAFETY PROTOCOLS & GUIDES</h1>
     <hr
       class="safety-hr"
       :class="{ 'sidebar-collapsed-for-divider': isOpen }"

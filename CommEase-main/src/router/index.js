@@ -20,6 +20,7 @@ import CreateGmailVolunteers from "@/views/Create-Gmail-Volunteers.vue";
 import FOTPVolunteers from "@/views/OTP - Volunteers-FPassword.vue";
 import FPasswordVolunteers from "@/views/Password - Volunteers - FPassword.vue";
 import ManageEventsOrganizers from "@/views/Manage-Events - Organizers.vue";
+import ArchivedEventsOrganizers from "@/views/Archived Events-Organizers.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -138,6 +139,12 @@ const router = createRouter({
       path: "/ActivityLogOrganizers",
       name: "ActivityLogOrganizers",
       component: ActivityLogOrganizers,
+    },
+
+    {
+      path: "/ArchivedEventsOrganizers",
+      name: "ArchivedEventsOrganizers",
+      component: ArchivedEventsOrganizers,
     },
 
     {

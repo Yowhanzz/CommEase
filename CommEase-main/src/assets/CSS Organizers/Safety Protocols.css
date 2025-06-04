@@ -46,8 +46,9 @@ body {
 }
 .nav-item {
   margin-left: 20px;
-  font-size: 14px;
+  font-size: 13px;
   transition: opacity 0.3s ease;
+  font-weight: 500;
 }
 ul {
   list-style: none;

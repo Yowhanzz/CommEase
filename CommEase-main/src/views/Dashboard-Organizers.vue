@@ -24,6 +24,12 @@
           </router-link>
         </li>
         <li>
+          <router-link to="/ArchivedEventsOrganizers">
+            <i class="bx bx-archive"></i>
+            <span class="nav-item" v-show="isSidebarOpen">Archived Events</span>
+          </router-link>
+        </li>
+        <li>
           <router-link to="/ActivityLogOrganizers">
             <i class="bx bx-file report"></i>
             <span class="nav-item" v-show="isSidebarOpen"
@@ -243,7 +249,10 @@
   <div class="container-events test" :class="{ 'sidebar-collapsed': !isOpen }">
     <div>
       <h1 class="lists-events">CREATED EVENTS</h1>
-      <hr class="hr-lists-events" />
+      <hr
+        class="hr-lists-events"
+        :class="{ 'sidebar-collapsed-for-divider': isOpen }"
+      />
     </div>
 
     <div class="dropdown-separation">

@@ -25,11 +25,22 @@
             </router-link>
           </li>
           <li>
-            <router-link to="/ActivityLogOrganizers">
-              <i class="bx bx-history"></i>
-              <span class="nav-item" v-show="isSidebarOpen">Event History</span>
+            <router-link to="/ArchivedEventsOrganizers">
+              <i class="bx bx-archive"></i>
+              <span class="nav-item" v-show="isSidebarOpen"
+                >Archived Events</span
+              >
             </router-link>
           </li>
+          <li>
+            <router-link to="/ActivityLogOrganizers">
+              <i class="bx bx-file report"></i>
+              <span class="nav-item" v-show="isSidebarOpen"
+                >Attendance Report</span
+              >
+            </router-link>
+          </li>
+
           <li>
             <router-link to="SafetyProtocolsOrganizers">
               <i class="bx bxs-shield-plus"></i>
@@ -97,7 +108,7 @@
     <!-- ACTIVITY LOG HEADER -->
     <div class="header-container" :class="{ 'sidebar-collapsed': !isOpen }">
       <h1 class="lists-events" :class="{ 'header-closed': isOpen }">
-        EVENT HISTORY
+        ARCHIVED EVENTS
       </h1>
       <input
         v-model="searchQuery"
@@ -107,34 +118,60 @@
       />
     </div>
     <hr class="hr-input" :class="{ 'sidebar-collapsed-for-divider': isOpen }" />
-
-    <!-- EVENTS TABLE -->
-    <div class="container-table" :class="{ 'sidebar-collapsed': !isOpen }">
-      <table class="users-table">
-        <thead>
-          <tr>
-            <th>No.</th>
-            <th>Event Title</th>
-            <th>Barangay</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Organizer</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(event, index) in filteredEvents" :key="index">
-            <td>{{ index + 1 }}</td>
-            <td>{{ event.title }}</td>
-            <td>{{ event.barangay }}</td>
-            <td>{{ event.date }}</td>
-            <td>{{ event.time }}</td>
-            <td>{{ event.organizer }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
   </div>
 
+  <!-- ARCHIVED EVENTS SECTION -->
+
+  <div class="test">
+    <div class="dropdown-filter" :class="{ 'sidebar-collapsed': !isOpen }">
+      <select v-model="selectedProgram" class="program-filter-dropdown">
+        <option value="">All Programs:</option>
+        <option value="BSIT">BSIT</option>
+        <option value="BSCS">BSCS</option>
+        <option value="BSEMC">BSEMC</option>
+      </select>
+    </div>
+
+    <div class="archived-whole" :class="{ 'sidebar-collapsed': !isOpen }">
+      <div class="archived-events-separation">
+        <div
+          class="archived-container"
+          v-for="(event, index) in filteredEvents"
+          :key="index"
+        >
+          <div class="archived-contents-separation">
+            <div class="green-vertical"></div>
+
+            <div class="archived-contents">
+              <h3 class="archived-event-title">{{ event.title }}</h3>
+
+              <p class="archived-event-barangay">
+                <span><b>Barangay:</b></span> {{ event.barangay }}
+              </p>
+              <p class="archived-event-organizer">
+                <span><b>Organizer:</b></span> {{ event.organizer }}
+              </p>
+              <p class="archived-event-date">
+                <span><b>Date:</b></span> {{ event.date }}
+              </p>
+              <p class="archived-event-time">
+                <span><b>Time:</b></span> {{ event.time }}
+              </p>
+              <span class="archived-event-programs"
+                ><span><b>Programs:</b></span> {{ event.programs }}</span
+              >
+            </div>
+          </div>
+
+          <i
+            class="bx bx-trash"
+            id="delete-button"
+            @click="deleteEvent(index)"
+          ></i>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="overlay" v-if="!isMobile && isSidebarOpen"></div>
 </template>
 
@@ -146,6 +183,7 @@ import { authService } from "@/api/services";
 export default {
   setup() {
     const router = useRouter();
+    const selectedProgram = ref("");
     const showNotifications = ref(false);
     const showLogoutModal = ref(false);
     const isOpen = ref(false);
@@ -172,6 +210,7 @@ export default {
         date: "08/06/2025",
         time: "10:00 - 12:00",
         organizer: "ELITES",
+        programs: "BSIT, BSCS",
         status: "Pending",
       },
       {
@@ -180,6 +219,7 @@ export default {
         date: "09/10/2025",
         time: "8:00 - 10:00",
         organizer: "GREEN INITIATIVE",
+        programs: "BSIT",
         status: "Pending",
       },
       {
@@ -188,6 +228,7 @@ export default {
         date: "10/12/2025",
         time: "2:00 - 4:00",
         organizer: "HELPING HANDS",
+        programs: "BSIT, BSCS",
         status: "Pending",
       },
       {
@@ -196,6 +237,7 @@ export default {
         date: "12/15/2025",
         time: "9:00 - 1:00",
         organizer: "HEALTH TEAM",
+        programs: "BSIT, BSEMC",
         status: "Pending",
       },
     ]);
@@ -210,6 +252,8 @@ export default {
           event.time.toLowerCase().includes(query) ||
           event.organizer.toLowerCase().includes(query)
       );
+
+      /* MAY PROGRAM FILTER */
     });
 
     const toggleNotifications = () => {
@@ -219,6 +263,15 @@ export default {
     const toggleSidebar = () => {
       isSidebarOpen.value = !isSidebarOpen.value;
       isOpen.value = !isOpen.value; // optional if you're toggling extra state
+    };
+
+    /* DELETE ARCHIVED EVENT */
+    const deleteEvent = (index) => {
+      const confirmed = confirm("Do you want to remove this in your archived?");
+      if (confirmed) {
+        alert("Removed Successfully!");
+        events.value.splice(index, 1);
+      }
     };
 
     const confirmLogout = async () => {
@@ -235,6 +288,7 @@ export default {
     return {
       showNotifications,
       showLogoutModal,
+      selectedProgram,
       isOpen,
       isSidebarOpen,
       searchQuery,
@@ -243,10 +297,11 @@ export default {
       filteredEvents,
       toggleNotifications,
       toggleSidebar,
+      deleteEvent, //delete archived event
       confirmLogout,
     };
   },
 };
 </script>
 
-<style scoped src="/src/assets/CSS Organizers/ActivityLog.css"></style>
+<style scoped src="/src/assets/CSS Organizers/archived.css"></style>

@@ -24,6 +24,12 @@
           </router-link>
         </li>
         <li>
+          <router-link to="/ArchivedEventsOrganizers">
+            <i class="bx bx-archive"></i>
+            <span class="nav-item" v-show="isSidebarOpen">Archived Events</span>
+          </router-link>
+        </li>
+        <li>
           <router-link to="/ActivityLogOrganizers">
             <i class="bx bx-file report"></i>
             <span class="nav-item" v-show="isSidebarOpen"
@@ -99,7 +105,7 @@
   <!-- SAFETY PROTOCOLS SECTIONS -->
 
   <div class="safety-prot-upper" :class="{ 'title-closed': !isOpen }">
-    <h1 class="title-safety">Safety Protcols & Guides</h1>
+    <h1 class="title-safety">SAFETY PROTOCOLS & GUIDES</h1>
     <hr
       class="safety-hr"
       :class="{ 'sidebar-collapsed-for-divider': isOpen }"
@@ -415,4 +421,4 @@ export default {
 };
 </script>
 
-<style scoped src="/src/assets/CSS Volunteers/Safety Protocols.css"></style>
+<style scoped src="/src/assets/CSS Organizers/Safety Protocols.css"></style>
