@@ -273,7 +273,10 @@
       </select>
     </div>
 
-    <div class="events-grid">
+    <div
+      class="events-grid"
+      :class="{ 'test-grid': filteredEvents.length === 1 }"
+    >
       <div
         v-for="(event, index) in filteredEvents"
         :key="index"

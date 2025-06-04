@@ -135,6 +135,88 @@
               >
                 Unregister
               </button>
+              <button
+                v-if="event.status === 'completed'"
+                class="evaluation-btn"
+                @click="openEvaluationModal(event)"
+              >
+                Evaluate
+              </button>
+
+              <!-- Modal for evaluation -->
+              <!-- Modal for evaluation -->
+              <div v-if="showModal" class="modal-overlay">
+                <div class="modal-content">
+                  <h2>Event Evaluation Form</h2>
+
+                  <form @submit.prevent="submitEvaluation">
+                    <!-- Scrollable Questions + File Upload -->
+                    <div class="questions-container">
+                      <!-- Questions with Star Ratings -->
+                      <div
+                        v-for="(question, index) in questions"
+                        :key="index"
+                        class="form-group"
+                      >
+                        <label class="question">{{ question }}</label>
+                        <div class="star-rating">
+                          <span
+                            v-for="star in 5"
+                            :key="star"
+                            class="star"
+                            :class="{ filled: star <= ratings[index] }"
+                            @click="ratings[index] = star"
+                          >
+                            ★
+                          </span>
+                        </div>
+                      </div>
+
+                      <!-- File Upload -->
+                      <div class="form-group">
+                        <label class="question"
+                          >Upload Your Reflection Paper Here:</label
+                        >
+                        <div class="file-upload-wrapper">
+                          <input
+                            type="file"
+                            id="file-upload"
+                            class="file-input"
+                            @change="handleFileUpload"
+                            accept=".pdf,.doc,.docx"
+                            required
+                          />
+                          <label for="file-upload" class="upload-label">
+                            <span>Choose File</span>
+                          </label>
+                          <p v-if="reflectionFileName" class="file-name">
+                            File Name: {{ reflectionFileName }}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="form-actions">
+                      <button
+                        type="button"
+                        @click="showModal = false"
+                        class="cancel-btn"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        class="submit-btn"
+                        @click="submitEvaluation"
+                      >
+                        <!-- CLICK NITO -->
+                        Submit
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
             </td>
           </tr>
         </tbody>
@@ -156,7 +238,6 @@ import {
 } from "../api/services";
 import axios from "axios";
 
-// Configure axios default base URL (this might be better configured globally elsewhere)
 axios.defaults.baseURL = "http://localhost:8000";
 
 const router = useRouter();
@@ -189,35 +270,27 @@ const filteredEvents = computed(() => {
     return [];
   }
   const query = searchQuery.value.toLowerCase();
-  // Using the data structure returned by getEventHistory
   return events.value.filter(
     (event) =>
       event.title?.toLowerCase().includes(query) ||
-      event.barangay?.toLowerCase().includes(query) || // Assuming barangay is still in the history data or you adjust the backend map
+      event.barangay?.toLowerCase().includes(query) ||
       event.organizer?.toLowerCase().includes(query) ||
       formatDate(event.date)?.toLowerCase().includes(query)
-    // Add time filtering if needed, but it might be complex with ranges
   );
 });
 
 async function fetchEventHistory() {
   try {
     console.log("Fetching event history...");
-    // Use getEventHistory which is designed for volunteer's events
     const response = await eventService.getEventHistory();
     console.log("API Response for Event History:", response);
-
-    // The backend getEventHistory returns a direct array of event data in response.data
     const eventsData = response.data;
-
-    // The data structure from getEventHistory is already mapped in the backend
     events.value = Array.isArray(eventsData) ? eventsData : [];
     console.log("Processed event history:", events.value);
   } catch (error) {
     console.error("Failed to fetch event history:", error);
-    console.error("Error details:", error.response?.data || error.message);
-    events.value = []; // Ensure events is an array even on error
     alert("Failed to load event history. Please try again.");
+    events.value = [];
   }
 }
 
@@ -228,7 +301,7 @@ async function unregisterFromEvent(eventId) {
 
   try {
     await eventService.unregister(eventId);
-    await fetchEventHistory(); // Refresh the list
+    await fetchEventHistory();
     alert("Successfully unregistered from the event");
   } catch (error) {
     console.error("Failed to unregister:", error);
@@ -263,6 +336,64 @@ async function confirmLogout() {
   }
 }
 
+// --- Modal Evaluation Form state & functions ---
+
+const showModal = ref(false);
+
+const questions = [
+  "1. How would you rate the overall quality of the community service provided?",
+  "2. How satisfied are you with the responsiveness and helpfulness of the service providers?",
+  "3. How effective was the community service in addressing the needs of the community?",
+  "4. How would you rate the organization and coordination of the community service activities?",
+  "5. How likely are you to recommend this community service to others?",
+];
+const ratings = ref(Array(questions.length).fill(0));
+
+const reflectionFile = ref(null);
+const reflectionFileName = ref("");
+
+// Open modal
+function openEvaluationModal(event) {
+  showModal.value = true;
+  ratings.value = Array(questions.length).fill(0);
+  reflectionFile.value = null;
+  reflectionFileName.value = "";
+}
+
+// Handle file upload
+const handleFileUpload = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    reflectionFile.value = file;
+    reflectionFileName.value = file.name;
+  } else {
+    reflectionFile.value = null;
+    reflectionFileName.value = "";
+  }
+};
+
+// Submit with validation
+const submitEvaluation = () => {
+  const incompleteRatings = ratings.value.some((rating) => rating === 0);
+  const noFileUploaded = !reflectionFile.value;
+
+  if (incompleteRatings || noFileUploaded) {
+    alert("Please complete the evaluation form needed.");
+    return;
+  }
+
+  // ✅ If complete, proceed
+  alert("Evaluated Successfully!");
+  console.log("Ratings:", ratings.value);
+  console.log("Reflection File:", reflectionFile.value);
+
+  // Reset after submission
+  showModal.value = false;
+  ratings.value = Array(questions.length).fill(0);
+  reflectionFile.value = null;
+  reflectionFileName.value = "";
+};
+
 onMounted(() => {
   fetchEventHistory();
   window.addEventListener("resize", handleResize);
@@ -275,22 +406,3 @@ onUnmounted(() => {
 </script>
 
 <style scoped src="/src/assets/CSS Volunteers/Activitylog.css"></style>
-<style scoped>
-/* Add these styles to your existing CSS */
-.unregister-btn {
-  background-color: #ae0707;
-  color: white;
-  border: none;
-  padding: 12px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 13px;
-  font-weight: 550;
-  transition: background-color 0.2s;
-}
-
-.unregister-btn:disabled {
-  background-color: #6c757d;
-  cursor: not-allowed;
-}
-</style>

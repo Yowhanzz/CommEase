@@ -45,7 +45,7 @@ body {
     radial-gradient(var(--r) at left var(--_g)),
     radial-gradient(var(--r) at right var(--_g));
   clip-path: polygon(50% 0, 100% 100%, 0 100%);
-  background: #436850;
+  background: #4e653d;
   margin-left: -23%;
   margin-top: -3%;
   transform: rotate(-15deg);
@@ -85,7 +85,7 @@ body {
     radial-gradient(var(--r) at left var(--_g)),
     radial-gradient(var(--r) at right var(--_g));
   clip-path: polygon(50% 0, 100% 100%, 0 100%);
-  background: #12372a;
+  background: #354c2b;
   margin-left: -25%;
   margin-top: -16%;
   transform: rotate(-15deg);
@@ -132,7 +132,7 @@ img {
   margin-top: -31%;
   width: 630px;
   height: 470px;
-  background-color: #daf1de;
+  background-color: #f2f4ec;
   background: linear-gradient(
     135deg,
     rgba(255, 255, 255, 0.1),
@@ -140,9 +140,9 @@ img {
   );
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  border-radius: 50px;
+  border-radius: 15px;
   padding: 3% 3%;
-  box-shadow: 0px 3px 20px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
   animation-name: slideinTopLogin;
   animation-duration: 1s;
   animation-timing-function: ease-in-out;
@@ -176,7 +176,7 @@ img {
 
 .signup-title {
   font-size: 28px;
-  color: #12372a;
+  color: #354c2b;
   font-weight: 700;
   animation-name: slideinTopTitle;
   animation-duration: 1s;
@@ -199,7 +199,7 @@ img {
   font-size: 14px;
   margin-top: 10px;
   text-align: center;
-  color: #12372a;
+  color: #354c2b;
   animation-name: slideinTopTitle;
   animation-duration: 1s;
   animation-timing-function: ease-in-out;
@@ -224,7 +224,7 @@ img {
 
 .title {
   font-size: 15px;
-  color: #12372a;
+  color: #354c2b;
   font-weight: 550;
   animation-name: slideinTopP;
   animation-duration: 1s;
@@ -246,12 +246,15 @@ img {
 .singup-input {
   width: 90%;
   height: 33px;
-  border-radius: 8px;
+  border-radius: 5px;
   border-style: none;
   padding-left: 10px;
+  border: 1px solid black;
   transition: 0.15s ease-in-out box-shadow;
-  background-color: #adbc9f;
-  opacity: 0.4;
+  background-color: #d9dfcc;
+  opacity: 0.6;
+  color: #000000; /* ✅ PURE BLACK TEXT */
+
   animation-name: slideinTopInput;
   animation-duration: 1s;
   animation-timing-function: ease-in-out;
@@ -271,8 +274,9 @@ img {
 
 .singup-input:focus {
   outline: none;
-  border: 2px solid #12372a;
-  box-shadow: 0px 3px 20px rgba(0, 0, 0, 0.5);
+  border-color: #000000; /* ✅ PURE BLACK BORDER FOCUS */
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+  color: #000000; /* ✅ PURE BLACK TEXT ON FOCUS */
 }
 
 .singup-input:hover {
@@ -296,8 +300,8 @@ a {
   justify-content: center;
   width: 90px;
   height: 50px;
-  color: #daf1de;
-  background-color: #12372a;
+  color: #f2f4ec;
+  background-color: #435739;
   border-radius: 5px;
   font-size: 14px;
   padding-top: 15px;
@@ -332,8 +336,10 @@ a {
 .footer router-link {
   font-size: 15px;
   border: none;
-  background: #464e2e;
+  background: #435739;
+}
 
+.next {
   cursor: pointer;
 }
 
@@ -345,9 +351,9 @@ a {
 
 .prev:hover,
 .next:hover {
-  background-color: #daf1de;
-  border: 1px solid #12372a;
-  color: #12372a;
+  background-color: #f2f4ec;
+  border: 1px solid #435739;
+  color: #435739;
 }
 
 .prev:active,

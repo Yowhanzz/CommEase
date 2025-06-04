@@ -23,7 +23,7 @@
           </router-link>
         </li>
         <li>
-          <router-link to="safety_protocol">
+          <router-link to="/safety_protocol">
             <i class="bx bxs-shield-plus"></i>
             <span class="nav-item" v-show="isSidebarOpen"
               >Safety & Protocols</span

@@ -43,7 +43,7 @@ body {
     radial-gradient(var(--r) at left var(--_g)),
     radial-gradient(var(--r) at right var(--_g));
   clip-path: polygon(50% 0, 100% 100%, 0 100%);
-  background: #436850;
+  background: #4e653d;
   margin-left: -62%;
   margin-top: -23%;
   transform: rotate(-15deg);
@@ -83,7 +83,7 @@ body {
     radial-gradient(var(--r) at left var(--_g)),
     radial-gradient(var(--r) at right var(--_g));
   clip-path: polygon(50% 0, 100% 100%, 0 100%);
-  background: #12372a;
+  background: #354c2b;
   margin-left: -64%;
   margin-top: -40%;
   transform: rotate(-15deg);
@@ -130,14 +130,14 @@ img {
 /* LOGIN PART */
 
 .login-container {
-  background-color: #daf1de;
+  background-color: #f2f4ec;
   width: 632px;
   height: 580px;
   margin-right: 4%;
   margin-top: 10%;
   text-align: center;
   padding: 50px 30px;
-  border-radius: 70px;
+  border-radius: 15px;
   background: linear-gradient(
     135deg,
     rgba(255, 255, 255, 0.1),
@@ -146,7 +146,7 @@ img {
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.18);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
   scale: 0.9;
   animation-name: slideinTopLogin;
   animation-duration: 1s;
@@ -168,7 +168,7 @@ img {
 .title {
   margin-bottom: 10%;
   font-size: 30px;
-  color: #12372a;
+  color: #354c2b;
   font-weight: bold;
   animation-name: slideinTopTitle;
   animation-duration: 1s;
@@ -220,11 +220,11 @@ img {
 
 .input-container input {
   width: 80%;
-  background-color: #adbc9f;
+  background-color: #d9dfcc;
   opacity: 0.6;
   height: 60px;
-  border: 1px solid #ccc;
-  border-radius: 60px;
+  border: 1px solid black;
+  border-radius: 12px;
   padding-left: 65px;
   color: #000000; /* ✅ PURE BLACK TEXT */
   font-weight: bold;
@@ -240,7 +240,7 @@ input::placeholder {
 input:focus {
   outline: none;
   border-color: #000000; /* ✅ PURE BLACK BORDER FOCUS */
-  box-shadow: 0px 3px 15px rgba(0, 0, 0, 0.8);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
   color: #000000; /* ✅ PURE BLACK TEXT ON FOCUS */
 }
 
@@ -251,7 +251,7 @@ input:focus {
   border: none;
   font-size: 16px;
   font-weight: bold;
-  border-radius: 60px;
+  border-radius: 12px;
   cursor: pointer;
   transition: 0.3s;
   height: 69px;
@@ -260,8 +260,8 @@ input:focus {
 }
 
 .login-btn {
-  background: #12372a;
-  color: white;
+  background: #435739;
+  color: #f2f4ec;
   margin-top: 5%;
   margin-bottom: 20px;
   padding-left: 14px;
@@ -283,9 +283,8 @@ input:focus {
 }
 
 .signup-btn {
-  background: transparent;
-  border: 2px solid #3c3f32;
-  color: #3c3f32;
+  background: #435739;
+  color: #f2f4ec;
   padding-left: 34%;
   animation-name: slideinTopSignup;
   animation-duration: 1s;
@@ -305,14 +304,15 @@ input:focus {
 }
 
 .login-btn:hover {
-  background: #daf1de;
-  color: #12372a;
-  border: 2px solid #12372a;
+  background: #f2f4ec;
+  color: #435739;
+  border: 2px solid #435739;
 }
 
 .signup-btn:hover {
-  background: #12372a;
-  color: #daf1de;
+  background: #f2f4ec;
+  color: #435739;
+  border: 2px solid #435739;
 }
 
 .action-button {

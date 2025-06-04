@@ -21,6 +21,7 @@ import FOTPVolunteers from "@/views/OTP - Volunteers-FPassword.vue";
 import FPasswordVolunteers from "@/views/Password - Volunteers - FPassword.vue";
 import ManageEventsOrganizers from "@/views/Manage-Events - Organizers.vue";
 import ArchivedEventsOrganizers from "@/views/Archived Events-Organizers.vue";
+import PostEval from "@/views/Post-eval.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -163,6 +164,12 @@ const router = createRouter({
       path: "/ManageEventsOrganizers",
       name: "ManageEventsOrganizers",
       component: ManageEventsOrganizers,
+    },
+
+    {
+      path: "/PostEval",
+      name: "PostEval",
+      component: PostEval,
     },
   ],
 });

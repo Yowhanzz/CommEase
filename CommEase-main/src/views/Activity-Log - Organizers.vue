@@ -182,7 +182,7 @@ export default {
     ]);
     const events = ref([
       {
-        name: "Johannes Rhandall De Jesus",
+        name: "Johannes De Jesus",
         program: "BSIT",
         title: "Clean Up Drive",
         barangay: "East Bajac - Bajac",
@@ -235,14 +235,19 @@ export default {
 
     const filteredEvents = computed(() => {
       const query = searchQuery.value.toLowerCase();
-      return events.value.filter(
-        (event) =>
+      return events.value.filter((event, index) => {
+        const indexStr = String(index + 1); // Convert index to string for comparison
+        return (
+          indexStr.includes(query) ||
+          event.name.toLowerCase().includes(query) ||
+          event.program.toLowerCase().includes(query) ||
           event.title.toLowerCase().includes(query) ||
           event.barangay.toLowerCase().includes(query) ||
           event.date.toLowerCase().includes(query) ||
           event.time.toLowerCase().includes(query) ||
           event.organizer.toLowerCase().includes(query)
-      );
+        );
+      });
     });
 
     const toggleNotifications = () => {

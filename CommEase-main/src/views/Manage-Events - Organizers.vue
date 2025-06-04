@@ -405,7 +405,9 @@ onUnmounted(() => {
 }
 
 .start-btn:hover {
-  background-color: #799351;
+  background: transparent;
+  color: #81a263;
+  border: 2px solid #81a263;
 }
 
 .end-btn {
@@ -414,7 +416,9 @@ onUnmounted(() => {
 }
 
 .end-btn:hover {
-  background-color: #9a1724;
+  background: transparent;
+  color: #ae0707;
+  border: 2px solid #ae0707;
 }
 
 .event-status {

@@ -315,6 +315,218 @@ i {
     transform: rotateY(0);
   }
 }
+/* Add these styles to your existing CSS */
+.unregister-btn {
+  background-color: #ae0707;
+  color: white;
+  border: none;
+  padding: 12px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 550;
+  transition: background-color 0.2s;
+}
+
+.unregister-btn:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+.questions-container {
+  max-height: 450px; /* adjust this based on your screen/modal height */
+  overflow-y: auto;
+  padding-right: 10px; /* prevent scrollbar overlap */
+  margin-bottom: 20px;
+
+  /* Scrollbar styling */
+  scrollbar-width: thin; /* For Firefox */
+  scrollbar-color: #888 transparent; /* For Firefox */
+}
+
+/* Webkit-based browsers (Chrome, Safari, Edge) */
+.questions-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.questions-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.questions-container::-webkit-scrollbar-thumb {
+  background-color: #888;
+  border-radius: 4px;
+  border: 2px solid transparent; /* Adds padding around thumb */
+  background-clip: content-box;
+}
+
+.questions-container::-webkit-scrollbar-thumb:hover {
+  background-color: #555;
+}
+
+.evaluation-btn {
+  background-color: #435739;
+  color: #f2f4ec;
+  border: none;
+  width: 90px;
+  height: 40px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 550;
+  transition: background-color 0.2s;
+}
+
+.evaluation-btn:hover {
+  background-color: #f2f4ec;
+  color: #435739;
+  border: 1px solid #435739;
+}
+
+/* Modal Design */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  display: grid;
+  place-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #f2f4ec;
+  padding: 32px;
+  border-radius: 16px;
+  width: 90%;
+  max-width: 580px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+h2 {
+  margin-bottom: 24px;
+  font-size: 24px;
+  text-align: center;
+  color: #435739;
+}
+
+/* Question Block */
+.form-group {
+  margin-bottom: 28px;
+}
+.question {
+  font-weight: 600;
+  display: block;
+  margin-bottom: 12px;
+  color: #435739;
+  text-align: left;
+}
+
+/* 🌟 Star Rating */
+.star-rating {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  font-size: 28px;
+  cursor: pointer;
+}
+.star {
+  color: #bfc0bf;
+  transition: color 0.2s;
+}
+.star.filled {
+  color: #ffc107;
+}
+
+/* 📂 File Upload */
+.file-upload-wrapper {
+  position: relative;
+  right: 180px;
+}
+.file-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 130px;
+  height: 40px;
+  opacity: 0;
+  z-index: 2;
+  cursor: pointer;
+}
+
+.upload-label {
+  background: #435739;
+  width: 130px;
+  height: 40px;
+  padding-top: 10px;
+  border-radius: 5px;
+  font-weight: 500;
+  color: #f2f4ec;
+  font-size: 14px;
+  font-weight: 550;
+  display: inline-block;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.upload-label:hover {
+  background-color: #f2f4ec;
+  color: #435739;
+  border: 1px solid #435739;
+}
+
+.file-name {
+  margin-top: 10px;
+  font-size: 14px;
+  color: #555;
+  margin-left: 160px;
+  font-style: italic;
+}
+
+/* Buttons */
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 30px;
+}
+.cancel-btn,
+.submit-btn {
+  width: 100px;
+  height: 40px;
+  font-size: 15px;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 600;
+}
+.cancel-btn {
+  background-color: #e0e0e0;
+  color: #333;
+}
+.cancel-btn:hover {
+  background-color: #c8c8c8;
+}
+.submit-btn {
+  background-color: #435739;
+  color: #f2f4ec;
+}
+.submit-btn:hover {
+  background-color: #f2f4ec;
+  color: #435739;
+  border: 1px solid #435739;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
 
 /* NOTIFICATION PANEL */
 .notification-panel {
@@ -424,6 +636,18 @@ i {
 /* RESPONSIVE PART */
 
 @media (max-width: 980px) {
+  .modal-content {
+    scale: 0.85;
+  }
+
+  .file-upload-wrapper {
+    position: relative;
+    padding-left: 37%;
+  }
+
+  .upload-label {
+    padding-left: 10px;
+  }
   .container-table {
     width: 100%;
     display: block;
@@ -526,6 +750,20 @@ i {
 
   .overlay {
     display: block;
+  }
+
+  .modal-content {
+    scale: 0.75;
+    margin-left: 50px;
+  }
+
+  .file-upload-wrapper {
+    position: relative;
+    padding-left: 53%;
+  }
+
+  .upload-label {
+    padding-left: 10px;
   }
 }
 

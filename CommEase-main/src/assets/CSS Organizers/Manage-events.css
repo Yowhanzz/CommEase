@@ -284,41 +284,58 @@ i {
   opacity: 0.7;
 }
 
-/* Centering the table */
+/* Container for spacing */
 .container-table {
-  display: flex;
-  /* justify-content: center; */
-  /* align-items: center; */
-  /* margin-left: 14%; */
   width: 100%;
-  margin-top: 10px;
-  padding-left: 250px; /* Adjusted padding to center the table */
+  margin-top: 20px;
+  padding-left: 250px;
   padding-right: 50px;
   animation-name: slideinTopThTd;
   animation-duration: 1s;
   animation-timing-function: ease-in-out;
   animation-delay: 0s;
   animation-iteration-count: 1;
-  margin-top: 20px;
+  margin-bottom: 40px;
 }
 
-/* Adjusting table spacing */
+/* Table wrapper to enable internal scroll */
 .users-table {
-  width: 100%;
-  /* max-width: 1200px; */
   border-collapse: collapse;
   border-radius: 8px;
-  overflow: hidden;
   background-color: #f2f4ec;
   box-shadow: 3px 0px 15px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  display: block;
+}
+
+/* Fixed header */
+.users-table thead {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
 }
 
 .users-table thead th {
-  background-color: #435739; /* or any color for header */
+  background-color: #435739;
   color: #daf1de;
   font-size: 16px;
   font-weight: 600;
   padding: 20px;
+}
+
+/* Scrollable body */
+.users-table tbody {
+  display: block;
+  max-height: 500px; /* adjust height as needed */
+  overflow-y: auto;
+  width: 100%;
+}
+
+/* Keep row structure */
+.users-table tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
 }
 
 .users-table th,
@@ -333,8 +350,27 @@ i {
   color: black;
 }
 
-.users-table tr:nth-child(odd) {
-  background-color: #d8d8d8; /* Replace with your desired color */
+.users-table thead th:first-child {
+  border-top-left-radius: 8px;
+}
+
+.users-table thead th:last-child {
+  border-top-right-radius: 8px;
+}
+
+/* Alternate row coloring */
+.users-table tbody tr:nth-child(odd) {
+  background-color: #d8d8d8;
+}
+
+/* Scrollbar styling (optional) */
+.users-table tbody::-webkit-scrollbar {
+  width: 8px;
+}
+
+.users-table tbody::-webkit-scrollbar-thumb {
+  background-color: #999;
+  border-radius: 4px;
 }
 
 @keyframes slideinTopThTd {

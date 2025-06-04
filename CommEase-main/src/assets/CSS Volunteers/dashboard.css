@@ -353,6 +353,12 @@ img {
   animation-iteration-count: 1;
 }
 
+.test-grid {
+  /* ADDED */
+  display: grid;
+  max-width: 33%;
+}
+
 .hr-lists-events {
   background-color: #0b2b26;
   position: absolute;
@@ -746,6 +752,12 @@ img {
     grid-template-rows: 1fr 1fr;
   }
 
+  .test-grid {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 20px;
+  }
   .search-options-container {
     /* REVISED */
     align-items: center;

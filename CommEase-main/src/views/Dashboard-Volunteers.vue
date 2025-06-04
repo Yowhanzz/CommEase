@@ -129,22 +129,11 @@
   </div>
 
   <!-- NOTIFICATION PANEL -->
-  <div class="notification-panel" :class="{ open: showNotifications }">
-    <div class="notification-header">
-      <h3>Notifications</h3>
-      <span class="close-btn" @click="toggleNotifications">&times;</span>
-    </div>
-    <div class="notification-list">
-      <div
-        class="notification-item"
-        v-for="(notif, index) in notifications"
-        :key="index"
-      >
-        <h4>{{ notif.message }}</h4>
-        <p class="time">{{ notif.time }}</p>
-      </div>
-    </div>
-  </div>
+  <notifications
+    :showNotifications="showNotifications"
+    @toggleNotifications="toggleNotifications"
+    :notifications="notifications"
+  />
 
   <!-- USER INFO -->
   <div class="container" :class="{ 'sidebar-collapsed': !isOpen }">
@@ -202,7 +191,11 @@
       <option value="Completed">Completed</option>
     </select>
 
-    <div class="events-grid">
+    <div
+      class="events-grid"
+      :class="{ 'test-grid': filteredEvents.length === 1 }"
+    >
+      <!-- ADDED -->
       <div v-if="loading" class="loading-message">Loading events...</div>
       <div v-else-if="error" class="error-message">
         {{ error }}
@@ -259,6 +252,8 @@ import { QrcodeStream } from "vue-qrcode-reader";
 import VueCal from "vue-cal";
 import VueQrcode from "@chenfengyuan/vue-qrcode";
 import "vue-cal/dist/vuecal.css";
+import Notifications from "@/components/notifications.vue";
+
 import {
   authService,
   eventService,

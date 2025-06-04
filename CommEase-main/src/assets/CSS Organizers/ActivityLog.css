@@ -255,53 +255,77 @@ i {
   }
 }
 
-/* Centering the table */
+/* CONTAINER TABLE */
 .container-table {
   display: flex;
-  /* justify-content: center; */
-  /* align-items: center; */
-  /* margin-left: 14%; */
   width: 100%;
   margin-top: 50px;
-  padding-left: 250px; /* Adjusted padding to center the table */
+  padding-left: 250px;
   padding-right: 50px;
-  animation-name: slideinTopThTd;
-  animation-duration: 1s;
-  animation-timing-function: ease-in-out;
-  animation-delay: 0s;
-  animation-iteration-count: 1;
+  animation: slideinTopThTd 1s ease-in-out;
+  margin-bottom: 40px;
+
+  /* Remove scrollbar here so container itself won't scroll */
+  /* overflow-y: auto;  <-- REMOVE or COMMENT OUT */
+  max-height: unset; /* unset this so container grows normally */
 }
 
-/* Adjusting table spacing */
+/* Table stays styled the same */
 .users-table {
   width: 100%;
-  /* max-width: 1200px; */
   border-collapse: collapse;
   border-radius: 8px;
-  overflow: hidden;
   background-color: #f2f4ec;
   box-shadow: 3px 0px 15px rgba(0, 0, 0, 0.2);
+  text-align: center;
 }
 
+/* Sticky header for usability */
 .users-table thead th {
-  background-color: #435739; /* or any color for header */
+  background-color: #435739;
   color: #daf1de;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  text-align: center;
 }
 
 .users-table th,
 .users-table td {
   padding: 15px;
   text-align: center;
-  animation-name: slideinTopThTd;
-  animation-duration: 1s;
-  animation-timing-function: ease-in-out;
-  animation-delay: 0s;
-  animation-iteration-count: 1;
+  animation: slideinTopThTd 1s ease-in-out;
   color: black;
 }
 
+/* Scrollable tbody with fixed height and vertical scrollbar inside the table */
+.users-table tbody {
+  display: block;
+  max-height: 600px; /* adjust scroll height */
+  overflow-y: auto;
+  width: 100%;
+}
+
+/* To keep columns aligned */
+.users-table thead,
+.users-table tbody tr {
+  display: table;
+  width: 100%;
+  text-align: center;
+  table-layout: fixed;
+}
+
+/* border radius on header corners */
+.users-table thead th:first-child {
+  border-top-left-radius: 8px;
+}
+
+.users-table thead th:last-child {
+  border-top-right-radius: 8px;
+}
+
 .users-table tr:nth-child(odd) {
-  background-color: #d8d8d8; /* Replace with your desired color */
+  background-color: #d8d8d8;
 }
 
 @keyframes slideinTopThTd {
@@ -309,10 +333,9 @@ i {
     opacity: 0.2;
     transform: translateY(60px);
   }
-
   to {
     opacity: 1;
-    transform: rotateY(0);
+    transform: translateY(0);
   }
 }
 
