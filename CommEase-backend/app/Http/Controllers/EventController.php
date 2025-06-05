@@ -3,11 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\PostEvaluation;
 use App\Models\Notification;
 use App\Models\User;
+use App\Services\CloudinaryService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Log;
+
 use Illuminate\Validation\Rule;
 use App\Http\Controllers\Controller;
 
@@ -22,6 +24,12 @@ class EventController extends Controller
     {
         $user = $request->user();
         $query = Event::query();
+
+        // Exclude completed events by default (they go to archive)
+        // Unless specifically requesting completed events via status filter
+        if (!$request->has('status') || $request->status !== 'completed') {
+            $query->where('status', '!=', 'completed');
+        }
 
         // Search by title or description
         if ($request->has('search')) {
@@ -66,13 +74,18 @@ class EventController extends Controller
             ->orderBy('date')
             ->paginate($request->get('per_page', 10));
 
-        // Append formatted time attributes to each event
+        // Append formatted time attributes and participant progress to each event
         $events->getCollection()->transform(function ($event) {
             $event->append([
                 'start_time_formatted',
                 'end_time_formatted',
                 'started_at_formatted',
-                'ended_at_formatted'
+                'ended_at_formatted',
+                'registered_count',
+                'participant_progress',
+                'available_slots',
+                'is_full',
+                'target_reached'
             ]);
             return $event;
         });
@@ -100,6 +113,8 @@ class EventController extends Controller
             'description' => ['required', 'string'],
             'thingsNeeded' => ['required', 'array'],
             'thingsNeeded.*' => ['required', 'string'],
+            'participantLimit' => ['required', 'integer', 'min:1', 'max:1000'],
+            'targetParticipants' => ['required', 'integer', 'min:1', 'lte:participantLimit'],
         ]);
 
         if ($validator->fails()) {
@@ -126,6 +141,8 @@ class EventController extends Controller
                 'objective' => $request->objective,
                 'description' => $request->description,
                 'things_needed' => $request->thingsNeeded,
+                'participant_limit' => $request->participantLimit,
+                'target_participants' => $request->targetParticipants,
             ]);
 
             \Log::info('Event Created Successfully:', [
@@ -164,7 +181,12 @@ class EventController extends Controller
             'start_time_formatted',
             'end_time_formatted',
             'started_at_formatted',
-            'ended_at_formatted'
+            'ended_at_formatted',
+            'registered_count',
+            'participant_progress',
+            'available_slots',
+            'is_full',
+            'target_reached'
         ]);
         return response()->json($event);
     }
@@ -191,10 +213,33 @@ class EventController extends Controller
             'description' => ['sometimes', 'required', 'string'],
             'thingsNeeded' => ['sometimes', 'required', 'array'],
             'thingsNeeded.*' => ['required', 'string'],
+            'participantLimit' => ['sometimes', 'required', 'integer', 'min:1', 'max:1000'],
+            'targetParticipants' => ['sometimes', 'required', 'integer', 'min:1'],
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Additional validation for participant limits
+        if ($request->has('participantLimit') && $request->has('targetParticipants')) {
+            if ($request->targetParticipants > $request->participantLimit) {
+                return response()->json([
+                    'errors' => ['targetParticipants' => ['Target participants cannot exceed participant limit']]
+                ], 422);
+            }
+        } elseif ($request->has('targetParticipants')) {
+            if ($request->targetParticipants > $event->participant_limit) {
+                return response()->json([
+                    'errors' => ['targetParticipants' => ['Target participants cannot exceed current participant limit']]
+                ], 422);
+            }
+        } elseif ($request->has('participantLimit')) {
+            if ($request->participantLimit < $event->target_participants) {
+                return response()->json([
+                    'errors' => ['participantLimit' => ['Participant limit cannot be less than current target participants']]
+                ], 422);
+            }
         }
 
         // Format the date and times
@@ -212,6 +257,8 @@ class EventController extends Controller
             'objective' => $request->objective ?? $event->objective,
             'description' => $request->description ?? $event->description,
             'things_needed' => $request->thingsNeeded ?? $event->things_needed,
+            'participant_limit' => $request->participantLimit ?? $event->participant_limit,
+            'target_participants' => $request->targetParticipants ?? $event->target_participants,
         ]);
 
         // Notify registered volunteers
@@ -254,8 +301,8 @@ class EventController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        if ($event->status !== 'upcoming') {
-            return response()->json(['message' => 'Event can only be started when in upcoming status'], 422);
+        if (!in_array($event->status, ['pending', 'upcoming'])) {
+            return response()->json(['message' => 'Event can only be started when in pending or upcoming status'], 422);
         }
 
         $event->update([
@@ -343,7 +390,7 @@ class EventController extends Controller
         }
 
         $attendance = $event->volunteers()
-            ->select('users.id', 'users.full_name', 'users.email', 'event_volunteer.attendance_status', 'event_volunteer.attendance_notes', 'event_volunteer.attendance_marked_at')
+            ->select('users.id', 'users.full_name', 'users.email', 'event_volunteers.attendance_status', 'event_volunteers.attendance_notes', 'event_volunteers.attendance_marked_at')
             ->get();
 
         return response()->json($attendance);
@@ -376,7 +423,7 @@ class EventController extends Controller
 
     public function submitFeedback(Request $request, Event $event)
     {
-        if (!$event->volunteers()->where('volunteer_id', $request->user()->id)->exists()) {
+        if (!$event->volunteers()->where('user_id', $request->user()->id)->exists()) {
             return response()->json(['message' => 'You must be a registered volunteer to submit feedback'], 403);
         }
 
@@ -482,7 +529,7 @@ class EventController extends Controller
         $user = $request->user();
 
         // Check if user is registered for the event
-        if (!$event->volunteers()->where('volunteer_id', $user->id)->exists()) {
+        if (!$event->volunteers()->where('user_id', $user->id)->exists()) {
             return response()->json(['message' => 'You must be registered for this event'], 403);
         }
 
@@ -516,7 +563,7 @@ class EventController extends Controller
         $user = $request->user();
 
         // Check if user is registered for the event
-        if (!$event->volunteers()->where('volunteer_id', $user->id)->exists()) {
+        if (!$event->volunteers()->where('user_id', $user->id)->exists()) {
             return response()->json(['message' => 'You must be registered for this event'], 403);
         }
 
@@ -532,9 +579,7 @@ class EventController extends Controller
         // Create suggestion
         $suggestion = $event->suggestions()->create([
             'volunteer_id' => $user->id,
-            'suggestion' => $request->suggestion,
-            'category' => $request->category,
-            'status' => 'pending'
+            'suggestion' => $request->suggestion
         ]);
 
         // Notify organizer
@@ -546,5 +591,203 @@ class EventController extends Controller
         ]);
 
         return response()->json($suggestion, 201);
+    }
+
+    /**
+     * Get archived (completed) events for organizers
+     */
+    public function getArchivedEvents(Request $request)
+    {
+        \Log::info('=== ARCHIVED EVENTS DEBUG ===');
+        \Log::info('Session ID:', [session()->getId()]);
+        \Log::info('Auth check:', [\Auth::check()]);
+        \Log::info('Request user:', [$request->user()]);
+
+        if ($request->user()) {
+            \Log::info('User details:', [
+                'id' => $request->user()->id,
+                'email' => $request->user()->email,
+                'role' => $request->user()->role,
+                'role_type' => gettype($request->user()->role),
+                'attributes' => $request->user()->getAttributes()
+            ]);
+        } else {
+            \Log::error('NO USER FOUND IN REQUEST');
+        }
+
+        // Simple query - just get all completed events
+        $events = Event::where('status', 'completed')
+            ->with(['organizer', 'volunteers'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        \Log::info('Found completed events:', [
+            'count' => $events->count(),
+        ]);
+
+        return response()->json([
+            'message' => 'Success - bypassed role check',
+            'user_role' => $request->user() ? $request->user()->role : 'no user',
+            'data' => $events
+        ]);
+    }
+
+    /**
+     * Submit post-evaluation for a completed event (volunteers only)
+     */
+    public function submitPostEvaluation(Request $request, Event $event)
+    {
+        $user = $request->user();
+
+        // Check if user is a volunteer
+        if ($user->role !== 'volunteer') {
+            return response()->json(['message' => 'Only volunteers can submit post-evaluations'], 403);
+        }
+
+        // Check if user participated in the event
+        if (!$event->volunteers()->where('user_id', $user->id)->exists()) {
+            return response()->json(['message' => 'You must have participated in this event to submit an evaluation'], 403);
+        }
+
+        // Check if event is completed
+        if ($event->status !== 'completed') {
+            return response()->json(['message' => 'Post-evaluation can only be submitted for completed events'], 422);
+        }
+
+        // Check if evaluation already exists
+        if ($event->postEvaluations()->where('volunteer_id', $user->id)->exists()) {
+            return response()->json(['message' => 'You have already submitted an evaluation for this event'], 422);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'quality_rating' => ['required', 'integer', 'min:1', 'max:5'],
+            'responsiveness_rating' => ['required', 'integer', 'min:1', 'max:5'],
+            'effectiveness_rating' => ['required', 'integer', 'min:1', 'max:5'],
+            'organization_rating' => ['required', 'integer', 'min:1', 'max:5'],
+            'recommendation_rating' => ['required', 'integer', 'min:1', 'max:5'],
+            'reflection_paper' => ['nullable', 'file', 'max:10240', 'mimes:pdf,doc,docx,txt']
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Handle reflection paper upload if provided
+        $reflectionData = [];
+        if ($request->hasFile('reflection_paper')) {
+            $cloudinaryService = app(CloudinaryService::class);
+            $file = $request->file('reflection_paper');
+
+            // Validate file
+            $validation = $cloudinaryService->validateFile($file);
+            if (!$validation['valid']) {
+                return response()->json([
+                    'message' => 'Reflection paper validation failed',
+                    'errors' => $validation['errors']
+                ], 422);
+            }
+
+            // Upload to Cloudinary
+            $uploadResult = $cloudinaryService->uploadReflectionPaper($file, $event->id, $user->id);
+            if (!$uploadResult['success']) {
+                return response()->json([
+                    'message' => 'Failed to upload reflection paper',
+                    'error' => $uploadResult['error']
+                ], 500);
+            }
+
+            $reflectionData = [
+                'reflection_paper_url' => $uploadResult['url'],
+                'reflection_paper_public_id' => $uploadResult['public_id'],
+                'reflection_paper_filename' => $uploadResult['original_filename']
+            ];
+        }
+
+        $evaluation = $event->postEvaluations()->create(array_merge([
+            'volunteer_id' => $user->id,
+            'quality_rating' => $request->quality_rating,
+            'responsiveness_rating' => $request->responsiveness_rating,
+            'effectiveness_rating' => $request->effectiveness_rating,
+            'organization_rating' => $request->organization_rating,
+            'recommendation_rating' => $request->recommendation_rating
+        ], $reflectionData));
+
+        // Notify organizer
+        Notification::create([
+            'user_id' => $event->organizer_id,
+            'event_id' => $event->id,
+            'type' => 'new_post_evaluation',
+            'message' => "New post-evaluation received from {$user->full_name} for event: {$event->event_title}",
+        ]);
+
+        return response()->json([
+            'message' => 'Post-evaluation submitted successfully',
+            'evaluation' => $evaluation,
+            'average_rating' => $evaluation->average_rating
+        ], 201);
+    }
+
+    /**
+     * Get post-evaluations for an event (organizers only)
+     */
+    public function getPostEvaluations(Request $request, Event $event)
+    {
+        $user = $request->user();
+
+        // Check if user is the organizer
+        if ($user->role !== 'organizer' || $event->organizer_id !== $user->id) {
+            return response()->json(['message' => 'Only the event organizer can view post-evaluations'], 403);
+        }
+
+        $evaluations = $event->postEvaluations()
+            ->with('volunteer:id,first_name,last_name,email')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        if ($evaluations->isEmpty()) {
+            return response()->json([
+                'evaluations' => [],
+                'stats' => null,
+                'questions' => PostEvaluation::getQuestions()
+            ]);
+        }
+
+        // Calculate statistics
+        $stats = [
+            'total_evaluations' => $evaluations->count(),
+            'average_ratings' => [
+                'quality' => round($evaluations->avg('quality_rating'), 2),
+                'responsiveness' => round($evaluations->avg('responsiveness_rating'), 2),
+                'effectiveness' => round($evaluations->avg('effectiveness_rating'), 2),
+                'organization' => round($evaluations->avg('organization_rating'), 2),
+                'recommendation' => round($evaluations->avg('recommendation_rating'), 2),
+                'overall' => round($evaluations->avg(function($eval) {
+                    return $eval->average_rating;
+                }), 2)
+            ],
+            'rating_distribution' => [
+                'quality' => $evaluations->groupBy('quality_rating')->map(fn($group) => $group->count())->toArray(),
+                'responsiveness' => $evaluations->groupBy('responsiveness_rating')->map(fn($group) => $group->count())->toArray(),
+                'effectiveness' => $evaluations->groupBy('effectiveness_rating')->map(fn($group) => $group->count())->toArray(),
+                'organization' => $evaluations->groupBy('organization_rating')->map(fn($group) => $group->count())->toArray(),
+                'recommendation' => $evaluations->groupBy('recommendation_rating')->map(fn($group) => $group->count())->toArray()
+            ]
+        ];
+
+        return response()->json([
+            'evaluations' => $evaluations,
+            'stats' => $stats,
+            'questions' => PostEvaluation::getQuestions()
+        ]);
+    }
+
+    /**
+     * Get evaluation questions (public endpoint)
+     */
+    public function getEvaluationQuestions()
+    {
+        return response()->json([
+            'questions' => PostEvaluation::getQuestions()
+        ]);
     }
 }

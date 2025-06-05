@@ -162,13 +162,30 @@
         </label>
       </div>
 
-      <h2 class="create-event-headers">Participants Needed:</h2>
-      <input class="create-event-input" type="number" />
-      <!-- v-model="participant limitation" -->
+      <h2 class="create-event-headers">Participants Needed (Limit):</h2>
+      <input
+        class="create-event-input"
+        type="number"
+        v-model.number="participantLimit"
+        min="1"
+        max="1000"
+        placeholder="Maximum number of volunteers"
+      />
 
       <h2 class="create-event-headers">Target Participants:</h2>
-      <input class="create-event-input" type="number" />
-      <!-- v-model="participant limitation" -->
+      <input
+        class="create-event-input"
+        type="number"
+        v-model.number="targetParticipants"
+        min="1"
+        :max="participantLimit || 1000"
+        placeholder="Ideal number of volunteers"
+      />
+
+      <!-- Validation message for participant fields -->
+      <div v-if="participantValidationError" class="validation-error">
+        {{ participantValidationError }}
+      </div>
 
       <h2 class="create-event-headers">Date</h2>
       <input class="create-event-input" v-model="date" type="date" />
@@ -258,6 +275,8 @@ const date = ref("");
 const startTime = ref("");
 const endTime = ref("");
 const programs = ref([]);
+const participantLimit = ref(null);
+const targetParticipants = ref(null);
 const organizer = ref("");
 const status = ref("");
 const objective = ref("");
@@ -266,6 +285,7 @@ const thingsNeeded = ref([]);
 const newThing = ref("");
 const loading = ref(false);
 const error = ref(null);
+const participantValidationError = ref("");
 
 // Notifications
 const notifications = ref([
@@ -320,6 +340,8 @@ onMounted(async () => {
     description.value = event.description;
     thingsNeeded.value = event.things_needed || [];
     programs.value = event.programs || [];
+    participantLimit.value = event.participant_limit || null;
+    targetParticipants.value = event.target_participants || null;
   } catch (err) {
     error.value =
       err.response?.data?.message || err.message || "Failed to load event";
@@ -356,6 +378,28 @@ const removeThing = (index) => {
   thingsNeeded.value.splice(index, 1);
 };
 
+// === Participant Validation ===
+const validateParticipants = () => {
+  participantValidationError.value = "";
+
+  if (!participantLimit.value || !targetParticipants.value) {
+    participantValidationError.value = "Both participant limit and target participants are required";
+    return false;
+  }
+
+  if (participantLimit.value < 1 || targetParticipants.value < 1) {
+    participantValidationError.value = "Participant numbers must be at least 1";
+    return false;
+  }
+
+  if (targetParticipants.value > participantLimit.value) {
+    participantValidationError.value = "Target participants cannot exceed participant limit";
+    return false;
+  }
+
+  return true;
+};
+
 const cancelEdit = () => {
   router.push("/ManageEventsOrganizers");
 };
@@ -386,6 +430,13 @@ const saveChanges = async () => {
       throw new Error("Please select at least one program");
     }
     console.log("Programs selected.");
+
+    // Validate participant fields
+    console.log("Validating participants...");
+    if (!validateParticipants()) {
+      throw new Error(participantValidationError.value);
+    }
+    console.log("Participants valid.");
 
     // Validate date is after today
     console.log("Validating date...");
@@ -437,6 +488,8 @@ const saveChanges = async () => {
       description: description.value,
       programs: programs.value,
       things_needed: thingsNeeded.value,
+      participantLimit: participantLimit.value,
+      targetParticipants: targetParticipants.value,
       status: status.value,
     };
 

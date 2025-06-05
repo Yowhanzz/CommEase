@@ -8,7 +8,7 @@ return new class extends Migration
 {
     public function up()
     {
-        Schema::table('event_volunteer', function (Blueprint $table) {
+        Schema::table('event_volunteers', function (Blueprint $table) {
             $table->string('attendance_status')->nullable();
             $table->text('attendance_notes')->nullable();
             $table->timestamp('attendance_marked_at')->nullable();
@@ -17,7 +17,7 @@ return new class extends Migration
 
     public function down()
     {
-        Schema::table('event_volunteer', function (Blueprint $table) {
+        Schema::table('event_volunteers', function (Blueprint $table) {
             $table->dropColumn(['attendance_status', 'attendance_notes', 'attendance_marked_at']);
         });
     }

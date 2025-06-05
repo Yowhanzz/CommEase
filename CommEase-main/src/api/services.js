@@ -82,6 +82,16 @@ export const authService = {
             console.error('Logout failed:', error);
             throw error;
         }
+    },
+
+    async getUser() {
+        try {
+            const response = await api.get('/user/profile');
+            return response.data;
+        } catch (error) {
+            console.error('Failed to get user:', error);
+            throw error;
+        }
     }
 };
 
@@ -284,6 +294,26 @@ export const eventService = {
             return response;
         } catch (error) {
             console.error('Failed to unregister from event:', error);
+            throw error;
+        }
+    },
+
+    async getArchivedEvents(params = {}) {
+        try {
+            // Simple request for archived events - no extra parameters needed
+            // Backend already filters for completed events and organizer-specific events
+            const response = await api.get('/events/archived');
+
+            // Handle both possible response structures
+            const eventsData = response.data.data || response.data;
+            return {
+                ...response,
+                data: Array.isArray(eventsData) ? eventsData : []
+            };
+        } catch (error) {
+            console.error('Failed to fetch archived events:', error);
+            console.error('Error response:', error.response?.data);
+            console.error('Error status:', error.response?.status);
             throw error;
         }
     }

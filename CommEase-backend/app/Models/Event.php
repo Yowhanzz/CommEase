@@ -24,6 +24,8 @@ class Event extends Model
         'objective',
         'description',
         'things_needed',
+        'participant_limit',
+        'target_participants',
         'status',
         'started_at',
         'ended_at'
@@ -49,14 +51,19 @@ class Event extends Model
      */
     public function volunteers()
     {
-        return $this->belongsToMany(User::class, 'event_volunteers')
-            ->withPivot(['things_brought', 'time_in', 'time_out'])
+        return $this->belongsToMany(User::class, 'event_volunteers', 'event_id', 'user_id')
+            ->withPivot(['things_brought', 'time_in', 'time_out', 'attendance_status', 'attendance_notes', 'attendance_marked_at'])
             ->withTimestamps();
     }
 
     public function feedbacks(): HasMany
     {
         return $this->hasMany(EventFeedback::class);
+    }
+
+    public function postEvaluations(): HasMany
+    {
+        return $this->hasMany(PostEvaluation::class);
     }
 
     public function suggestions(): HasMany
@@ -107,6 +114,40 @@ class Event extends Model
 
         $averageMinutes = $totalMinutes / $volunteers->count();
         return round($averageMinutes) . ' minutes';
+    }
+
+    // Participant management methods
+    public function getAvailableSlotsAttribute(): int
+    {
+        return $this->participant_limit - $this->registered_count;
+    }
+
+    public function getIsFullAttribute(): bool
+    {
+        return $this->registered_count >= $this->participant_limit;
+    }
+
+    public function getTargetReachedAttribute(): bool
+    {
+        return $this->registered_count >= $this->target_participants;
+    }
+
+    public function getParticipantProgressAttribute(): array
+    {
+        return [
+            'registered' => $this->registered_count,
+            'target' => $this->target_participants,
+            'limit' => $this->participant_limit,
+            'available_slots' => $this->available_slots,
+            'target_reached' => $this->target_reached,
+            'is_full' => $this->is_full,
+            'progress_percentage' => $this->participant_limit > 0
+                ? round(($this->registered_count / $this->participant_limit) * 100, 2)
+                : 0,
+            'target_percentage' => $this->target_participants > 0
+                ? round(($this->registered_count / $this->target_participants) * 100, 2)
+                : 0
+        ];
     }
 
     // Accessors for time formatting

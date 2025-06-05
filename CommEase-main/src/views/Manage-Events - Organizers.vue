@@ -124,8 +124,8 @@
     >
 
     <!-- EVENTS TABLE -->
-    <div class="container-table" :class="{ 'sidebar-collapsed': !isOpen }">
-      <table class="users-table">
+    <div class="container-table" :class="{ 'sidebar-collapsed': !isOpen }" style="overflow-x: auto;">
+      <table class="users-table" style="min-width: 1200px;">
         <thead>
           <tr>
             <th>No.</th>
@@ -135,6 +135,7 @@
             <th>Time</th>
             <th>Organizer</th>
             <th>Programs</th>
+            <th>Participants</th>
             <th>Status</th>
             <th>Action</th>
             <th>Event Control</th>
@@ -155,6 +156,32 @@
               {{ event.organizer?.first_name }} {{ event.organizer?.last_name }}
             </td>
             <td>{{ (event.programs || []).join(", ") }}</td>
+            <td data-label="Participants" class="participants-cell">
+              <div class="participant-info">
+                <div class="participant-numbers">
+                  <span class="registered">{{ event.registered_count || 0 }}</span>
+                  <span class="separator">/</span>
+                  <span class="limit">{{ event.participant_limit || 0 }}</span>
+                </div>
+                <div class="participant-target" v-if="event.target_participants">
+                  Target: {{ event.target_participants }}
+                </div>
+                <div class="progress-bar" v-if="event.participant_limit">
+                  <div
+                    class="progress-fill"
+                    :style="{
+                      width: `${Math.min((event.registered_count || 0) / event.participant_limit * 100, 100)}%`,
+                      backgroundColor: (event.registered_count || 0) >= (event.target_participants || 0) ? '#81a263' : '#ffc107'
+                    }"
+                  ></div>
+                </div>
+                <div class="participant-status">
+                  <span v-if="event.is_full" class="status-full">FULL</span>
+                  <span v-else-if="event.target_reached" class="status-target">TARGET REACHED</span>
+                  <span v-else class="status-open">{{ event.available_slots || 0 }} slots left</span>
+                </div>
+              </div>
+            </td>
             <td>
               <span
                 :class="{
@@ -181,7 +208,7 @@
             <td data-label="Event Control" class="event-control">
               <div class="test">
                 <button
-                  v-if="event.status.toLowerCase() === 'upcoming'"
+                  v-if="['pending', 'upcoming'].includes(event.status.toLowerCase())"
                   class="start-btn"
                   @click="handleStartEvent(event.id)"
                 >
@@ -204,7 +231,7 @@
           </tr>
           <!-- Show placeholder if 'events' is empty -->
           <tr v-if="events.length === 0">
-            <td colspan="8" class="no-data">No events available</td>
+            <td colspan="11" class="no-data">No events available</td>
           </tr>
         </tbody>
       </table>
@@ -430,5 +457,74 @@ onUnmounted(() => {
 .end-btn:disabled {
   background-color: #6c757d;
   cursor: not-allowed;
+}
+
+/* Participant Progress Styles */
+.participants-cell {
+  min-width: 150px;
+}
+
+.participant-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+}
+
+.participant-numbers {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.registered {
+  color: #435739;
+}
+
+.separator {
+  color: #6c757d;
+  margin: 0 2px;
+}
+
+.limit {
+  color: #6c757d;
+}
+
+.participant-target {
+  font-size: 12px;
+  color: #6c757d;
+  font-style: italic;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background-color: #e9ecef;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+  border-radius: 3px;
+}
+
+.participant-status {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.status-full {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.status-target {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.status-open {
+  color: #6c757d;
 }
 </style>
