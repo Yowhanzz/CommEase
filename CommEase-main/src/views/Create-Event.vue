@@ -137,13 +137,30 @@
           </label>
         </div>
 
-        <h2 class="create-event-headers">Participants Needed:</h2>
-        <input class="create-event-input" type="number" />
-        <!-- v-model="participant limitation" -->
+        <h2 class="create-event-headers">Participants Needed (Limit):</h2>
+        <input
+          class="create-event-input"
+          type="number"
+          v-model.number="participantLimit"
+          min="1"
+          max="1000"
+          placeholder="Maximum number of volunteers"
+        />
 
         <h2 class="create-event-headers">Target Participants:</h2>
-        <input class="create-event-input" type="number" />
-        <!-- v-model="participant limitation" -->
+        <input
+          class="create-event-input"
+          type="number"
+          v-model.number="targetParticipants"
+          min="1"
+          :max="participantLimit || 1000"
+          placeholder="Ideal number of volunteers"
+        />
+
+        <!-- Validation message for participant fields -->
+        <div v-if="participantValidationError" class="validation-error">
+          {{ participantValidationError }}
+        </div>
 
         <h2 class="create-event-headers">Date</h2>
         <input class="create-event-input" v-model="date" type="date" />
@@ -234,6 +251,8 @@ const eventTitle = ref("");
 const barangay = ref("");
 const organizer = ref("");
 const programs = ref([]);
+const participantLimit = ref(null);
+const targetParticipants = ref(null);
 const date = ref("");
 const startTime = ref("");
 const endTime = ref("");
@@ -244,6 +263,7 @@ const thingsNeeded = ref([]);
 const router = useRouter();
 const loading = ref(false);
 const error = ref(null);
+const participantValidationError = ref("");
 
 // === Notifications Data ===
 const notifications = ref([
@@ -319,6 +339,28 @@ const filteredEvents = computed(() => {
   });
 });
 
+// === Participant Validation ===
+const validateParticipants = () => {
+  participantValidationError.value = "";
+
+  if (!participantLimit.value || !targetParticipants.value) {
+    participantValidationError.value = "Both participant limit and target participants are required";
+    return false;
+  }
+
+  if (participantLimit.value < 1 || targetParticipants.value < 1) {
+    participantValidationError.value = "Participant numbers must be at least 1";
+    return false;
+  }
+
+  if (targetParticipants.value > participantLimit.value) {
+    participantValidationError.value = "Target participants cannot exceed participant limit";
+    return false;
+  }
+
+  return true;
+};
+
 // === Methods ===
 const addThing = () => {
   if (newThing.value.trim()) {
@@ -357,6 +399,11 @@ const saveEvent = async () => {
       throw new Error("Please select at least one program");
     }
 
+    // Validate participant fields
+    if (!validateParticipants()) {
+      throw new Error(participantValidationError.value);
+    }
+
     const eventData = {
       eventTitle: eventTitle.value,
       barangay: barangay.value,
@@ -367,6 +414,8 @@ const saveEvent = async () => {
       description: description.value,
       programs: programs.value,
       thingsNeeded: thingsNeeded.value,
+      participantLimit: participantLimit.value,
+      targetParticipants: targetParticipants.value,
     };
 
     const response = await eventService.createEvent(eventData);

@@ -3,13 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
-use App\Models\User;
 use App\Models\Notification;
 use App\Models\Suggestion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Controller;
-use SimpleSoftwareIO\QrCode\Facades\QrCode;
 
 
 class VolunteerController extends Controller
@@ -34,6 +32,15 @@ class VolunteerController extends Controller
 
         if ($event->volunteers()->where('user_id', $user->id)->exists()) {
             return response()->json(['message' => 'You are already registered for this event'], 422);
+        }
+
+        // Check if event has reached participant limit
+        if ($event->is_full) {
+            return response()->json([
+                'message' => 'This event has reached its participant limit',
+                'participant_limit' => $event->participant_limit,
+                'current_registrations' => $event->registered_count
+            ], 422);
         }
 
         $event->volunteers()->attach($user->id);
@@ -148,6 +155,71 @@ class VolunteerController extends Controller
                     'barangay' => $event->barangay ?? 'N/A',
                 ];
             });
+
+        return response()->json($events);
+    }
+
+    /**
+     * Get archived (completed) events for volunteers
+     */
+    public function getArchivedEvents(Request $request)
+    {
+        $user = $request->user();
+
+        $query = $user->events()
+            ->where('status', 'completed')
+            ->with(['organizer']);
+
+        // Search by title or description
+        if ($request->has('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('event_title', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter by date range
+        if ($request->has('start_date')) {
+            $query->where('date', '>=', $request->start_date);
+        }
+        if ($request->has('end_date')) {
+            $query->where('date', '<=', $request->end_date);
+        }
+
+        // Filter by barangay
+        if ($request->has('barangay')) {
+            $query->where('barangay', $request->barangay);
+        }
+
+        $events = $query->orderBy('ended_at', 'desc')
+            ->paginate($request->get('per_page', 10));
+
+        // Transform the data to include additional information
+        $events->getCollection()->transform(function ($event) {
+            return [
+                'id' => $event->id,
+                'title' => $event->event_title,
+                'date' => $event->date,
+                'status' => $event->status,
+                'organizer' => $event->organizer->full_name,
+                'start_time' => $event->start_time,
+                'end_time' => $event->end_time,
+                'started_at' => $event->started_at,
+                'ended_at' => $event->ended_at,
+                'duration' => $event->duration,
+                'barangay' => $event->barangay ?? 'N/A',
+                'programs' => $event->programs,
+                'things_brought' => $event->pivot->things_brought,
+                'attendance_status' => $event->pivot->attendance_status,
+                'attendance_notes' => $event->pivot->attendance_notes,
+                'time_in' => $event->pivot->time_in,
+                'time_out' => $event->pivot->time_out,
+                'volunteer_duration' => $event->pivot->time_in && $event->pivot->time_out
+                    ? $event->pivot->time_in->diffForHumans($event->pivot->time_out, true)
+                    : 'N/A'
+            ];
+        });
 
         return response()->json($events);
     }

@@ -78,7 +78,7 @@ class User extends Authenticatable
     public function volunteeredEvents()
     {
         return $this->belongsToMany(Event::class, 'event_volunteers', 'user_id', 'event_id')
-            ->withPivot('things_brought', 'time_in', 'time_out')
+            ->withPivot(['things_brought', 'time_in', 'time_out', 'attendance_status', 'attendance_notes', 'attendance_marked_at'])
             ->withTimestamps();
     }
 
@@ -104,10 +104,12 @@ class User extends Authenticatable
      */
     public function events()
     {
-        return $this->belongsToMany(Event::class, 'event_volunteers')
-            ->withPivot(['things_brought', 'time_in', 'time_out'])
+        return $this->belongsToMany(Event::class, 'event_volunteers', 'user_id', 'event_id')
+            ->withPivot(['things_brought', 'time_in', 'time_out', 'attendance_status', 'attendance_notes', 'attendance_marked_at'])
             ->withTimestamps();
     }
+
+
 
     // Add this method to automatically set user_email_id when email is set
     public function setEmailAttribute($value)

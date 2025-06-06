@@ -54,6 +54,89 @@ class AuthController extends Controller
         ], 201);
     }
 
+    public function profile(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json(['message' => 'User not authenticated'], 401);
+        }
+
+        return response()->json([
+            'id' => $user->id,
+            'first_name' => $user->first_name,
+            'last_name' => $user->last_name,
+            'full_name' => $user->first_name . ' ' . $user->last_name,
+            'email' => $user->email,
+            'user_email_id' => $user->user_email_id,
+            'role' => $user->role,
+            'program' => $user->program,
+            'created_at' => $user->created_at,
+            'updated_at' => $user->updated_at,
+        ]);
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $user = $request->user();
+
+        if (!$user) {
+            return response()->json(['message' => 'User not authenticated'], 401);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'first_name' => 'sometimes|required|string|max:255',
+            'last_name' => 'sometimes|required|string|max:255',
+            'email' => [
+                'sometimes',
+                'required',
+                'string',
+                'email',
+                'max:255',
+                'unique:users,email,' . $user->id,
+                'regex:/^[0-9]+@gordoncollege\.edu\.ph$/'
+            ],
+            'program' => 'sometimes|required_if:role,volunteer|in:BSIT,BSCS,BSEMC',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Update user fields
+        if ($request->has('first_name')) {
+            $user->first_name = $request->first_name;
+        }
+        if ($request->has('last_name')) {
+            $user->last_name = $request->last_name;
+        }
+        if ($request->has('email')) {
+            $user->email = $request->email;
+            // Update user_email_id if email changes
+            $user->user_email_id = explode('@', $request->email)[0];
+        }
+        if ($request->has('program') && $user->role === 'volunteer') {
+            $user->program = $request->program;
+        }
+
+        $user->save();
+
+        return response()->json([
+            'message' => 'Profile updated successfully',
+            'user' => [
+                'id' => $user->id,
+                'first_name' => $user->first_name,
+                'last_name' => $user->last_name,
+                'full_name' => $user->first_name . ' ' . $user->last_name,
+                'email' => $user->email,
+                'user_email_id' => $user->user_email_id,
+                'role' => $user->role,
+                'program' => $user->program,
+                'updated_at' => $user->updated_at,
+            ]
+        ]);
+    }
+
     public function getUserQR(Request $request)
     {
         $user = $request->user();
@@ -68,4 +151,4 @@ class AuthController extends Controller
             'name' => $user->first_name . ' ' . $user->last_name,
         ]);
     }
-} 
+}

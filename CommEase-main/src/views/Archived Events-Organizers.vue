@@ -120,40 +120,70 @@
     </div>
 
     <div class="archived-whole" :class="{ 'sidebar-collapsed': !isOpen }">
-      <div class="archived-events-separation">
+      <!-- Loading State -->
+      <div v-if="loading" class="loading-container">
+        <p>Loading archived events...</p>
+      </div>
+
+      <!-- Error State -->
+      <div v-else-if="error" class="error-container">
+        <p class="error-message">{{ error }}</p>
+        <button @click="fetchArchivedEvents" class="retry-btn">Retry</button>
+      </div>
+
+      <!-- Events List -->
+      <div v-else class="archived-events-separation">
+        <!-- No Events Message -->
+        <div v-if="filteredEvents.length === 0" class="no-events-container">
+          <p>No archived events found.</p>
+        </div>
+
+        <!-- Events Cards -->
         <div
           class="archived-container"
           v-for="(event, index) in filteredEvents"
-          :key="index"
+          :key="event.id"
         >
           <div class="archived-contents-separation">
             <div class="green-vertical"></div>
 
             <div class="archived-contents">
-              <h3 class="archived-event-title">{{ event.title }}</h3>
+              <h3 class="archived-event-title">{{ event.event_title }}</h3>
 
               <p class="archived-event-barangay">
                 <span><b>Barangay:</b></span> {{ event.barangay }}
               </p>
               <p class="archived-event-organizer">
-                <span><b>Organizer:</b></span> {{ event.organizer }}
+                <span><b>Organizer:</b></span>
+                {{ event.organizer?.first_name }}
+                {{ event.organizer?.last_name }}
               </p>
               <p class="archived-event-date">
-                <span><b>Date:</b></span> {{ event.date }}
+                <span><b>Date:</b></span> {{ formatDate(event.date) }}
               </p>
               <p class="archived-event-time">
-                <span><b>Time:</b></span> {{ event.time }}
+                <span><b>Time:</b></span>
+                {{ formatTime(event.start_time) }} -
+                {{ formatTime(event.end_time) }}
               </p>
-              <span class="archived-event-programs"
-                ><span><b>Programs:</b></span> {{ event.programs }}</span
-              >
+              <p class="archived-event-participants">
+                <span><b>Participants:</b></span>
+                {{ event.registered_count || 0 }}/{{
+                  event.participant_limit || 0
+                }}
+              </p>
+              <span class="archived-event-programs">
+                <span><b>Programs:</b></span>
+                {{ (event.programs || []).join(", ") }}
+              </span>
             </div>
           </div>
 
           <i
             class="bx bx-trash"
             id="delete-button"
-            @click="deleteEvent(index)"
+            @click="deleteEvent(event.id, index)"
+            title="Delete archived event"
           ></i>
         </div>
       </div>
@@ -163,10 +193,14 @@
 </template>
 
 <script>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { authService } from "@/api/services";
-import NotificationPanel from "@/components/NotificationPanel.vue"; // Import the notification component
+import {
+  authService,
+  eventService,
+  formatTime,
+  formatDate,
+} from "@/api/services";
 
 export default {
   name: "safety",
@@ -182,6 +216,9 @@ export default {
     const isOpen = ref(false);
     const isSidebarOpen = ref(false);
     const searchQuery = ref("");
+    const loading = ref(false);
+    const error = ref(null);
+    const events = ref([]);
     const notifications = ref([
       {
         message: "You completed the 'Update website content' task.",
@@ -196,57 +233,34 @@ export default {
         time: "5 hours ago",
       },
     ]);
-    const events = ref([
-      {
-        title: "Clean Up Drive",
-        barangay: "East Bajac - Bajac",
-        date: "08/06/2025",
-        time: "10:00 - 12:00",
-        organizer: "ELITES",
-        programs: "BSIT, BSCS",
-        status: "Pending",
-      },
-      {
-        title: "Tree Planting",
-        barangay: "West Bajac - Bajac",
-        date: "09/10/2025",
-        time: "8:00 - 10:00",
-        organizer: "GREEN INITIATIVE",
-        programs: "BSIT",
-        status: "Pending",
-      },
-      {
-        title: "Feeding Program",
-        barangay: "North Bajac - Bajac",
-        date: "10/12/2025",
-        time: "2:00 - 4:00",
-        organizer: "HELPING HANDS",
-        programs: "BSIT, BSCS",
-        status: "Pending",
-      },
-      {
-        title: "Blood Donation",
-        barangay: "South Bajac - Bajac",
-        date: "12/15/2025",
-        time: "9:00 - 1:00",
-        organizer: "HEALTH TEAM",
-        programs: "BSIT, BSEMC",
-        status: "Pending",
-      },
-    ]);
 
     const filteredEvents = computed(() => {
+      if (!Array.isArray(events.value)) {
+        return [];
+      }
+
       const query = searchQuery.value.toLowerCase();
-      return events.value.filter(
+      let filtered = events.value.filter(
         (event) =>
-          event.title.toLowerCase().includes(query) ||
-          event.barangay.toLowerCase().includes(query) ||
-          event.date.toLowerCase().includes(query) ||
-          event.time.toLowerCase().includes(query) ||
-          event.organizer.toLowerCase().includes(query)
+          event.event_title?.toLowerCase().includes(query) ||
+          event.barangay?.toLowerCase().includes(query) ||
+          formatDate(event.date)?.toLowerCase().includes(query) ||
+          `${formatTime(event.start_time)} - ${formatTime(event.end_time)}`
+            .toLowerCase()
+            .includes(query) ||
+          `${event.organizer?.first_name} ${event.organizer?.last_name}`
+            .toLowerCase()
+            .includes(query)
       );
 
-      /* MAY PROGRAM FILTER */
+      // Filter by program if selected
+      if (selectedProgram.value) {
+        filtered = filtered.filter((event) =>
+          event.programs?.includes(selectedProgram.value)
+        );
+      }
+
+      return filtered;
     });
 
     const toggleNotifications = () => {
@@ -258,12 +272,95 @@ export default {
       isOpen.value = !isOpen.value; // optional if you're toggling extra state
     };
 
+    // Fetch archived events from API
+    const fetchArchivedEvents = async () => {
+      try {
+        loading.value = true;
+        error.value = null;
+
+        // Debug: Check current user authentication and role
+        console.log("Checking user authentication...");
+        try {
+          const user = await authService.getUser();
+          console.log("Current user:", user);
+          console.log("User role:", user.role);
+          console.log("User role type:", typeof user.role);
+          console.log("User role length:", user.role?.length);
+          console.log("User role exact value:", JSON.stringify(user.role));
+
+          if (user.role !== "organizer") {
+            error.value = `Access denied. Current role: "${
+              user.role
+            }" (type: ${typeof user.role}). Expected: "organizer"`;
+            return;
+          }
+
+          // Test if regular events route works
+          console.log("Testing regular events route...");
+          const testResponse = await eventService.getEventsOrganizer();
+          console.log(
+            "Regular events route works:",
+            testResponse.data.length,
+            "events"
+          );
+        } catch (authError) {
+          console.error("Authentication check failed:", authError);
+          error.value = "Authentication failed. Please log in again.";
+          return;
+        }
+
+        console.log("Fetching archived events...");
+        const response = await eventService.getArchivedEvents();
+        // Handle both possible response structures
+        const eventsData = response.data.data || response.data;
+        events.value = Array.isArray(eventsData) ? eventsData : [];
+        console.log("Archived events loaded:", events.value.length, "events");
+      } catch (err) {
+        console.error("Error details:", {
+          status: err.response?.status,
+          data: err.response?.data,
+          message: err.message,
+        });
+
+        if (err.response?.status === 404) {
+          error.value = "Archived events route not found.";
+        } else if (err.response?.status === 401) {
+          error.value = "You are not authenticated. Please log in again.";
+        } else if (err.response?.status === 403) {
+          const errorMsg = err.response?.data?.message || "Access forbidden";
+          error.value = `Access denied: ${errorMsg}. Please ensure you're logged in as an organizer.`;
+        } else {
+          error.value =
+            err.response?.data?.message ||
+            err.message ||
+            "Failed to fetch archived events";
+        }
+        events.value = []; // Ensure events is an array even on error
+      } finally {
+        loading.value = false;
+      }
+    };
+
     /* DELETE ARCHIVED EVENT */
-    const deleteEvent = (index) => {
-      const confirmed = confirm("Do you want to remove this in your archived?");
+    const deleteEvent = async (eventId, index) => {
+      const confirmed = confirm(
+        "Do you want to permanently delete this archived event?"
+      );
       if (confirmed) {
-        alert("Removed Successfully!");
-        events.value.splice(index, 1);
+        try {
+          loading.value = true;
+          await eventService.deleteEvent(eventId);
+          events.value.splice(index, 1);
+          alert("Event deleted successfully!");
+        } catch (err) {
+          error.value =
+            err.response?.data?.message ||
+            err.message ||
+            "Failed to delete event";
+          alert("Failed to delete event. Please try again.");
+        } finally {
+          loading.value = false;
+        }
       }
     };
 
@@ -278,6 +375,11 @@ export default {
       }
     };
 
+    // Load archived events when component mounts
+    onMounted(() => {
+      fetchArchivedEvents();
+    });
+
     return {
       showNotifications,
       showLogoutModal,
@@ -285,16 +387,94 @@ export default {
       isOpen,
       isSidebarOpen,
       searchQuery,
+      loading,
+      error,
       notifications,
       events,
       filteredEvents,
       toggleNotifications,
       toggleSidebar,
+      fetchArchivedEvents,
       deleteEvent, //delete archived event
       confirmLogout,
+      formatTime,
+      formatDate,
     };
   },
 };
 </script>
 
 <style scoped src="/src/assets/CSS Organizers/archived.css"></style>
+
+<style scoped>
+/* Loading, Error, and No Events States */
+.loading-container,
+.error-container,
+.no-events-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  min-height: 200px;
+}
+
+.loading-container p {
+  font-size: 18px;
+  color: #435739;
+  font-weight: 500;
+}
+
+.error-container {
+  color: #dc3545;
+}
+
+.error-message {
+  font-size: 16px;
+  margin-bottom: 15px;
+  font-weight: 500;
+}
+
+.retry-btn {
+  background-color: #435739;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.retry-btn:hover {
+  background-color: #2d3d26;
+}
+
+.no-events-container p {
+  font-size: 16px;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Enhanced archived event participants info */
+.archived-event-participants {
+  color: #435739;
+  font-size: 14px;
+  margin-bottom: 5px;
+}
+
+.archived-event-participants span {
+  font-weight: 600;
+}
+
+/* Delete button enhancement */
+#delete-button {
+  transition: color 0.3s ease, transform 0.2s ease;
+}
+
+#delete-button:hover {
+  color: #dc3545;
+  transform: scale(1.1);
+}
+</style>
