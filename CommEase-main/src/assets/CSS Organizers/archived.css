@@ -102,13 +102,7 @@ i {
 }
 
 .logout-modal {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.1),
-    rgba(255, 255, 255, 0)
-  );
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background-color: #f2f4ec;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
@@ -116,17 +110,18 @@ i {
   border-radius: 10px;
   text-align: center;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  width: 300px;
+  width: 350px;
   scale: 1.1;
 }
 
 .logout-modal h2 {
   margin-bottom: 10px;
-  color: #e9e5d6;
+  color: black;
 }
 
 .logout-modal p {
-  color: #e9e5d6;
+  color: black;
+  padding-bottom: 10px;
 }
 
 .logout-modal-buttons {
@@ -136,32 +131,34 @@ i {
 }
 
 .logout-btn {
-  background: #59692a;
-  color: white;
+  background: #435739;
+  border: 1px solid #435739;
+  color: #f2f4ec;
   padding: 8px 15px;
-  border: none;
   border-radius: 5px;
   cursor: pointer;
+  font-weight: 550;
   transition: 0.15s ease-in-out background-color, 0.15s ease-in-out color;
 }
 
 .cancel-btn {
-  background: #bdc3c7;
-  color: white;
+  background: #b6b8af;
+  color: black;
+  border: 1px solid #435739;
   padding: 8px 15px;
-  border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: 0.15s ease-in-out background-color;
+  font-weight: 550;
 }
 
 .logout-btn:hover {
-  background-color: #e9e5d6;
-  color: #464e2e;
+  background-color: #f2f4ec;
+  color: #435739;
 }
 
 .cancel-btn:hover {
-  background: #95a5a6;
+  background: #d8dada;
 }
 
 /* NOTIFICATION PANEL */
@@ -447,7 +444,7 @@ i {
 
 .green-vertical {
   background-color: #435739;
-  width: 20px;
+  width: 5px;
   border-radius: 10px 0px 0px 10px;
   height: auto;
 }

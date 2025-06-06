@@ -102,13 +102,7 @@ i {
 }
 
 .logout-modal {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.1),
-    rgba(255, 255, 255, 0)
-  );
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background-color: #f2f4ec;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
@@ -122,11 +116,11 @@ i {
 
 .logout-modal h2 {
   margin-bottom: 10px;
-  color: #f2f4ec;
+  color: black;
 }
 
 .logout-modal p {
-  color: #f2f4ec;
+  color: black;
   padding-bottom: 10px;
 }
 
@@ -138,9 +132,9 @@ i {
 
 .logout-btn {
   background: #435739;
+  border: 1px solid #435739;
   color: #f2f4ec;
   padding: 8px 15px;
-  border: none;
   border-radius: 5px;
   cursor: pointer;
   font-weight: 550;
@@ -148,10 +142,10 @@ i {
 }
 
 .cancel-btn {
-  background: #f2f4ec;
-  color: #435739;
+  background: #b6b8af;
+  color: black;
+  border: 1px solid #435739;
   padding: 8px 15px;
-  border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: 0.15s ease-in-out background-color;
@@ -174,7 +168,6 @@ i {
 }
 .analytics-title {
   color: #12372a;
-
   margin-top: 2%;
 }
 
@@ -190,7 +183,7 @@ i {
 
 .sidebar-collapsed-for-divider {
   /* REVISED */
-  width: calc(100% - 180px) !important;
+  width: calc(100% - 190px) !important;
 }
 
 .total-analytics-container {
@@ -511,7 +504,7 @@ i {
   }
 
   .total-pie-graph-glasscard {
-    background-color: #436850;
+    background-color: #f2f4ec;
     width: 100%;
     height: auto;
     border-radius: 10px;
@@ -519,7 +512,7 @@ i {
   }
 
   .total-graph-glasscard {
-    background-color: #436850;
+    background-color: #f2f4ec;
     width: 100%;
     height: auto;
     border-radius: 10px;
@@ -544,18 +537,39 @@ i {
   }
 }
 
+@media (max-width: 1220px) {
+  .analytics-title {
+    padding-left: 40px;
+  }
+}
+
 @media (max-width: 1085px) {
   .analytics-title {
     font-size: 20px;
+  }
+
+  .total-analytics-container {
+    margin-top: 40px;
   }
 }
 
 @media (max-width: 945px) {
   .total-analytics-container,
   .total-graph-container {
-    padding-left: 130px;
+    padding-left: 100px;
   }
 
+  .analytics-title {
+    padding-left: 10px;
+  }
+
+  .hr-input {
+    width: calc(100% - 120px) !important;
+  }
+
+  .sidebar-collapsed-for-divider {
+    width: calc(100% - 120px) !important;
+  }
   .container-table {
     overflow-x: auto; /* prevents horizontal scroll */
   }
@@ -587,36 +601,28 @@ i {
 @media (max-width: 725px) {
   .analytics-title {
     font-size: 20px;
-    padding-left: 30px;
+    padding-left: 20px; /* Consistent, hindi na nababago sa toggle */
   }
 
-  /* TOGGLE SIDEBAR */
   .overlay {
     display: block;
-  }
-
-  .sidebar-collapsed-for-divider {
-    /* REVISED */
-    width: calc(100% - 100px) !important;
-  }
-
-  .sidebar-collapsed {
-    padding-left: 90px !important;
   }
 
   .sidebar {
     z-index: 2000 !important;
   }
 
-  .total-analytics-container {
-    padding-left: 100px;
-  }
-
+  /* Maintain layout width */
+  .total-analytics-container,
   .total-graph-container {
-    padding-left: 100px;
+    width: 100% !important;
+    padding-left: 90px !important;
+    padding-right: 30px !important;
   }
 
-  /* KAPAG TINOGGLE SYA, DI SYA NAUSOG */
+  .sidebar-collapsed {
+    padding-left: 20px !important;
+  }
 }
 
 @media (max-width: 575px) {
@@ -626,6 +632,6 @@ i {
 
   .analytics-title {
     font-size: 20px;
-    padding-left: 40px;
+    padding-left: 20px; /* 40PX */
   }
 }

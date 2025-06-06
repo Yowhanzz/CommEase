@@ -75,24 +75,11 @@
       </div>
     </div>
 
-    <!-- NOTIFICATION PANEL -->
-    <div class="notification-panel" :class="{ open: showNotifications }">
-      <div class="notification-header">
-        <h2>Notifications</h2>
-        <i class="bx bx-x close-btn" @click="toggleNotifications"></i>
-      </div>
-      <div class="notification-list">
-        <div
-          class="notification-item"
-          v-for="(notif, index) in notifications"
-          :key="index"
-        >
-          <h4>Task Completed</h4>
-          <p>{{ notif.message }}</p>
-          <span class="time">{{ notif.time }}</span>
-        </div>
-      </div>
-    </div>
+    <!-- NOTIFICATION COMPONENT -->
+    <NotificationPanel
+      :isOpen="showNotifications"
+      @close="toggleNotifications"
+    />
 
     <!-- OVERLAY -->
     <div
@@ -233,6 +220,8 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
+import NotificationPanel from "@/components/NotificationPanel.vue"; // Import the notification component
+
 import {
   authService,
   eventService,
@@ -469,5 +458,8 @@ const confirmLogout = async () => {
   }
 };
 </script>
+
+name: "safety", components: { QrcodeStream, VueCal, VueQrcode,
+NotificationPanel, // Register the component },
 
 <style scoped src="/src/assets/CSS Organizers/edit-event.css"></style>

@@ -79,24 +79,11 @@
       </div>
     </header>
 
-    <!-- NOTIFICATION PANEL -->
-    <div class="notification-panel" :class="{ open: showNotifications }">
-      <div class="notification-header">
-        <h2>Notifications</h2>
-        <i class="bx bx-x close-btn" @click="toggleNotifications"></i>
-      </div>
-      <div class="notification-list">
-        <div
-          class="notification-item"
-          v-for="(notif, index) in notifications"
-          :key="index"
-        >
-          <h4>Task Completed</h4>
-          <p>{{ notif.message }}</p>
-          <span class="time">{{ notif.time }}</span>
-        </div>
-      </div>
-    </div>
+    <!-- NOTIFICATION COMPONENT -->
+    <NotificationPanel
+      :isOpen="showNotifications"
+      @close="toggleNotifications"
+    />
 
     <!-- OVERLAY -->
     <div
@@ -157,8 +144,14 @@
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { authService } from "@/api/services";
+import NotificationPanel from "@/components/NotificationPanel.vue"; // Import the notification component
 
 export default {
+  name: "safety",
+
+  components: {
+    NotificationPanel, // Register the component
+  },
   setup() {
     const router = useRouter();
     const showNotifications = ref(false);

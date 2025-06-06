@@ -60,31 +60,8 @@
     </div>
   </header>
 
-  <!-- NOTIFICATION PANEL -->
-  <div class="notification-panel" :class="{ open: showNotifications }">
-    <div class="notification-header">
-      <h2>Notifications</h2>
-      <i class="bx bx-x close-btn" @click="toggleNotifications"></i>
-    </div>
-    <div class="notification-list">
-      <div
-        class="notification-item"
-        v-for="(notif, index) in notifications"
-        :key="index"
-      >
-        <h4>Task Completed</h4>
-        <p>{{ notif.message }}</p>
-        <span class="time">{{ notif.time }}</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- OVERLAY (Para i-disable background) -->
-  <div
-    class="overlay"
-    v-if="showNotifications"
-    @click="toggleNotifications"
-  ></div>
+  <!-- NOTIFICATION COMPONENT -->
+  <NotificationPanel :isOpen="showNotifications" @close="toggleNotifications" />
 
   <!-- SAFETY PROTOCOLS SECTIONS -->
 
@@ -334,9 +311,14 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { authService } from "../api/services";
+import NotificationPanel from "@/components/NotificationPanel.vue"; // Import the notification component
 
 export default {
-  name: "YourComponentName",
+  name: "safety",
+
+  components: {
+    NotificationPanel, // Register the component
+  },
 
   data() {
     return {
@@ -348,20 +330,6 @@ export default {
       isMobile: false,
 
       showLogoutModal: false,
-      notifications: [
-        {
-          message: 'You completed the "Update website content" task.',
-          time: "2 hours ago",
-        },
-        {
-          message: 'You completed the "Clean up drive" task.',
-          time: "3 hours ago",
-        },
-        {
-          message: 'You completed the "Meeting with organizers" task.',
-          time: "5 hours ago",
-        },
-      ],
     };
   },
 

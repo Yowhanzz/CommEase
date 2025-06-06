@@ -128,12 +128,8 @@
     </div>
   </div>
 
-  <!-- NOTIFICATION PANEL -->
-  <notifications
-    :showNotifications="showNotifications"
-    @toggleNotifications="toggleNotifications"
-    :notifications="notifications"
-  />
+  <!-- NOTIFICATION COMPONENT -->
+  <NotificationPanel :isOpen="showNotifications" @close="toggleNotifications" />
 
   <!-- USER INFO -->
   <div class="container" :class="{ 'sidebar-collapsed': !isOpen }">
@@ -252,7 +248,7 @@ import { QrcodeStream } from "vue-qrcode-reader";
 import VueCal from "vue-cal";
 import VueQrcode from "@chenfengyuan/vue-qrcode";
 import "vue-cal/dist/vuecal.css";
-import Notifications from "@/components/notifications.vue";
+import NotificationPanel from "@/components/NotificationPanel.vue"; // Import the notification component
 
 import {
   authService,
@@ -264,10 +260,13 @@ import {
 import axios from "axios";
 
 export default {
+  name: "safety",
+
   components: {
     QrcodeStream,
     VueCal,
     VueQrcode,
+    NotificationPanel, // Register the component
   },
   setup() {
     return {

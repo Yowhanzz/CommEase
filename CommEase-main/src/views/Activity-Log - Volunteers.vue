@@ -62,24 +62,11 @@
       </div>
     </header>
 
-    <!-- NOTIFICATION PANEL -->
-    <div class="notification-panel" :class="{ open: showNotifications }">
-      <div class="notification-header">
-        <h2>Notifications</h2>
-        <i class="bx bx-x close-btn" @click="toggleNotifications"></i>
-      </div>
-      <div class="notification-list">
-        <div
-          class="notification-item"
-          v-for="(notif, index) in notifications"
-          :key="index"
-        >
-          <h4>Task Completed</h4>
-          <p>{{ notif.message }}</p>
-          <span class="time">{{ notif.time }}</span>
-        </div>
-      </div>
-    </div>
+    <!-- NOTIFICATION COMPONENT -->
+    <NotificationPanel
+      :isOpen="showNotifications"
+      @close="toggleNotifications"
+    />
 
     <!-- OVERLAY -->
     <div
@@ -237,6 +224,10 @@ import {
   eventService,
 } from "../api/services";
 import axios from "axios";
+import NotificationPanel from "@/components/NotificationPanel.vue"; // Import the notification component
+import { QrcodeStream } from "vue-qrcode-reader";
+import VueCal from "vue-cal";
+import VueQrcode from "@chenfengyuan/vue-qrcode";
 
 axios.defaults.baseURL = "http://localhost:8000";
 
@@ -404,5 +395,8 @@ onUnmounted(() => {
   window.removeEventListener("resize", handleResize);
 });
 </script>
+
+name: "safety", components: { QrcodeStream, VueCal, VueQrcode,
+NotificationPanel, // Register the component },
 
 <style scoped src="/src/assets/CSS Volunteers/Activitylog.css"></style>

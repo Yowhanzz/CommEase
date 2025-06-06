@@ -73,25 +73,11 @@
         </div>
       </div>
     </div>
-
-    <!-- NOTIFICATION PANEL -->
-    <div class="notification-panel" :class="{ open: showNotifications }">
-      <div class="notification-header">
-        <h2>Notifications</h2>
-        <i class="bx bx-x close-btn" @click="toggleNotifications"></i>
-      </div>
-      <div class="notification-list">
-        <div
-          class="notification-item"
-          v-for="(notif, index) in notifications"
-          :key="index"
-        >
-          <h4>Task Completed</h4>
-          <p>{{ notif.message }}</p>
-          <span class="time">{{ notif.time }}</span>
-        </div>
-      </div>
-    </div>
+    <!-- NOTIFICATION COMPONENT -->
+    <NotificationPanel
+      :isOpen="showNotifications"
+      @close="toggleNotifications"
+    />
 
     <!-- OVERLAY -->
     <div
@@ -220,6 +206,7 @@ import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { eventService } from "../api/services";
 import { authService } from "../api/services";
+import NotificationPanel from "@/components/NotificationPanel.vue"; // Import the notification component
 
 // === Sidebar Toggle ===
 const isOpen = ref(false); // sidebar animation or icon toggle
@@ -429,5 +416,6 @@ onUnmounted(() => {
   window.removeEventListener("resize", handleResize);
 });
 </script>
-
+name: "safety", components: { QrcodeStream, VueCal, VueQrcode,
+NotificationPanel, // Register the component },
 <style scoped src="/src/assets/CSS Organizers/create-event.css"></style>

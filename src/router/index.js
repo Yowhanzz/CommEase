@@ -29,6 +29,7 @@ const router = createRouter({
       path: "/signup",
       name: "signup",
       component: Signup,
+      meta: { requiresAuth: false }
     },
 
     {
@@ -40,78 +41,84 @@ const router = createRouter({
       path: "/OTPVolunteers",
       name: "OTP",
       component: OTPVolunteers,
+      meta: { requiresAuth: false }
     },
 
     {
       path: "/FOTPVolunteers",
       name: "FOTP",
       component: FOTPVolunteers,
+      meta: { requiresAuth: false }
     },
 
     {
       path: "/FPasswordVolunteers",
       name: "FPassword",
       component: FPasswordVolunteers,
+      meta: { requiresAuth: false }
     },
 
     {
       path: "/CreateGmailVolunteers",
       name: "CreateGmail",
       component: CreateGmailVolunteers,
+      meta: { requiresAuth: false }
     },
 
     {
       path: "/PasswordVolunteers",
       name: "PasswordVolunteers",
       component: PasswordVolunteers,
+      meta: { requiresAuth: false }
     },
 
     {
       path: "/DashboardVolunteers",
       name: "DashboardVolunteers",
       component: DashboardVolunteers,
-      meta: { requiresAuth: true, requiresVolunteer: true },
+      meta: { requiresAuth: true, requiresVolunteer: true }
     },
 
     {
       path: "/safety_protocol",
       name: "safety",
       component: Safety_Protocol,
-      meta: { requiresAuth: true, requiresVolunteer: true },
+      meta: { requiresAuth: true, requiresVolunteer: true }
     },
 
     {
       path: "/ActivityLogVolunteers",
       name: "ActivityLogVolunteers",
       component: ActivityLogVolunteers,
-      meta: { requiresAuth: true, requiresVolunteer: true },
+      meta: { requiresAuth: true, requiresVolunteer: true }
     },
 
     {
       path: "/RegistrationVolunteers/:id",
       name: "RegistrationVolunteers",
-      component: () => import("../views/Registration-Volunteers.vue"),
-      meta: { requiresAuth: true, requiresVolunteer: true },
+      component: RegistrationVolunteers,
+      meta: { requiresAuth: true, requiresVolunteer: true }
     },
 
     {
       path: "/LoginVolunteers",
       name: "LoginVolunteers",
       component: LoginVolunteers,
+      meta: { requiresAuth: false }
     },
 
     {
       path: "/qr",
       name: "qr",
       component: Qr,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, requiresVolunteer: true }
     },
 
     {
       path: "/analytics",
       name: "analytics",
       component: Analytics,
-      meta: { requiresAuth: true },
+      meta: { requiresAuth: true, requiresVolunteer: true }
     },
 
     /* FOR ORGANIZERS */
@@ -120,55 +127,70 @@ const router = createRouter({
       path: "/LoginOrganizers",
       name: "LoginOrganizers",
       component: LoginOrganizers,
+      meta: { requiresAuth: false }
     },
 
     {
       path: "/DashboardOrganizers",
       name: "DashboardOrganizers",
       component: DashboardOrganizers,
-      meta: { requiresAuth: true, requiresOrganizer: true },
+      meta: { requiresAuth: true, requiresOrganizer: true }
     },
 
     {
       path: "/CreateEventOrganizers",
       name: "CreateEventOrganizers",
       component: CreateEventOrganizers,
-      meta: { requiresAuth: true, requiresOrganizer: true },
+      meta: { requiresAuth: true, requiresOrganizer: true }
     },
 
     {
       path: "/EditEventOrganizers/:id",
       name: "EditEventOrganizers",
       component: EditEventOrganizers,
-      meta: { requiresAuth: true, requiresOrganizer: true },
+      meta: { requiresAuth: true, requiresOrganizer: true }
     },
 
     {
       path: "/ActivityLogOrganizers",
       name: "ActivityLogOrganizers",
       component: ActivityLogOrganizers,
-      meta: { requiresAuth: true, requiresOrganizer: true },
+      meta: { requiresAuth: true, requiresOrganizer: true }
+    },
+
+    {
+      path: "/ArchivedEventsOrganizers",
+      name: "ArchivedEventsOrganizers",
+      component: ArchivedEventsOrganizers,
+      meta: { requiresAuth: true, requiresOrganizer: true }
     },
 
     {
       path: "/AnalyticsOrganizers",
       name: "AnalyticsOrganizers",
       component: AnalyticsOrganizers,
-      meta: { requiresAuth: true, requiresOrganizer: true },
+      meta: { requiresAuth: true, requiresOrganizer: true }
     },
 
     {
       path: "/SafetyProtocolsOrganizers",
       name: "SafetyProtocolsOrganizers",
       component: SafetyProtocolsOrganizers,
-      meta: { requiresAuth: true, requiresOrganizer: true },
+      meta: { requiresAuth: true, requiresOrganizer: true }
     },
 
     {
       path: "/ManageEventsOrganizers",
       name: "ManageEventsOrganizers",
       component: ManageEventsOrganizers,
-      meta: { requiresAuth: true, requiresOrganizer: true },
+      meta: { requiresAuth: true, requiresOrganizer: true }
+    },
+
+    {
+      path: "/PostEval",
+      name: "PostEval",
+      component: PostEval,
+      meta: { requiresAuth: true, requiresOrganizer: true }
     },
   ],
 });
@@ -176,18 +198,7 @@ const router = createRouter({
 // Navigation guard
 router.beforeEach(async (to, from, next) => {
   // Public routes that don't require authentication
-  const publicRoutes = [
-    "LoginVolunteers",
-    "LoginOrganizers",
-    "signup",
-    "OTP",
-    "FOTP",
-    "FPassword",
-    "CreateGmail",
-    "PasswordVolunteers",
-  ];
-
-  if (publicRoutes.includes(to.name)) {
+  if (!to.meta.requiresAuth) {
     next();
     return;
   }

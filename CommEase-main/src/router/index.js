@@ -88,8 +88,7 @@ const router = createRouter({
     {
       path: "/RegistrationVolunteers/:id",
       name: "RegistrationVolunteers",
-      component: () => import("../views/Registration-Volunteers.vue"),
-      meta: { requiresAuth: true },
+      component: RegistrationVolunteers,
     },
 
     {

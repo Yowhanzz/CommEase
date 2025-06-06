@@ -76,24 +76,8 @@
     </div>
   </header>
 
-  <!-- NOTIFICATION PANEL -->
-  <div class="notification-panel" :class="{ open: showNotifications }">
-    <div class="notification-header">
-      <h2>Notifications</h2>
-      <i class="bx bx-x close-btn" @click="toggleNotifications"></i>
-    </div>
-    <div class="notification-list">
-      <div
-        class="notification-item"
-        v-for="(notif, index) in notifications"
-        :key="index"
-      >
-        <h4>Task Completed</h4>
-        <p>{{ notif.message }}</p>
-        <span class="time">{{ notif.time }}</span>
-      </div>
-    </div>
-  </div>
+  <!-- NOTIFICATION COMPONENT -->
+  <NotificationPanel :isOpen="showNotifications" @close="toggleNotifications" />
 
   <!-- OVERLAY -->
   <div
@@ -237,6 +221,27 @@
           <PieChart />
         </div>
       </div>
+
+      <!-- Review Analytics -->
+      <div class="review-list">
+        <h3>Review Analytics</h3>
+        <div v-if="reviews.length === 0" class="no-data">No reviews yet.</div>
+        <div v-for="(rev, index) in reviews" :key="index" class="review-card">
+          <p>
+            <strong>Avg Rating:</strong>
+            <span class="rating-display">
+              <span
+                v-for="s in 5"
+                :key="s"
+                :class="s <= Math.round(rev.average) ? 'filled' : 'empty'"
+                >★</span
+              >
+              ({{ rev.average.toFixed(1) }})
+            </span>
+          </p>
+          <p class="reflection">{{ rev.reflection }}</p>
+        </div>
+      </div>
     </div>
   </div>
   <div class="overlay" v-if="!isMobile && isSidebarOpen"></div>
@@ -248,14 +253,18 @@ import { useRouter } from "vue-router";
 import { authService } from "@/api/services";
 import BarChart from "@/components/Barchart.vue";
 import PieChart from "@/components/PieChart.vue";
+import NotificationPanel from "@/components/NotificationPanel.vue"; // Import the notification component
+
+// Sidebar and UI States
 const isSidebarOpen = ref(true);
-const isOpen = ref(false); // for sidebar icon animation toggle
+const isOpen = ref(false);
 const showNotifications = ref(false);
 const showLogoutModal = ref(false);
 const searchQuery = ref("");
 const isMobile = ref(false);
 const router = useRouter();
 
+// Notifications
 const notifications = ref([
   {
     message: "You completed the 'Update website content' task.",
@@ -271,6 +280,7 @@ const notifications = ref([
   },
 ]);
 
+// Event Data
 const events = ref([
   {
     title: "Clean Up Drive",
@@ -319,16 +329,108 @@ const toggleNotifications = () => {
 const confirmLogout = async () => {
   try {
     await authService.logout();
-    // Clear any local storage or state
     localStorage.clear();
-    // Redirect to login page
     router.push("/LoginOrganizers");
   } catch (error) {
     console.error("Logout failed:", error);
-    // Even if the API call fails, we should still redirect to login
     router.push("/LoginOrganizers");
   }
 };
+
+// === Review & Feedback Integration ===
+const questions = [
+  "Was the event organized well?",
+  "Were the activities engaging?",
+  "Were the speakers effective?",
+  "Was the event timely?",
+  "Would you attend a future event?",
+];
+
+const questionRatings = ref(Array(5).fill(0));
+const reflection = ref("");
+const reviews = ref([]);
+
+function setQuestionRating(index, value) {
+  questionRatings.value[index] = value;
+}
+
+function submitReview() {
+  const valid = questionRatings.value.every((r) => r > 0);
+
+  if (!valid || !reflection.value.trim()) {
+    alert("Please answer all questions and add a reflection.");
+    return;
+  }
+
+  const total = questionRatings.value.reduce((a, b) => a + b, 0);
+  const average = total / questionRatings.value.length;
+
+  reviews.value.push({
+    average,
+    reflection: reflection.value.trim(),
+  });
+
+  questionRatings.value = Array(5).fill(0);
+  reflection.value = "";
+}
 </script>
+name: "safety", components: { QrcodeStream, VueCal, VueQrcode,
+NotificationPanel, // Register the component },
 
 <style scoped src="/src/assets/CSS Organizers/analytics.css"></style>
+
+<style scoped>
+.review-list {
+  background: #f2f4ec;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+  min-width: 320px;
+}
+.review-list h3 {
+  margin-bottom: 16px;
+  color: #435739;
+}
+
+.review-list {
+  margin-top: 30px;
+  /* ✅ Updated to be scrollable if too long */
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+/* Optional scroll styling */
+.review-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.review-list::-webkit-scrollbar-thumb {
+  background-color: #bbb;
+  border-radius: 10px;
+}
+
+.review-card {
+  background-color: #f2f4ec;
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #435739;
+  word-wrap: break-word;
+}
+
+.rating-display {
+  font-size: 18px;
+  margin: 6px 0;
+}
+
+.reflection {
+  font-size: 14px;
+  color: #444;
+  white-space: pre-wrap;
+}
+
+.no-data {
+  color: #888;
+  font-style: italic;
+}
+</style>

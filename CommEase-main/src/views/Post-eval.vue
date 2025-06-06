@@ -1,64 +1,23 @@
 <template>
-  <div>
-    <!-- Trigger Button -->
-    <button @click="showModal = true" class="button-post-event">
-      📋 Post-eval
-    </button>
-
-    <!-- Modal -->
-    <div v-if="showModal" class="modal-overlay">
-      <div class="modal-content">
-        <h2>📝 Event Evaluation</h2>
-
-        <form @submit.prevent="submitEvaluation">
-          <!-- Questions with Star Ratings -->
-          <div
-            v-for="(question, index) in questions"
-            :key="index"
-            class="form-group"
-          >
-            <label class="question">{{ question }}</label>
-            <div class="star-rating">
-              <span
-                v-for="star in 5"
-                :key="star"
-                class="star"
-                :class="{ filled: star <= ratings[index] }"
-                @click="ratings[index] = star"
-                >★</span
-              >
-            </div>
-          </div>
-
-          <!-- File Upload -->
-          <div class="form-group">
-            <label class="question">📄 Upload Reflection Paper</label>
-            <div class="file-upload-wrapper">
-              <input
-                type="file"
-                id="file-upload"
-                class="file-input"
-                @change="handleFileUpload"
-                accept=".pdf,.doc,.docx"
-                required
-              />
-              <label for="file-upload" class="upload-label">
-                <span>📎 Choose File</span>
-              </label>
-              <p v-if="reflectionFileName" class="file-name">
-                📁 {{ reflectionFileName }}
-              </p>
-            </div>
-          </div>
-
-          <!-- Action Buttons -->
-          <div class="form-actions">
-            <button type="button" @click="showModal = false" class="cancel-btn">
-              Cancel
-            </button>
-            <button type="submit" class="submit-btn">Submit</button>
-          </div>
-        </form>
+  <div class="analytics-container">
+    <!-- Review Analytics -->
+    <div class="review-list">
+      <h3>📊 Review Analytics</h3>
+      <div v-if="reviews.length === 0" class="no-data">No reviews yet.</div>
+      <div v-for="(rev, index) in reviews" :key="index" class="review-card">
+        <p>
+          <strong>Avg Rating:</strong>
+          <span class="rating-display">
+            <span
+              v-for="s in 5"
+              :key="s"
+              :class="s <= Math.round(rev.average) ? 'filled' : 'empty'"
+              >★</span
+            >
+            ({{ rev.average.toFixed(1) }})
+          </span>
+        </p>
+        <p class="reflection">{{ rev.reflection }}</p>
       </div>
     </div>
   </div>
@@ -67,184 +26,160 @@
 <script setup>
 import { ref } from "vue";
 
-const showModal = ref(false);
+// Questions
 const questions = [
-  "The activity was well-organized and clearly explained.",
-  "I was able to contribute meaningfully to the community.",
-  "The facilitators were helpful and approachable.",
-  "I gained valuable insights or learning from the experience.",
+  "Was the event organized well?",
+  "Were the activities engaging?",
+  "Were the speakers effective?",
+  "Was the event timely?",
+  "Would you attend a future event?",
 ];
-const ratings = ref(Array(questions.length).fill(0));
 
-const reflectionFile = ref(null);
-const reflectionFileName = ref("");
+const questionRatings = ref(Array(5).fill(0));
+const reflection = ref("");
+const reviews = ref([]);
 
-const handleFileUpload = (event) => {
-  const file = event.target.files[0];
-  if (file) {
-    reflectionFile.value = file;
-    reflectionFileName.value = file.name;
+// Rating setter
+function setQuestionRating(index, value) {
+  questionRatings.value[index] = value;
+}
+
+// Submit handler
+function submitReview() {
+  const valid = questionRatings.value.every((r) => r > 0);
+
+  if (!valid || !reflection.value.trim()) {
+    alert("Please answer all questions and add a reflection.");
+    return;
   }
-};
 
-const submitEvaluation = () => {
-  console.log("Ratings:", ratings.value);
-  console.log("Reflection File:", reflectionFile.value);
+  const total = questionRatings.value.reduce((a, b) => a + b, 0);
+  const average = total / questionRatings.value.length;
 
-  // Reset modal
-  showModal.value = false;
-  reflectionFile.value = null;
-  reflectionFileName.value = "";
-};
+  reviews.value.push({
+    average,
+    reflection: reflection.value.trim(),
+  });
+
+  // Reset
+  questionRatings.value = Array(5).fill(0);
+  reflection.value = "";
+}
 </script>
-
 <style scoped>
-/* Post-eval Button */
-.button-post-event {
-  background: linear-gradient(to right, #6a82fb, #56ccf2);
-  color: white;
-  padding: 14px 28px;
-  border: none;
-  border-radius: 10px;
-  font-size: 16px;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(106, 130, 251, 0.3);
-  transition: 0.3s;
-}
-.button-post-event:hover {
-  opacity: 0.9;
+.analytics-container {
+  max-width: 900px;
+  margin: 40px auto;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  font-family: "Segoe UI", sans-serif;
 }
 
-/* Modal Design */
-.modal-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  display: grid;
-  place-items: center;
-  z-index: 1000;
+.review-form,
+.review-list {
+  background: #f2f4ec;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+  min-width: 560px;
 }
 
-.modal-content {
-  background: #fff;
-  padding: 32px;
-  border-radius: 16px;
-  width: 90%;
-  max-width: 580px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-h2 {
-  margin-bottom: 24px;
-  font-size: 24px;
-  text-align: center;
+.review-form h2,
+.review-list h3 {
+  margin-bottom: 16px;
   color: #333;
 }
 
-/* Question Block */
-.form-group {
-  margin-bottom: 28px;
-}
-.question {
-  font-weight: 600;
-  display: block;
-  margin-bottom: 12px;
-  color: #444;
+.question-block {
+  margin-bottom: 14px;
 }
 
-/* 🌟 Star Rating */
-.star-rating {
-  display: flex;
-  gap: 8px;
-  font-size: 28px;
-  cursor: pointer;
-}
-.star {
-  color: #ccc;
-  transition: color 0.2s;
-}
-.star.filled {
-  color: #ffc107;
-}
-
-/* 📂 File Upload */
-.file-upload-wrapper {
-  position: relative;
-}
-
-.file-input {
-  opacity: 0;
-  position: absolute;
-  width: 100%;
-  height: 40px;
-  top: 0;
-  left: 0;
-  cursor: pointer;
-}
-
-.upload-label {
-  background: #f1f1f1;
-  padding: 10px 18px;
-  border-radius: 8px;
+.question-block p {
+  margin: 0 0 4px;
   font-weight: 500;
-  display: inline-block;
-  cursor: pointer;
-  transition: background 0.3s;
-}
-.upload-label:hover {
-  background: #e0e0e0;
 }
 
-.file-name {
-  margin-top: 10px;
-  font-size: 14px;
-  color: #555;
-  font-style: italic;
-}
-
-/* Buttons */
-.form-actions {
+.stars {
   display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 30px;
-}
-.cancel-btn,
-.submit-btn {
-  padding: 10px 22px;
-  font-size: 15px;
-  border-radius: 8px;
-  border: none;
+  gap: 5px;
+  font-size: 24px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  font-weight: 600;
-}
-.cancel-btn {
-  background-color: #e0e0e0;
-  color: #333;
-}
-.cancel-btn:hover {
-  background-color: #c8c8c8;
-}
-.submit-btn {
-  background-color: #4caf50;
-  color: white;
-}
-.submit-btn:hover {
-  background-color: #3e8e41;
 }
 
-/* Animation */
-@keyframes fadeIn {
-  from {
-    transform: translateY(-10px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
+.filled {
+  color: gold;
+}
+.empty {
+  color: lightgray;
+}
+
+textarea {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  resize: none;
+  margin-top: 10px;
+  margin-bottom: 12px;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+button:hover {
+  background-color: #0056b3;
+}
+
+.review-list {
+  max-height: 500px;
+  margin-top: 30px;
+  overflow-y: auto;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Optional scroll styling */
+.review-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.review-list::-webkit-scrollbar-thumb {
+  background-color: #bbb;
+  border-radius: 10px;
+}
+
+.review-card {
+  background-color: #f2f4ec;
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-left: 4px solid #435739;
+  word-wrap: break-word;
+}
+
+.rating-display {
+  font-size: 18px;
+  margin: 6px 0;
+}
+
+.reflection {
+  font-size: 14px;
+  color: #444;
+  white-space: pre-wrap;
+}
+
+.no-data {
+  color: #888;
+  font-style: italic;
 }
 </style>

@@ -191,32 +191,8 @@
     </div>
   </div>
 
-  <!-- NOTIFICATION PANEL -->
-  <div class="notification-panel" :class="{ open: showNotifications }">
-    <div class="notification-header">
-      <h3>Notifications</h3>
-      <span class="close-btn" @click="toggleNotifications">&times;</span>
-    </div>
-    <div class="notification-list">
-      <div
-        v-for="(notif, index) in notifications"
-        :key="index"
-        class="notification-item"
-        :class="{ unread: !notif.read }"
-      >
-        <div class="notification-content">
-          <h4>{{ notif.message }}</h4>
-          <p class="time">{{ notif.time }}</p>
-        </div>
-        <div class="notification-type" :class="notif.type">
-          {{ notif.type === "volunteer_time_in" ? "Time In" : "Time Out" }}
-        </div>
-      </div>
-      <div v-if="notifications.length === 0" class="no-notifications">
-        No notifications yet
-      </div>
-    </div>
-  </div>
+  <!-- NOTIFICATION COMPONENT -->
+  <NotificationPanel :isOpen="showNotifications" @close="toggleNotifications" />
 
   <!-- USER INFO -->
   <div class="container" :class="{ 'sidebar-collapsed': !isOpen }">
@@ -320,11 +296,15 @@ import { QrcodeStream } from "vue-qrcode-reader";
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { authService, qrService, eventService } from "@/api/services";
+import NotificationPanel from "@/components/NotificationPanel.vue"; // Import the notification component
 
 export default {
+  name: "safety",
+
   components: {
     VueCal,
     QrcodeStream,
+    NotificationPanel, // Register the component
   },
   setup() {
     const router = useRouter();

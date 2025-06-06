@@ -60,24 +60,8 @@
     </div>
   </header>
 
-  <!-- NOTIFICATION PANEL -->
-  <div class="notification-panel" :class="{ open: showNotifications }">
-    <div class="notification-header">
-      <h2>Notifications</h2>
-      <i class="bx bx-x close-btn" @click="toggleNotifications"></i>
-    </div>
-    <div class="notification-list">
-      <div
-        class="notification-item"
-        v-for="(notif, index) in notifications"
-        :key="index"
-      >
-        <h4>Task Completed</h4>
-        <p>{{ notif.message }}</p>
-        <span class="time">{{ notif.time }}</span>
-      </div>
-    </div>
-  </div>
+  <!-- NOTIFICATION COMPONENT -->
+  <NotificationPanel :isOpen="showNotifications" @close="toggleNotifications" />
 
   <!-- OVERLAY (Para i-disable background) -->
   <div
@@ -281,6 +265,7 @@
 import { ref, computed, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { authService, eventService } from "../api/services";
+import NotificationPanel from "@/components/NotificationPanel.vue"; // Import the notification component
 
 // === Sidebar Toggle ===
 const isSidebarOpen = ref(true);
@@ -497,5 +482,8 @@ const formatTime = (timeStr) => {
   });
 };
 </script>
+
+name: "safety", components: { QrcodeStream, VueCal, VueQrcode,
+NotificationPanel, // Register the component },
 
 <style scoped src="/src/assets/CSS Volunteers/registration.css"></style>

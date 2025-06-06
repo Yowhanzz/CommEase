@@ -109,13 +109,7 @@ i {
 }
 
 .logout-modal {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.1),
-    rgba(255, 255, 255, 0)
-  );
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background-color: #f2f4ec;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.18);
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
@@ -129,11 +123,11 @@ i {
 
 .logout-modal h2 {
   margin-bottom: 10px;
-  color: #f2f4ec;
+  color: black;
 }
 
 .logout-modal p {
-  color: #f2f4ec;
+  color: black;
   padding-bottom: 10px;
 }
 
@@ -145,9 +139,9 @@ i {
 
 .logout-btn {
   background: #435739;
+  border: 1px solid #435739;
   color: #f2f4ec;
   padding: 8px 15px;
-  border: none;
   border-radius: 5px;
   cursor: pointer;
   font-weight: 550;
@@ -155,16 +149,15 @@ i {
 }
 
 .cancel-btn {
-  background: #f2f4ec;
-  color: #435739;
+  background: #b6b8af;
+  color: black;
+  border: 1px solid #435739;
   padding: 8px 15px;
-  border: none;
   border-radius: 5px;
   cursor: pointer;
   transition: 0.15s ease-in-out background-color;
   font-weight: 550;
 }
-
 .logout-btn:hover {
   background-color: #f2f4ec;
   color: #435739;
