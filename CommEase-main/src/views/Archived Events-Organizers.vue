@@ -195,6 +195,8 @@
 <script>
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import NotificationPanel from "@/components/NotificationPanel.vue"; // Import the notification component
+
 import {
   authService,
   eventService,
