@@ -718,3 +718,10 @@ span {
     width: calc(100% - 20px) !important;
   }
 }
+
+@media (max-width: 562px) {
+  .logout-modal {
+    scale: 0.9;
+    margin-left: 50px;
+  }
+}

@@ -729,3 +729,10 @@ i {
     margin-top: -0.5rem;
   }
 }
+
+@media (max-width: 562px) {
+  .logout-modal {
+    scale: 0.9;
+    margin-left: 50px;
+  }
+}
