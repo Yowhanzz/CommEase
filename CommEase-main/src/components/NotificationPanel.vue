@@ -3,17 +3,52 @@
   <div class="notification-panel" :class="{ open: isOpen }">
     <div class="notification-header">
       <h2>Notifications</h2>
-      <i class="bx bx-x close-btn" @click="closeNotifications"></i>
+      <div class="header-actions">
+        <button
+          v-if="unreadCount > 0"
+          @click="markAllAsRead"
+          class="mark-all-read-btn"
+          title="Mark all as read"
+        >
+          Mark all read
+        </button>
+        <i class="bx bx-x close-btn" @click="closeNotifications"></i>
+      </div>
     </div>
     <div class="notification-list">
+      <!-- Loading state -->
+      <div v-if="loading" class="loading-state">
+        <p>Loading notifications...</p>
+      </div>
+
+      <!-- No notifications -->
+      <div v-else-if="notifications.length === 0" class="no-notifications">
+        <p>No notifications yet</p>
+      </div>
+
+      <!-- Notification items -->
       <div
+        v-else
         class="notification-item"
-        v-for="(notif, index) in notifications"
-        :key="index"
+        v-for="notification in notifications"
+        :key="notification.id"
+        :class="{ unread: !notification.read }"
+        @click="markAsRead(notification)"
       >
-        <h4>Task Completed</h4>
-        <p>{{ notif.message }}</p>
-        <span class="time">{{ notif.time }}</span>
+        <div class="notification-content">
+          <div class="notification-type-badge" :class="notification.type">
+            {{ getNotificationTypeLabel(notification.type) }}
+          </div>
+          <p class="notification-message">{{ notification.message }}</p>
+          <span class="time">{{ notification.time }}</span>
+        </div>
+        <div class="notification-actions">
+          <i
+            class="bx bx-trash delete-btn"
+            @click.stop="deleteNotification(notification)"
+            title="Delete notification"
+          ></i>
+        </div>
       </div>
     </div>
   </div>
@@ -24,37 +59,65 @@
 
 <script>
 export default {
-  name: "Notifications",
+  name: "NotificationPanel",
 
   props: {
     isOpen: {
       type: Boolean,
       default: false,
     },
-  },
-
-  data() {
-    return {
-      notifications: [
-        {
-          message: 'You completed the "Update website content" task.',
-          time: "2 hours ago",
-        },
-        {
-          message: 'You completed the "Clean up drive" task.',
-          time: "3 hours ago",
-        },
-        {
-          message: 'You completed the "Meeting with organizers" task.',
-          time: "5 hours ago",
-        },
-      ],
-    };
+    notifications: {
+      type: Array,
+      default: () => [],
+    },
+    loading: {
+      type: Boolean,
+      default: false,
+    },
+    unreadCount: {
+      type: Number,
+      default: 0,
+    },
   },
 
   methods: {
     closeNotifications() {
       this.$emit("close");
+    },
+
+    markAsRead(notification) {
+      if (!notification.read) {
+        this.$emit("mark-as-read", notification.id);
+      }
+    },
+
+    markAllAsRead() {
+      this.$emit("mark-all-as-read");
+    },
+
+    deleteNotification(notification) {
+      if (confirm("Are you sure you want to delete this notification?")) {
+        this.$emit("delete-notification", notification.id);
+      }
+    },
+
+    getNotificationTypeLabel(type) {
+      const typeLabels = {
+        new_event: "New Event",
+        event_started: "Event Started",
+        event_ended: "Event Ended",
+        event_updated: "Event Updated",
+        event_cancelled: "Event Cancelled",
+        volunteer_registered: "Volunteer Registered",
+        volunteer_unregistered: "Volunteer Unregistered",
+        volunteer_time_in: "Time In",
+        volunteer_time_out: "Time Out",
+        attendance_marked: "Attendance Marked",
+        new_feedback: "New Feedback",
+        new_post_evaluation: "New Evaluation",
+        things_brought_updated: "Items Updated",
+      };
+      return typeLabels[type] || "Notification";
     },
   },
 };
@@ -107,6 +170,27 @@ export default {
   color: black;
 }
 
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.mark-all-read-btn {
+  background: #435739;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.mark-all-read-btn:hover {
+  background: #2d3d26;
+}
+
 .close-btn {
   font-size: 24px;
   cursor: pointer;
@@ -124,6 +208,14 @@ export default {
   cursor: pointer;
   color: black;
   transition: 0.15s ease-in-out background-color, 0.15s ease-in-out color;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.notification-item.unread {
+  background: rgba(67, 87, 57, 0.1);
+  border-left: 4px solid #435739;
 }
 
 .notification-item:hover {
@@ -132,7 +224,77 @@ export default {
 }
 
 .notification-item:hover .time {
-  color: #daf1de; /* Change the color of the span.time on hover */
+  color: #daf1de;
+}
+
+.notification-content {
+  flex: 1;
+}
+
+.notification-type-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: bold;
+  margin-bottom: 5px;
+  text-transform: uppercase;
+}
+
+.notification-type-badge.new_event {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.notification-type-badge.event_started {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.notification-type-badge.event_ended {
+  background: #fff3e0;
+  color: #f57c00;
+}
+
+.notification-type-badge.volunteer_time_in {
+  background: #e3f2fd;
+  color: #1976d2;
+}
+
+.notification-type-badge.volunteer_time_out {
+  background: #e8f5e9;
+  color: #2e7d32;
+}
+
+.notification-message {
+  margin: 5px 0;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.notification-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.delete-btn {
+  font-size: 16px;
+  color: #666;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.delete-btn:hover {
+  color: #dc3545;
+}
+
+.loading-state,
+.no-notifications {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-style: italic;
 }
 
 .notification-item h4 {

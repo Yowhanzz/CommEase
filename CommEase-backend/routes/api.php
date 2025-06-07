@@ -99,7 +99,13 @@ Route::middleware(['web', 'auth', CheckRole::class.':volunteer'])->group(functio
 Route::middleware(['web', 'auth'])->group(function () {
     Route::get('user/profile', [AuthController::class, 'profile']);
     Route::put('user/profile', [AuthController::class, 'updateProfile']);
+
+    // Notification routes
     Route::get('notifications', [NotificationController::class, 'index']);
-    Route::put('notifications/{notification}', [NotificationController::class, 'markAsRead']);
+    Route::put('notifications/{notification}/read', [NotificationController::class, 'markAsRead']);
+    Route::put('notifications/mark-all-read', [NotificationController::class, 'markAllAsRead']);
+    Route::get('notifications/unread-count', [NotificationController::class, 'getUnreadCount']);
+    Route::delete('notifications/{notification}', [NotificationController::class, 'destroy']);
+
     Route::get('user/qr', [AuthController::class, 'getUserQR']);
 });

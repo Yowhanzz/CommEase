@@ -77,7 +77,16 @@
   </header>
 
   <!-- NOTIFICATION COMPONENT -->
-  <NotificationPanel :isOpen="showNotifications" @close="toggleNotifications" />
+  <NotificationPanel
+    :isOpen="showNotifications"
+    :notifications="notifications"
+    :loading="notificationLoading"
+    :unreadCount="unreadCount"
+    @close="toggleNotifications"
+    @mark-as-read="handleMarkAsRead"
+    @mark-all-as-read="handleMarkAllAsRead"
+    @delete-notification="handleDeleteNotification"
+  />
 
   <!-- OVERLAY (Para i-disable background) -->
   <div
@@ -334,6 +343,7 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import { authService } from "../api/services";
+import { useNotifications } from "@/composables/useNotifications";
 import NotificationPanel from "@/components/NotificationPanel.vue"; // Import the notification component
 
 export default {
@@ -346,32 +356,42 @@ export default {
     return {
       isOpen: false, // you requested this
       isSidebarOpen: false, // toggle sidebar
-      showNotifications: false,
-
       //
       isMobile: false,
 
       showLogoutModal: false,
-      notifications: [
-        {
-          message: 'You completed the "Update website content" task.',
-          time: "2 hours ago",
-        },
-        {
-          message: 'You completed the "Clean up drive" task.',
-          time: "3 hours ago",
-        },
-        {
-          message: 'You completed the "Meeting with organizers" task.',
-          time: "5 hours ago",
-        },
-      ],
     };
   },
 
   setup() {
     const router = useRouter();
-    return { router };
+
+    // Use notification composable
+    const {
+      notifications,
+      notificationLoading,
+      unreadCount,
+      showNotifications,
+      fetchNotifications,
+      toggleNotifications,
+      handleMarkAsRead,
+      handleMarkAllAsRead,
+      handleDeleteNotification,
+      addLocalNotification,
+    } = useNotifications();
+
+    return {
+      router,
+      // Notification functionality
+      notifications,
+      notificationLoading,
+      unreadCount,
+      showNotifications,
+      toggleNotifications,
+      handleMarkAsRead,
+      handleMarkAllAsRead,
+      handleDeleteNotification,
+    };
   },
 
   methods: {
@@ -388,9 +408,7 @@ export default {
       }
     },
 
-    toggleNotifications() {
-      this.showNotifications = !this.showNotifications;
-    },
+
 
     async confirmLogout() {
       try {

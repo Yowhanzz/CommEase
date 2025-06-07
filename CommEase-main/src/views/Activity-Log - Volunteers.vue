@@ -65,7 +65,13 @@
     <!-- NOTIFICATION COMPONENT -->
     <NotificationPanel
       :isOpen="showNotifications"
+      :notifications="notifications"
+      :loading="notificationLoading"
+      :unreadCount="unreadCount"
       @close="toggleNotifications"
+      @mark-as-read="handleMarkAsRead"
+      @mark-all-as-read="handleMarkAllAsRead"
+      @delete-notification="handleDeleteNotification"
     />
 
     <!-- OVERLAY -->
@@ -116,7 +122,7 @@
             <td>{{ event.organizer }}</td>
             <td>
               <button
-                v-if="event.status === 'upcoming'"
+                v-if="['pending', 'upcoming'].includes(event.status)"
                 @click="unregisterFromEvent(event.id)"
                 class="unregister-btn"
               >
@@ -223,6 +229,7 @@ import {
   formatDate,
   eventService,
 } from "../api/services";
+import { useNotifications } from "@/composables/useNotifications";
 import axios from "axios";
 import NotificationPanel from "@/components/NotificationPanel.vue"; // Import the notification component
 import { QrcodeStream } from "vue-qrcode-reader";
@@ -233,28 +240,26 @@ axios.defaults.baseURL = "http://localhost:8000";
 
 const router = useRouter();
 
-const showNotifications = ref(false);
+// Use notification composable
+const {
+  notifications,
+  notificationLoading,
+  unreadCount,
+  showNotifications,
+  fetchNotifications,
+  toggleNotifications,
+  handleMarkAsRead,
+  handleMarkAllAsRead,
+  handleDeleteNotification,
+  addLocalNotification,
+} = useNotifications();
+
 const showLogoutModal = ref(false);
 const isOpen = ref(false);
 const isSidebarOpen = ref(false);
 const isMobile = ref(false);
 const searchQuery = ref("");
 const events = ref([]);
-
-const notifications = ref([
-  {
-    message: "You completed the 'Update website content' task.",
-    time: "2 hours ago",
-  },
-  {
-    message: "You completed the 'Clean up drive' task.",
-    time: "3 hours ago",
-  },
-  {
-    message: "You completed the 'Meeting with organizers' task.",
-    time: "5 hours ago",
-  },
-]);
 
 const filteredEvents = computed(() => {
   if (!Array.isArray(events.value)) {
@@ -300,9 +305,7 @@ async function unregisterFromEvent(eventId) {
   }
 }
 
-function toggleNotifications() {
-  showNotifications.value = !showNotifications.value;
-}
+
 
 function handleResize() {
   isMobile.value = window.innerWidth <= 928;

@@ -82,7 +82,13 @@
     <!-- NOTIFICATION COMPONENT -->
     <NotificationPanel
       :isOpen="showNotifications"
+      :notifications="notifications"
+      :loading="notificationLoading"
+      :unreadCount="unreadCount"
       @close="toggleNotifications"
+      @mark-as-read="handleMarkAsRead"
+      @mark-all-as-read="handleMarkAllAsRead"
+      @delete-notification="handleDeleteNotification"
     />
 
     <!-- OVERLAY -->
@@ -144,6 +150,7 @@
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { authService } from "@/api/services";
+import { useNotifications } from "@/composables/useNotifications";
 import NotificationPanel from "@/components/NotificationPanel.vue"; // Import the notification component
 
 export default {
@@ -154,25 +161,25 @@ export default {
   },
   setup() {
     const router = useRouter();
-    const showNotifications = ref(false);
+
+    // Use notification composable
+    const {
+      notifications,
+      notificationLoading,
+      unreadCount,
+      showNotifications,
+      fetchNotifications,
+      toggleNotifications,
+      handleMarkAsRead,
+      handleMarkAllAsRead,
+      handleDeleteNotification,
+      addLocalNotification,
+    } = useNotifications();
+
     const showLogoutModal = ref(false);
     const isOpen = ref(false);
     const isSidebarOpen = ref(false);
     const searchQuery = ref("");
-    const notifications = ref([
-      {
-        message: "You completed the 'Update website content' task.",
-        time: "2 hours ago",
-      },
-      {
-        message: "You completed the 'Clean up drive' task.",
-        time: "3 hours ago",
-      },
-      {
-        message: "You completed the 'Meeting with organizers' task.",
-        time: "5 hours ago",
-      },
-    ]);
     const events = ref([
       {
         name: "Johannes De Jesus",
@@ -243,10 +250,6 @@ export default {
       });
     });
 
-    const toggleNotifications = () => {
-      showNotifications.value = !showNotifications.value;
-    };
-
     const toggleSidebar = () => {
       isSidebarOpen.value = !isSidebarOpen.value;
       isOpen.value = !isOpen.value; // optional if you're toggling extra state
@@ -264,15 +267,22 @@ export default {
     };
 
     return {
+      // Notification functionality
+      notifications,
+      notificationLoading,
+      unreadCount,
       showNotifications,
+      toggleNotifications,
+      handleMarkAsRead,
+      handleMarkAllAsRead,
+      handleDeleteNotification,
+      // Other functionality
       showLogoutModal,
       isOpen,
       isSidebarOpen,
       searchQuery,
-      notifications,
       events,
       filteredEvents,
-      toggleNotifications,
       toggleSidebar,
       confirmLogout,
     };

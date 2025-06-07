@@ -102,14 +102,15 @@
       </div>
       <vue-cal
         style="height: 500px"
-        :events="
-          events.map((event) => ({
-            start: event.start_time,
-            end: event.end_time,
-            title: event.event_title,
-          }))
-        "
+        :events="calendarEvents"
         @cell-click="onDateClick"
+        @event-click="onEventClick"
+        :disable-views="['years', 'year']"
+        :time-from="5 * 60"
+        :time-to="22 * 60"
+        :time-step="30"
+        :snap-to-time="30"
+        :show-all-day-events="true"
       />
     </div>
   </div>
@@ -129,7 +130,16 @@
   </div>
 
   <!-- NOTIFICATION COMPONENT -->
-  <NotificationPanel :isOpen="showNotifications" @close="toggleNotifications" />
+  <NotificationPanel
+    :isOpen="showNotifications"
+    :notifications="notifications"
+    :loading="notificationLoading"
+    :unreadCount="unreadCount"
+    @close="toggleNotifications"
+    @mark-as-read="handleMarkAsRead"
+    @mark-all-as-read="handleMarkAllAsRead"
+    @delete-notification="handleDeleteNotification"
+  />
 
   <!-- USER INFO -->
   <div class="container" :class="{ 'sidebar-collapsed': !isOpen }">
@@ -182,9 +192,11 @@
 
     <select v-model="selectedStatus" class="program-filter-dropdown">
       <option value="">Status:</option>
-      <option value="Pending">Pending</option>
-      <option value="Active">Active</option>
-      <option value="Completed">Completed</option>
+      <option value="pending">Pending</option>
+      <option value="upcoming">Upcoming</option>
+      <option value="ongoing">Ongoing</option>
+      <option value="completed">Completed</option>
+      <option value="cancelled">Cancelled</option>
     </select>
 
     <div
@@ -225,14 +237,14 @@
           </div>
           <div class="button">
             <button
-              v-if="event.status && event.status.toLowerCase() === 'upcoming'"
+              v-if="event.status && ['pending', 'upcoming'].includes(event.status.toLowerCase())"
               @click="registerForEvent(event.id)"
               class="button-enter"
             >
               Register
             </button>
             <span v-else class="button-enter disabled">
-              {{ event.status.charAt(0).toUpperCase() + event.status.slice(1) }}
+              {{ event.status ? event.status.charAt(0).toUpperCase() + event.status.slice(1) : 'Unknown' }}
             </span>
           </div>
         </div>
@@ -255,8 +267,10 @@ import {
   eventService,
   formatTime,
   formatDate,
+  formatEventForCalendar,
   qrService,
 } from "../api/services";
+import { useNotifications } from "@/composables/useNotifications";
 import axios from "axios";
 
 export default {
@@ -269,9 +283,34 @@ export default {
     NotificationPanel, // Register the component
   },
   setup() {
+    // Use notification composable
+    const {
+      notifications,
+      notificationLoading,
+      unreadCount,
+      showNotifications,
+      fetchNotifications,
+      toggleNotifications,
+      handleMarkAsRead,
+      handleMarkAllAsRead,
+      handleDeleteNotification,
+      addLocalNotification,
+    } = useNotifications();
+
     return {
       formatTime,
       formatDate,
+      // Notification functionality
+      notifications,
+      notificationLoading,
+      unreadCount,
+      showNotifications,
+      fetchNotifications,
+      toggleNotifications,
+      handleMarkAsRead,
+      handleMarkAllAsRead,
+      handleDeleteNotification,
+      addLocalNotification,
     };
   },
   data() {
@@ -289,7 +328,6 @@ export default {
       searchQuery: "",
       showDropdown: false,
       activeContent: null,
-      showNotifications: false,
       showLogoutModal: false,
       isSidebarOpen: false,
       isOpen: false,
@@ -304,21 +342,8 @@ export default {
           title: "Clean up Drive",
         },
       ],
-      notifications: [
-        {
-          message: "You completed the 'Update website content' task.",
-          time: "2 hours ago",
-        },
-        {
-          message: "You completed the 'Clean up drive' task.",
-          time: "3 hours ago",
-        },
-        {
-          message: "You completed the 'Meeting with organizers' task.",
-          time: "5 hours ago",
-        },
-      ],
       events: [],
+      allEvents: [], // For calendar display - all events regardless of registration
       loading: false,
       error: null,
       firstName: "",
@@ -345,9 +370,26 @@ export default {
         return matchesSearch && matchesStatus;
       });
     },
+    calendarEvents() {
+      // Transform all events for calendar display
+      console.log("Computing calendar events from:", this.allEvents);
+      const transformed = this.allEvents
+        .map(event => {
+          const formatted = formatEventForCalendar(event);
+          if (!formatted) {
+            console.warn("Failed to format event:", event);
+          }
+          return formatted;
+        })
+        .filter(event => event !== null);
+
+      console.log("Transformed calendar events:", transformed);
+      return transformed;
+    },
   },
   async mounted() {
     await this.fetchEvents();
+    await this.fetchAllEvents();
     await this.fetchUserData();
     await this.fetchWeather();
   },
@@ -365,6 +407,29 @@ export default {
         console.error("Error fetching events:", err);
       } finally {
         this.loading = false;
+      }
+    },
+    async fetchAllEvents() {
+      try {
+        console.log("Fetching all events for calendar...");
+        const response = await eventService.getAllEvents();
+        console.log("Raw API response:", response);
+
+        // Handle both possible response structures
+        const eventsData = response.data.data || response.data;
+        this.allEvents = Array.isArray(eventsData) ? eventsData : [];
+
+        console.log("Processed events for calendar:", this.allEvents);
+        console.log("Number of events:", this.allEvents.length);
+
+        // Log first event for debugging
+        if (this.allEvents.length > 0) {
+          console.log("Sample event:", this.allEvents[0]);
+        }
+      } catch (err) {
+        console.error("Error fetching all events for calendar:", err);
+        console.error("Error details:", err.response?.data);
+        // Don't show error to user for calendar events, just log it
       }
     },
     async fetchUserData() {
@@ -415,15 +480,22 @@ export default {
     closeModal() {
       this.activeContent = null;
     },
-    toggleNotifications() {
-      this.showNotifications = !this.showNotifications;
-    },
+
     onDateClick({ date }) {
-      const selected = this.events.find((event) => {
+      const selected = this.allEvents.find((event) => {
         const eventDate = new Date(event.date).toLocaleDateString();
         return eventDate === new Date(date).toLocaleDateString();
       });
       this.selectedEvent = selected || null;
+    },
+    onEventClick(event, e) {
+      // Find the original event data from the calendar event
+      const originalEvent = this.allEvents.find(evt => evt.event_title === event.title);
+      if (originalEvent) {
+        this.selectedEvent = originalEvent;
+        // You can add more actions here, like showing event details
+        console.log("Selected event:", originalEvent);
+      }
     },
     async confirmLogout() {
       try {
@@ -461,3 +533,58 @@ export default {
 </script>
 
 <style scoped src="/src/assets/CSS Volunteers/dashboard.css"></style>
+
+<style scoped>
+/* Calendar event styling */
+:deep(.vuecal__event) {
+  border-radius: 6px;
+  font-size: 12px;
+  padding: 2px 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+:deep(.event-status-pending) {
+  background-color: #fbbf24 !important;
+  color: #92400e !important;
+  border-left: 4px solid #f59e0b;
+}
+
+:deep(.event-status-upcoming) {
+  background-color: #60a5fa !important;
+  color: #1e40af !important;
+  border-left: 4px solid #3b82f6;
+}
+
+:deep(.event-status-ongoing) {
+  background-color: #34d399 !important;
+  color: #065f46 !important;
+  border-left: 4px solid #10b981;
+}
+
+:deep(.event-status-completed) {
+  background-color: #9ca3af !important;
+  color: #374151 !important;
+  border-left: 4px solid #6b7280;
+}
+
+:deep(.event-status-cancelled) {
+  background-color: #f87171 !important;
+  color: #7f1d1d !important;
+  border-left: 4px solid #ef4444;
+}
+
+:deep(.calendar-event-content) {
+  line-height: 1.2;
+}
+
+:deep(.calendar-event-content strong) {
+  display: block;
+  margin-bottom: 2px;
+}
+
+:deep(.calendar-event-content small) {
+  display: block;
+  opacity: 0.8;
+  font-size: 10px;
+}
+</style>

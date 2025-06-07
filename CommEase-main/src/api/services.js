@@ -341,6 +341,97 @@ export const eventService = {
       throw error;
     }
   },
+
+  async getAllEvents() {
+    try {
+      // Fetch all events without role-specific filtering for calendar display
+      const response = await api.get("/events", {
+        params: {
+          include: "organizer,volunteers",
+          all: "true", // Request all events regardless of user role (must be string)
+        },
+      });
+
+      console.log("getAllEvents API call made with params:", {
+        include: "organizer,volunteers",
+        all: "true"
+      });
+
+      // Handle both possible response structures
+      const eventsData = response.data.data || response.data;
+      return {
+        ...response,
+        data: Array.isArray(eventsData) ? eventsData : [],
+      };
+    } catch (error) {
+      console.error("Failed to fetch all events:", error);
+      throw error;
+    }
+  },
+};
+
+// Notification Services
+export const notificationService = {
+  // Get all notifications for the current user
+  async getNotifications() {
+    try {
+      console.log("Making API call to /notifications");
+      const response = await api.get("/notifications");
+      console.log("Notification API response:", response);
+      console.log("Response data:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch notifications:", error);
+      console.error("Error status:", error.response?.status);
+      console.error("Error data:", error.response?.data);
+      console.error("Error message:", error.message);
+      throw error;
+    }
+  },
+
+  // Mark a specific notification as read
+  async markAsRead(notificationId) {
+    try {
+      const response = await api.put(`/notifications/${notificationId}/read`);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to mark notification as read:", error);
+      throw error;
+    }
+  },
+
+  // Mark all notifications as read
+  async markAllAsRead() {
+    try {
+      const response = await api.put("/notifications/mark-all-read");
+      return response.data;
+    } catch (error) {
+      console.error("Failed to mark all notifications as read:", error);
+      throw error;
+    }
+  },
+
+  // Get unread notification count
+  async getUnreadCount() {
+    try {
+      const response = await api.get("/notifications/unread-count");
+      return response.data.unread_count;
+    } catch (error) {
+      console.error("Failed to fetch unread count:", error);
+      throw error;
+    }
+  },
+
+  // Delete a notification
+  async deleteNotification(notificationId) {
+    try {
+      const response = await api.delete(`/notifications/${notificationId}`);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to delete notification:", error);
+      throw error;
+    }
+  },
 };
 
 // QR Code and Attendance Services
@@ -486,4 +577,62 @@ export const formatDate = (
   return inputFormat
     ? dayjs(date, inputFormat).format(outputFormat)
     : dayjs(date).format(outputFormat);
+};
+
+// Calendar-specific formatting functions
+export const formatCalendarDateTime = (date, time) => {
+  if (!date || !time) return "";
+
+  try {
+    // Handle different time formats from backend
+    let timeString = time;
+
+    // If time is already a full datetime string, extract just the time part
+    if (time.includes('T') || time.includes(' ')) {
+      timeString = dayjs(time).format('HH:mm:ss');
+    }
+
+    // Combine date and time for calendar display
+    const dateTimeString = `${date} ${timeString}`;
+    return dayjs(dateTimeString).tz("Asia/Manila").format();
+  } catch (error) {
+    console.error("Error formatting calendar datetime:", error, { date, time });
+    return "";
+  }
+};
+
+export const formatEventForCalendar = (event) => {
+  if (!event) return null;
+
+  try {
+    // Create start and end datetime strings
+    const startDateTime = formatCalendarDateTime(event.date, event.start_time);
+    const endDateTime = formatCalendarDateTime(event.date, event.end_time);
+
+    // Skip events with invalid dates
+    if (!startDateTime || !endDateTime) {
+      console.warn("Skipping event with invalid dates:", event);
+      return null;
+    }
+
+    return {
+      start: startDateTime,
+      end: endDateTime,
+      title: event.event_title || "Untitled Event",
+      content: `
+        <div class="calendar-event-content">
+          <strong>${event.event_title}</strong><br>
+          <small>📍 Barangay ${event.barangay}</small><br>
+          <small>👥 ${(event.programs || []).join(", ")}</small><br>
+          <small>📊 ${event.status || "Unknown"}</small>
+        </div>
+      `,
+      class: `event-status-${(event.status || "unknown").toLowerCase()}`,
+      deletable: false,
+      resizable: false,
+    };
+  } catch (error) {
+    console.error("Error formatting event for calendar:", error, event);
+    return null;
+  }
 };
