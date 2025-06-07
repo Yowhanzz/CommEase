@@ -171,8 +171,15 @@
       </div>
       <vue-cal
         style="height: 500px"
-        :events="events"
+        :events="calendarEvents"
         @cell-click="onDateClick"
+        @event-click="onEventClick"
+        :disable-views="['years', 'year']"
+        :time-from="5 * 60"
+        :time-to="22 * 60"
+        :time-step="30"
+        :snap-to-time="30"
+        :show-all-day-events="false"
       />
     </div>
   </div>
@@ -192,7 +199,16 @@
   </div>
 
   <!-- NOTIFICATION COMPONENT -->
-  <NotificationPanel :isOpen="showNotifications" @close="toggleNotifications" />
+  <NotificationPanel
+    :isOpen="showNotifications"
+    :notifications="notifications"
+    :loading="notificationLoading"
+    :unreadCount="unreadCount"
+    @close="toggleNotifications"
+    @mark-as-read="handleMarkAsRead"
+    @mark-all-as-read="handleMarkAllAsRead"
+    @delete-notification="handleDeleteNotification"
+  />
 
   <!-- USER INFO -->
   <div class="container" :class="{ 'sidebar-collapsed': !isOpen }">
@@ -235,9 +251,11 @@
       <!-- DROPDOWN STATUS -->
       <select v-model="selectedStatus" class="program-filter-dropdown">
         <option value="">Status:</option>
-        <option value="Pending">Pending</option>
-        <option value="Active">Active</option>
-        <option value="Completed">Completed</option>
+        <option value="pending">Pending</option>
+        <option value="upcoming">Upcoming</option>
+        <option value="ongoing">Ongoing</option>
+        <option value="completed">Completed</option>
+        <option value="cancelled">Cancelled</option>
       </select>
 
       <!-- DROPDOWN PROGRAM -->
@@ -293,9 +311,9 @@
 import "vue-cal/dist/vuecal.css";
 import VueCal from "vue-cal";
 import { QrcodeStream } from "vue-qrcode-reader";
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
-import { authService, qrService, eventService } from "@/api/services";
+import { authService, qrService, eventService, notificationService, formatEventForCalendar } from "@/api/services";
 import NotificationPanel from "@/components/NotificationPanel.vue"; // Import the notification component
 
 export default {
@@ -319,13 +337,17 @@ export default {
     const showLogoutModal = ref(false);
     const isSidebarOpen = ref(false);
     const isOpen = ref(false);
+    const isMobile = ref(false);
     const qrData = ref("sample-qr-data");
     const calendarVisible = ref(false);
     const selectedEvent = ref(null);
     const showQRCode = ref(false);
     const useManualInput = ref(false);
     const notifications = ref([]);
+    const notificationLoading = ref(false);
+    const unreadCount = ref(0);
     const events = ref([]);
+    const allEvents = ref([]); // For calendar display - all events regardless of organizer
 
     // Only show ongoing events in the QR scanner dropdown
     const ongoingEvents = computed(() =>
@@ -345,19 +367,87 @@ export default {
       }
     };
 
+    // Fetch all events for calendar display
+    const fetchAllEvents = async () => {
+      try {
+        console.log("Fetching all events for calendar...");
+        const response = await eventService.getAllEvents();
+        console.log("Raw API response:", response);
+
+        const eventsData = response.data.data || response.data;
+        allEvents.value = Array.isArray(eventsData) ? eventsData : [];
+
+        console.log("Processed events for calendar:", allEvents.value);
+        console.log("Number of events:", allEvents.value.length);
+
+        // Log first event for debugging
+        if (allEvents.value.length > 0) {
+          console.log("Sample event:", allEvents.value[0]);
+        }
+      } catch (err) {
+        console.error("Error fetching all events for calendar:", err);
+        console.error("Error details:", err.response?.data);
+      }
+    };
+
     // Fetch notifications
     const fetchNotifications = async () => {
       try {
-        const response = await api.get("/notifications");
-        notifications.value = response.data;
+        notificationLoading.value = true;
+        console.log("🔔 fetchNotifications called - starting notification fetch");
+
+        // Test if notificationService exists
+        if (!notificationService) {
+          console.error("❌ notificationService is undefined!");
+          return;
+        }
+
+        console.log("✅ notificationService exists, calling getNotifications()");
+        const response = await notificationService.getNotifications();
+        console.log("✅ Notifications response received:", response);
+
+        if (response && response.notifications) {
+          notifications.value = response.notifications;
+          unreadCount.value = response.unread_count || 0;
+          console.log("✅ Notifications loaded:", notifications.value.length, "notifications");
+          console.log("✅ Unread count:", unreadCount.value);
+        } else {
+          console.error("❌ Invalid response structure:", response);
+          notifications.value = [];
+          unreadCount.value = 0;
+        }
       } catch (error) {
-        console.error("Failed to fetch notifications:", error);
+        console.error("❌ Failed to fetch notifications:", error);
+        console.error("❌ Error status:", error.response?.status);
+        console.error("❌ Error data:", error.response?.data);
+        console.error("❌ Error message:", error.message);
+        notifications.value = [];
+        unreadCount.value = 0;
+      } finally {
+        notificationLoading.value = false;
+        console.log("🔔 fetchNotifications completed");
+      }
+    };
+
+    // Handle window resize for mobile detection
+    const handleResize = () => {
+      isMobile.value = window.innerWidth <= 928;
+      if (isMobile.value) {
+        isSidebarOpen.value = false;
       }
     };
 
     onMounted(() => {
       fetchEvents();
+      fetchAllEvents();
       fetchNotifications();
+      handleResize();
+      window.addEventListener('resize', handleResize);
+    });
+
+    // Clean up event listener
+    onUnmounted(() => {
+      window.removeEventListener('resize', handleResize);
     });
 
     const filteredEvents = computed(() => {
@@ -379,6 +469,23 @@ export default {
 
         return matchesSearch && matchesStatus && matchesProgram;
       });
+    });
+
+    // Calendar events computed property
+    const calendarEvents = computed(() => {
+      console.log("Computing calendar events from:", allEvents.value);
+      const transformed = allEvents.value
+        .map(event => {
+          const formatted = formatEventForCalendar(event);
+          if (!formatted) {
+            console.warn("Failed to format event:", event);
+          }
+          return formatted;
+        })
+        .filter(event => event !== null);
+
+      console.log("Transformed calendar events:", transformed);
+      return transformed;
     });
 
     const toggleSidebar = () => {
@@ -488,16 +595,30 @@ export default {
     };
 
     const onDateClick = ({ date }) => {
-      const selected = events.value.find(
-        (event) =>
-          new Date(event.start).toLocaleDateString() ===
-          new Date(date).toLocaleDateString()
-      );
+      const selected = allEvents.value.find((event) => {
+        const eventDate = new Date(event.date).toLocaleDateString();
+        return eventDate === new Date(date).toLocaleDateString();
+      });
       selectedEvent.value = selected || null;
     };
 
-    const toggleNotifications = () => {
+    const onEventClick = (event, e) => {
+      // Find the original event data from the calendar event
+      const originalEvent = allEvents.value.find(evt => evt.event_title === event.title);
+      if (originalEvent) {
+        selectedEvent.value = originalEvent;
+        console.log("Selected event:", originalEvent);
+      }
+    };
+
+    const toggleNotifications = async () => {
       showNotifications.value = !showNotifications.value;
+
+      // Fetch notifications when opening the panel
+      if (showNotifications.value) {
+        console.log("🔔 Notification panel opened - fetching notifications");
+        await fetchNotifications();
+      }
     };
 
     const formatTime = (datetime) => {
@@ -532,6 +653,7 @@ export default {
       try {
         // Add new notification to the list
         notifications.value.unshift({
+          id: Date.now(), // Temporary ID for local notifications
           message,
           type,
           time: "Just now",
@@ -542,8 +664,56 @@ export default {
         if (notifications.value.length > 10) {
           notifications.value = notifications.value.slice(0, 10);
         }
+
+        // Update unread count
+        unreadCount.value++;
       } catch (error) {
         console.error("Failed to update notifications:", error);
+      }
+    };
+
+    // Handle notification actions
+    const handleMarkAsRead = async (notificationId) => {
+      try {
+        await notificationService.markAsRead(notificationId);
+        // Update local state
+        const notification = notifications.value.find(n => n.id === notificationId);
+        if (notification && !notification.read) {
+          notification.read = true;
+          unreadCount.value = Math.max(0, unreadCount.value - 1);
+        }
+      } catch (error) {
+        console.error("Failed to mark notification as read:", error);
+      }
+    };
+
+    const handleMarkAllAsRead = async () => {
+      try {
+        await notificationService.markAllAsRead();
+        // Update local state
+        notifications.value.forEach(notification => {
+          notification.read = true;
+        });
+        unreadCount.value = 0;
+      } catch (error) {
+        console.error("Failed to mark all notifications as read:", error);
+      }
+    };
+
+    const handleDeleteNotification = async (notificationId) => {
+      try {
+        await notificationService.deleteNotification(notificationId);
+        // Remove from local state
+        const index = notifications.value.findIndex(n => n.id === notificationId);
+        if (index !== -1) {
+          const notification = notifications.value[index];
+          if (!notification.read) {
+            unreadCount.value = Math.max(0, unreadCount.value - 1);
+          }
+          notifications.value.splice(index, 1);
+        }
+      } catch (error) {
+        console.error("Failed to delete notification:", error);
       }
     };
 
@@ -559,27 +729,38 @@ export default {
       showLogoutModal,
       isSidebarOpen,
       isOpen,
+      isMobile,
       qrData,
       calendarVisible,
       selectedEvent,
       showQRCode,
       useManualInput,
       notifications,
+      notificationLoading,
+      unreadCount,
       events,
+      allEvents,
       filteredEvents,
       ongoingEvents,
+      calendarEvents,
       toggleSidebar,
       toggleDropdown,
       toggleCalendar,
       onDetect,
       onDateClick,
+      onEventClick,
       toggleNotifications,
+      handleMarkAsRead,
+      handleMarkAllAsRead,
+      handleDeleteNotification,
       formatTime,
       formatDate,
       confirmLogout,
       submitID,
       fetchEvents,
+      fetchAllEvents,
       fetchNotifications,
+      handleResize,
     };
   },
 };
@@ -661,6 +842,62 @@ export default {
   cursor: pointer;
   padding: 8px 15px;
   border-radius: 5px;
+}
+
+/* Calendar event styling */
+:deep(.vuecal__event) {
+  border-radius: 6px;
+  font-size: 12px;
+  padding: 2px 6px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+:deep(.event-status-pending) {
+  background-color: #fbbf24 !important;
+  color: #92400e !important;
+  border-left: 4px solid #f59e0b;
+}
+
+:deep(.event-status-upcoming) {
+  background-color: #60a5fa !important;
+  color: #1e40af !important;
+  border-left: 4px solid #3b82f6;
+}
+
+:deep(.event-status-ongoing) {
+  background-color: #34d399 !important;
+  color: #065f46 !important;
+  border-left: 4px solid #10b981;
+}
+
+:deep(.event-status-completed) {
+  background-color: #9ca3af !important;
+  color: #374151 !important;
+  border-left: 4px solid #6b7280;
+}
+
+:deep(.event-status-cancelled) {
+  background-color: #f87171 !important;
+  color: #7f1d1d !important;
+  border-left: 4px solid #ef4444;
+}
+
+:deep(.calendar-event-content) {
+  line-height: 1.2;
+}
+
+:deep(.calendar-event-content strong) {
+  display: block;
+  margin-bottom: 2px;
+}
+
+:deep(.calendar-event-content small) {
+  display: block;
+  opacity: 0.8;
+  font-size: 10px;
+}
+
+.scan-type-selection label {
   background: #f0f0f0;
   transition: background-color 0.3s;
 }

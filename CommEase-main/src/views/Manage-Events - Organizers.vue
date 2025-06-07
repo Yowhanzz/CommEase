@@ -82,7 +82,13 @@
     <!-- NOTIFICATION COMPONENT -->
     <NotificationPanel
       :isOpen="showNotifications"
+      :notifications="notifications"
+      :loading="notificationLoading"
+      :unreadCount="unreadCount"
       @close="toggleNotifications"
+      @mark-as-read="handleMarkAsRead"
+      @mark-all-as-read="handleMarkAllAsRead"
+      @delete-notification="handleDeleteNotification"
     />
 
     <!-- OVERLAY -->
@@ -239,9 +245,24 @@ import {
   formatTime,
   formatDate,
 } from "../api/services";
+import { useNotifications } from "@/composables/useNotifications";
 
 const router = useRouter();
-const showNotifications = ref(false);
+
+// Use notification composable
+const {
+  notifications,
+  notificationLoading,
+  unreadCount,
+  showNotifications,
+  fetchNotifications,
+  toggleNotifications,
+  handleMarkAsRead,
+  handleMarkAllAsRead,
+  handleDeleteNotification,
+  addLocalNotification,
+} = useNotifications();
+
 const showLogoutModal = ref(false);
 const isOpen = ref(false);
 const isSidebarOpen = ref(false);
@@ -254,18 +275,6 @@ const isMobile = ref(false);
 // Expose the formatting functions
 const formatTimeFn = formatTime;
 const formatDateFn = formatDate;
-
-const notifications = ref([
-  {
-    message: "You completed the 'Update website content' task.",
-    time: "2 hours ago",
-  },
-  { message: "You completed the 'Clean up drive' task.", time: "3 hours ago" },
-  {
-    message: "You completed the 'Meeting with organizers' task.",
-    time: "5 hours ago",
-  },
-]);
 
 const filteredEvents = computed(() => {
   if (!Array.isArray(events.value)) {
@@ -286,9 +295,7 @@ const filteredEvents = computed(() => {
   );
 });
 
-const toggleNotifications = () => {
-  showNotifications.value = !showNotifications.value;
-};
+
 
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value;
@@ -353,7 +360,7 @@ const handleEndEvent = async (eventId) => {
     error.value = null;
     await eventService.endEvent(eventId);
     events.value = events.value.map((event) =>
-      event.id === eventId ? { ...event, status: "Completed" } : event
+      event.id === eventId ? { ...event, status: "completed" } : event
     );
   } catch (err) {
     error.value =

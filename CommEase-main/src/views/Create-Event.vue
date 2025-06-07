@@ -223,6 +223,7 @@ import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
 import { eventService } from "../api/services";
 import { authService } from "../api/services";
+import { useNotifications } from "@/composables/useNotifications";
 import NotificationPanel from "@/components/NotificationPanel.vue"; // Import the notification component
 
 // === Sidebar Toggle ===
@@ -243,8 +244,21 @@ const handleResize = () => {
   }
 };
 
+// === Use notification composable ===
+const {
+  notifications,
+  notificationLoading,
+  unreadCount,
+  showNotifications,
+  fetchNotifications,
+  toggleNotifications,
+  handleMarkAsRead,
+  handleMarkAllAsRead,
+  handleDeleteNotification,
+  addLocalNotification,
+} = useNotifications();
+
 // === Data for the Component ===
-const showNotifications = ref(false);
 const showLogoutModal = ref(false);
 const searchQuery = ref("");
 const eventTitle = ref("");
@@ -264,19 +278,6 @@ const router = useRouter();
 const loading = ref(false);
 const error = ref(null);
 const participantValidationError = ref("");
-
-// === Notifications Data ===
-const notifications = ref([
-  {
-    message: "You completed the 'Update website content' task.",
-    time: "2 hours ago",
-  },
-  { message: "You completed the 'Clean up drive' task.", time: "3 hours ago" },
-  {
-    message: "You completed the 'Meeting with organizers' task.",
-    time: "5 hours ago",
-  },
-]);
 
 // === Events Data ===
 const events = ref([

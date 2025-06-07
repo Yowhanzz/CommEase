@@ -61,7 +61,16 @@
   </header>
 
   <!-- NOTIFICATION COMPONENT -->
-  <NotificationPanel :isOpen="showNotifications" @close="toggleNotifications" />
+  <NotificationPanel
+    :isOpen="showNotifications"
+    :notifications="notifications"
+    :loading="notificationLoading"
+    :unreadCount="unreadCount"
+    @close="toggleNotifications"
+    @mark-as-read="handleMarkAsRead"
+    @mark-all-as-read="handleMarkAllAsRead"
+    @delete-notification="handleDeleteNotification"
+  />
 
   <!-- OVERLAY (Para i-disable background) -->
   <div
@@ -265,6 +274,7 @@
 import { ref, computed, onMounted } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { authService, eventService } from "../api/services";
+import { useNotifications } from "@/composables/useNotifications";
 import NotificationPanel from "@/components/NotificationPanel.vue"; // Import the notification component
 
 // === Sidebar Toggle ===
@@ -327,23 +337,19 @@ const toggleSidebar = () => {
   isOpen.value = !isOpen.value;
 };
 // === Notifications ===
-const showNotifications = ref(false);
-const toggleNotifications = () => {
-  showNotifications.value = !showNotifications.value;
-};
-
-// === Notifications Data ===
-const notifications = ref([
-  {
-    message: 'You completed the "Update website content" task.',
-    time: "2 hours ago",
-  },
-  { message: 'You completed the "Clean up drive" task.', time: "3 hours ago" },
-  {
-    message: 'You completed the "Meeting with organizers" task.',
-    time: "5 hours ago",
-  },
-]);
+// Use notification composable
+const {
+  notifications,
+  notificationLoading,
+  unreadCount,
+  showNotifications,
+  fetchNotifications,
+  toggleNotifications,
+  handleMarkAsRead,
+  handleMarkAllAsRead,
+  handleDeleteNotification,
+  addLocalNotification,
+} = useNotifications();
 
 // === Logout Modal ===
 const showLogoutModal = ref(false);

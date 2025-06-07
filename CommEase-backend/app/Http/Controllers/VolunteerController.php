@@ -22,7 +22,7 @@ class VolunteerController extends Controller
     {
         $user = $request->user();
 
-        if ($event->status !== 'upcoming') {
+        if (!in_array($event->status, ['pending', 'upcoming'])) {
             return response()->json(['message' => 'Cannot register for this event'], 422);
         }
 
@@ -68,7 +68,7 @@ class VolunteerController extends Controller
 
     public function unregisterFromEvent(Request $request, Event $event)
     {
-        if ($event->status !== 'upcoming') {
+        if (!in_array($event->status, ['pending', 'upcoming'])) {
             return response()->json(['message' => 'Cannot unregister from this event'], 422);
         }
 

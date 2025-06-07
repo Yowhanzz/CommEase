@@ -77,7 +77,16 @@
   </header>
 
   <!-- NOTIFICATION COMPONENT -->
-  <NotificationPanel :isOpen="showNotifications" @close="toggleNotifications" />
+  <NotificationPanel
+    :isOpen="showNotifications"
+    :notifications="notifications"
+    :loading="notificationLoading"
+    :unreadCount="unreadCount"
+    @close="toggleNotifications"
+    @mark-as-read="handleMarkAsRead"
+    @mark-all-as-read="handleMarkAllAsRead"
+    @delete-notification="handleDeleteNotification"
+  />
 
   <!-- OVERLAY -->
   <div
@@ -251,6 +260,7 @@
 import { ref, computed } from "vue";
 import { useRouter } from "vue-router";
 import { authService } from "@/api/services";
+import { useNotifications } from "@/composables/useNotifications";
 import BarChart from "@/components/Barchart.vue";
 import PieChart from "@/components/PieChart.vue";
 import NotificationPanel from "@/components/NotificationPanel.vue"; // Import the notification component
@@ -258,27 +268,24 @@ import NotificationPanel from "@/components/NotificationPanel.vue"; // Import th
 // Sidebar and UI States
 const isSidebarOpen = ref(true);
 const isOpen = ref(false);
-const showNotifications = ref(false);
 const showLogoutModal = ref(false);
 const searchQuery = ref("");
 const isMobile = ref(false);
 const router = useRouter();
 
-// Notifications
-const notifications = ref([
-  {
-    message: "You completed the 'Update website content' task.",
-    time: "2 hours ago",
-  },
-  {
-    message: "You completed the 'Clean up drive' task.",
-    time: "3 hours ago",
-  },
-  {
-    message: "You completed the 'Meeting with organizers' task.",
-    time: "5 hours ago",
-  },
-]);
+// Use notification composable
+const {
+  notifications,
+  notificationLoading,
+  unreadCount,
+  showNotifications,
+  fetchNotifications,
+  toggleNotifications,
+  handleMarkAsRead,
+  handleMarkAllAsRead,
+  handleDeleteNotification,
+  addLocalNotification,
+} = useNotifications();
 
 // Event Data
 const events = ref([
@@ -322,9 +329,7 @@ const handleResize = () => {
   }
 };
 
-const toggleNotifications = () => {
-  showNotifications.value = !showNotifications.value;
-};
+
 
 const confirmLogout = async () => {
   try {

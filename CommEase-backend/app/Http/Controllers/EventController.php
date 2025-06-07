@@ -26,9 +26,17 @@ class EventController extends Controller
         $query = Event::query();
 
         // Exclude completed events by default (they go to archive)
-        // Unless specifically requesting completed events via status filter
-        if (!$request->has('status') || $request->status !== 'completed') {
+        // Unless specifically requesting completed events via status filter OR requesting all events
+        $requestingAll = $request->has('all') && $request->get('all') === 'true';
+        if (!$requestingAll && (!$request->has('status') || $request->status !== 'completed')) {
             $query->where('status', '!=', 'completed');
+            \Log::info('Applied completed events filter - excluding completed events');
+        } else {
+            \Log::info('Skipping completed events filter', [
+                'requesting_all' => $requestingAll,
+                'has_status' => $request->has('status'),
+                'status_value' => $request->get('status')
+            ]);
         }
 
         // Search by title or description
@@ -63,32 +71,104 @@ class EventController extends Controller
             $query->where('barangay', $request->barangay);
         }
 
-        if ($user->role === 'organizer') {
-            $query->where('organizer_id', $user->id);
+        // Check if requesting all events (for calendar display) - already defined above
+        \Log::info('EventController::index - Request params:', [
+            'has_all' => $request->has('all'),
+            'all_value' => $request->get('all'),
+            'requesting_all' => $requestingAll,
+            'user_role' => $user->role
+        ]);
+
+        if (!$requestingAll) {
+            // Apply role-based filtering only if not requesting all events
+            if ($user->role === 'organizer') {
+                $query->where('organizer_id', $user->id);
+                \Log::info('Applied organizer filter');
+            } else {
+                // For volunteers, show all events that match their program
+                $query->whereJsonContains('programs', $user->program);
+                \Log::info('Applied volunteer program filter', ['program' => $user->program]);
+            }
         } else {
-            // For volunteers, show all events that match their program
-            $query->whereJsonContains('programs', $user->program);
+            \Log::info('Skipping role-based filtering - showing all events');
         }
 
-        $events = $query->with(['organizer', 'volunteers'])
-            ->orderBy('date')
-            ->paginate($request->get('per_page', 10));
+        // Debug: Log the SQL query that will be executed
+        \Log::info('SQL Query to be executed:', [
+            'sql' => $query->toSql(),
+            'bindings' => $query->getBindings()
+        ]);
+
+        // If requesting all events, don't paginate
+        if ($requestingAll) {
+            $events = $query->with(['organizer', 'volunteers'])
+                ->orderBy('date')
+                ->get();
+            \Log::info('Returning all events without pagination');
+        } else {
+            $events = $query->with(['organizer', 'volunteers'])
+                ->orderBy('date')
+                ->paginate($request->get('per_page', 10));
+            \Log::info('Returning paginated events');
+        }
+
+        // Log the events found
+        \Log::info('Events found:', [
+            'requesting_all' => $requestingAll,
+            'count' => $events->count(),
+            'first_few_events' => $requestingAll
+                ? $events->take(3)->map(function($event) {
+                    return [
+                        'id' => $event->id,
+                        'title' => $event->event_title,
+                        'status' => $event->status,
+                        'organizer_id' => $event->organizer_id
+                    ];
+                })
+                : $events->getCollection()->take(3)->map(function($event) {
+                    return [
+                        'id' => $event->id,
+                        'title' => $event->event_title,
+                        'status' => $event->status,
+                        'organizer_id' => $event->organizer_id
+                    ];
+                })
+        ]);
 
         // Append formatted time attributes and participant progress to each event
-        $events->getCollection()->transform(function ($event) {
-            $event->append([
-                'start_time_formatted',
-                'end_time_formatted',
-                'started_at_formatted',
-                'ended_at_formatted',
-                'registered_count',
-                'participant_progress',
-                'available_slots',
-                'is_full',
-                'target_reached'
-            ]);
-            return $event;
-        });
+        if ($requestingAll) {
+            // For non-paginated results (Collection)
+            $events->transform(function ($event) {
+                $event->append([
+                    'start_time_formatted',
+                    'end_time_formatted',
+                    'started_at_formatted',
+                    'ended_at_formatted',
+                    'registered_count',
+                    'participant_progress',
+                    'available_slots',
+                    'is_full',
+                    'target_reached'
+                ]);
+                return $event;
+            });
+        } else {
+            // For paginated results (LengthAwarePaginator)
+            $events->getCollection()->transform(function ($event) {
+                $event->append([
+                    'start_time_formatted',
+                    'end_time_formatted',
+                    'started_at_formatted',
+                    'ended_at_formatted',
+                    'registered_count',
+                    'participant_progress',
+                    'available_slots',
+                    'is_full',
+                    'target_reached'
+                ]);
+                return $event;
+            });
+        }
 
         return response()->json($events);
     }

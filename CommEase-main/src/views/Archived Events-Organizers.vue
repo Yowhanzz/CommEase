@@ -82,7 +82,13 @@
     <!-- NOTIFICATION COMPONENT -->
     <NotificationPanel
       :isOpen="showNotifications"
+      :notifications="notifications"
+      :loading="notificationLoading"
+      :unreadCount="unreadCount"
       @close="toggleNotifications"
+      @mark-as-read="handleMarkAsRead"
+      @mark-all-as-read="handleMarkAllAsRead"
+      @delete-notification="handleDeleteNotification"
     />
 
     <!-- OVERLAY -->
@@ -196,6 +202,7 @@
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import NotificationPanel from "@/components/NotificationPanel.vue"; // Import the notification component
+import { useNotifications } from "@/composables/useNotifications";
 
 import {
   authService,
@@ -212,8 +219,22 @@ export default {
   },
   setup() {
     const router = useRouter();
+
+    // Use notification composable
+    const {
+      notifications,
+      notificationLoading,
+      unreadCount,
+      showNotifications,
+      fetchNotifications,
+      toggleNotifications,
+      handleMarkAsRead,
+      handleMarkAllAsRead,
+      handleDeleteNotification,
+      addLocalNotification,
+    } = useNotifications();
+
     const selectedProgram = ref("");
-    const showNotifications = ref(false);
     const showLogoutModal = ref(false);
     const isOpen = ref(false);
     const isSidebarOpen = ref(false);
@@ -221,20 +242,6 @@ export default {
     const loading = ref(false);
     const error = ref(null);
     const events = ref([]);
-    const notifications = ref([
-      {
-        message: "You completed the 'Update website content' task.",
-        time: "2 hours ago",
-      },
-      {
-        message: "You completed the 'Clean up drive' task.",
-        time: "3 hours ago",
-      },
-      {
-        message: "You completed the 'Meeting with organizers' task.",
-        time: "5 hours ago",
-      },
-    ]);
 
     const filteredEvents = computed(() => {
       if (!Array.isArray(events.value)) {
@@ -265,78 +272,81 @@ export default {
       return filtered;
     });
 
-    const toggleNotifications = () => {
-      showNotifications.value = !showNotifications.value;
-    };
+
 
     const toggleSidebar = () => {
       isSidebarOpen.value = !isSidebarOpen.value;
       isOpen.value = !isOpen.value; // optional if you're toggling extra state
     };
 
-    // Fetch archived events from API
+    // Fetch archived events using getAllEvents and filter for completed events
     const fetchArchivedEvents = async () => {
       try {
         loading.value = true;
         error.value = null;
 
-        // Debug: Check current user authentication and role
-        console.log("Checking user authentication...");
+        console.log("Fetching all events and filtering for completed ones...");
+
+        // Debug: Check current user
         try {
-          const user = await authService.getUser();
-          console.log("Current user:", user);
-          console.log("User role:", user.role);
-          console.log("User role type:", typeof user.role);
-          console.log("User role length:", user.role?.length);
-          console.log("User role exact value:", JSON.stringify(user.role));
-
-          if (user.role !== "organizer") {
-            error.value = `Access denied. Current role: "${
-              user.role
-            }" (type: ${typeof user.role}). Expected: "organizer"`;
-            return;
-          }
-
-          // Test if regular events route works
-          console.log("Testing regular events route...");
-          const testResponse = await eventService.getEventsOrganizer();
-          console.log(
-            "Regular events route works:",
-            testResponse.data.length,
-            "events"
-          );
-        } catch (authError) {
-          console.error("Authentication check failed:", authError);
-          error.value = "Authentication failed. Please log in again.";
-          return;
+          const currentUser = await authService.getUser();
+          console.log("Current user:", currentUser);
+        } catch (err) {
+          console.error("Failed to get current user:", err);
         }
 
-        console.log("Fetching archived events...");
-        const response = await eventService.getArchivedEvents();
-        // Handle both possible response structures
-        const eventsData = response.data.data || response.data;
-        events.value = Array.isArray(eventsData) ? eventsData : [];
-        console.log("Archived events loaded:", events.value.length, "events");
-      } catch (err) {
-        console.error("Error details:", {
-          status: err.response?.status,
-          data: err.response?.data,
-          message: err.message,
+        // Use getAllEvents instead of getArchivedEvents to avoid permission issues
+        console.log("Making API call to getAllEvents...");
+        const response = await eventService.getAllEvents();
+        console.log("Raw getAllEvents response:", response);
+
+        // Handle both possible response structures (pagination vs direct array)
+        console.log("Response structure:", {
+          hasData: !!response.data,
+          hasDataData: !!response.data.data,
+          dataType: typeof response.data,
+          dataDataType: typeof response.data.data,
+          isDataArray: Array.isArray(response.data),
+          isDataDataArray: Array.isArray(response.data.data)
         });
 
-        if (err.response?.status === 404) {
-          error.value = "Archived events route not found.";
-        } else if (err.response?.status === 401) {
-          error.value = "You are not authenticated. Please log in again.";
-        } else if (err.response?.status === 403) {
-          const errorMsg = err.response?.data?.message || "Access forbidden";
-          error.value = `Access denied: ${errorMsg}. Please ensure you're logged in as an organizer.`;
+        let allEvents = [];
+        if (Array.isArray(response.data)) {
+          // Direct array response (when all=true, no pagination)
+          allEvents = response.data;
+          console.log("Using direct array data:", allEvents.length, "events");
+        } else if (response.data.data && Array.isArray(response.data.data)) {
+          // Paginated response
+          allEvents = response.data.data;
+          console.log("Using paginated data:", allEvents.length, "events");
         } else {
-          error.value =
-            err.response?.data?.message ||
-            err.message ||
-            "Failed to fetch archived events";
+          console.error("Unexpected response structure:", response.data);
+          allEvents = [];
         }
+
+        // Debug: Log all events and their statuses
+        console.log("All events from API:", allEvents);
+        console.log("Event statuses:", allEvents.map(event => ({
+          id: event.id,
+          title: event.event_title,
+          status: event.status,
+          status_type: typeof event.status
+        })));
+
+        // Filter for completed events only
+        const completedEvents = allEvents.filter(event => {
+          const isCompleted = event.status && event.status.toLowerCase() === 'completed';
+          console.log(`Event "${event.event_title}" - Status: "${event.status}" - Is Completed: ${isCompleted}`);
+          return isCompleted;
+        });
+
+        events.value = completedEvents;
+        console.log("Archived events loaded:", events.value.length, "completed events");
+        console.log("Completed events:", completedEvents);
+
+      } catch (err) {
+        console.error("Error fetching archived events:", err);
+        error.value = err.response?.data?.message || err.message || "Failed to fetch archived events";
         events.value = []; // Ensure events is an array even on error
       } finally {
         loading.value = false;
@@ -383,7 +393,16 @@ export default {
     });
 
     return {
+      // Notification functionality
+      notifications,
+      notificationLoading,
+      unreadCount,
       showNotifications,
+      toggleNotifications,
+      handleMarkAsRead,
+      handleMarkAllAsRead,
+      handleDeleteNotification,
+      // Other functionality
       showLogoutModal,
       selectedProgram,
       isOpen,
@@ -391,10 +410,8 @@ export default {
       searchQuery,
       loading,
       error,
-      notifications,
       events,
       filteredEvents,
-      toggleNotifications,
       toggleSidebar,
       fetchArchivedEvents,
       deleteEvent, //delete archived event
