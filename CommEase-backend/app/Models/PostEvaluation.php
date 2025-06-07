@@ -18,6 +18,7 @@ class PostEvaluation extends Model
         'effectiveness_rating',
         'organization_rating',
         'recommendation_rating',
+        'reflection_text',
         'reflection_paper_url',
         'reflection_paper_public_id',
         'reflection_paper_filename'

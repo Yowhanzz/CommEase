@@ -46,6 +46,14 @@
             >
           </router-link>
         </li>
+        <li>
+          <router-link to="/PostEvaluationAnalytics">
+            <i class="bx bx-bar-chart-alt-2"></i>
+            <span class="nav-item" v-show="isSidebarOpen"
+              >Post Evaluations</span
+            >
+          </router-link>
+        </li>
         <li @click="toggleNotifications">
           <a>
             <i class="bx bxs-bell"></i>
@@ -76,7 +84,13 @@
     <!-- NOTIFICATION COMPONENT -->
     <NotificationPanel
       :isOpen="showNotifications"
+      :notifications="notifications"
+      :loading="notificationLoading"
+      :unreadCount="unreadCount"
       @close="toggleNotifications"
+      @mark-as-read="handleMarkAsRead"
+      @mark-all-as-read="handleMarkAllAsRead"
+      @delete-notification="handleDeleteNotification"
     />
 
     <!-- OVERLAY -->
@@ -455,9 +469,7 @@ const confirmLogout = async () => {
   }
 };
 
-const toggleNotifications = () => {
-  showNotifications.value = !showNotifications.value;
-};
+
 
 onMounted(() => {
   window.addEventListener("resize", handleResize);

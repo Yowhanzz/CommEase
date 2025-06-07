@@ -322,6 +322,50 @@ export const eventService = {
     }
   },
 
+  // Post Evaluation Methods
+  async submitPostEvaluation(eventId, evaluationData) {
+    try {
+      await authService.ensureCsrfToken();
+
+      // Send as JSON instead of FormData since we're using text area
+      const payload = {
+        quality_rating: evaluationData.quality_rating,
+        responsiveness_rating: evaluationData.responsiveness_rating,
+        effectiveness_rating: evaluationData.effectiveness_rating,
+        organization_rating: evaluationData.organization_rating,
+        recommendation_rating: evaluationData.recommendation_rating,
+        reflection_text: evaluationData.reflection_text, // Changed from reflection_paper to reflection_text
+      };
+
+      const response = await api.post(`/events/${eventId}/post-evaluation`, payload);
+      return response;
+    } catch (error) {
+      console.error("Failed to submit post evaluation:", error);
+      throw error;
+    }
+  },
+
+  async getPostEvaluations(eventId) {
+    try {
+      await authService.ensureCsrfToken();
+      const response = await api.get(`/events/${eventId}/post-evaluations`);
+      return response;
+    } catch (error) {
+      console.error("Failed to get post evaluations:", error);
+      throw error;
+    }
+  },
+
+  async getEvaluationQuestions() {
+    try {
+      const response = await api.get('/evaluation-questions');
+      return response;
+    } catch (error) {
+      console.error("Failed to get evaluation questions:", error);
+      throw error;
+    }
+  },
+
   async getArchivedEvents(params = {}) {
     try {
       // Simple request for archived events - no extra parameters needed
