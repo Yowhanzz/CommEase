@@ -46,6 +46,14 @@
             >
           </router-link>
         </li>
+        <li>
+          <router-link to="/PostEvaluationAnalytics">
+            <i class="bx bx-bar-chart-alt-2"></i>
+            <span class="nav-item" v-show="isSidebarOpen"
+              >Post Evaluations</span
+            >
+          </router-link>
+        </li>
         <li @click="toggleNotifications">
           <a>
             <i class="bx bxs-bell"></i>
@@ -78,7 +86,13 @@
     <!-- NOTIFICATION COMPONENT -->
     <NotificationPanel
       :isOpen="showNotifications"
+      :notifications="notifications"
+      :loading="notificationLoading"
+      :unreadCount="unreadCount"
       @close="toggleNotifications"
+      @mark-as-read="handleMarkAsRead"
+      @mark-all-as-read="handleMarkAllAsRead"
+      @delete-notification="handleDeleteNotification"
     />
 
     <!-- OVERLAY -->
@@ -238,6 +252,7 @@
 import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import NotificationPanel from "@/components/NotificationPanel.vue"; // Import the notification component
+import { useNotifications } from "@/composables/useNotifications";
 
 import {
   authService,
@@ -249,8 +264,21 @@ import {
 const route = useRoute();
 const router = useRouter();
 
+// Use notification composable
+const {
+  notifications,
+  notificationLoading,
+  unreadCount,
+  showNotifications,
+  fetchNotifications,
+  toggleNotifications,
+  handleMarkAsRead,
+  handleMarkAllAsRead,
+  handleDeleteNotification,
+  addLocalNotification,
+} = useNotifications();
+
 const isSidebarOpen = ref(true);
-const showNotifications = ref(false);
 const showLogoutModal = ref(false);
 const searchQuery = ref("");
 const isOpen = ref(false); // sidebar animation or icon toggle
@@ -275,22 +303,6 @@ const newThing = ref("");
 const loading = ref(false);
 const error = ref(null);
 const participantValidationError = ref("");
-
-// Notifications
-const notifications = ref([
-  {
-    message: "You completed the 'Update website content' task.",
-    time: "2 hours ago",
-  },
-  {
-    message: "You completed the 'Clean up drive' task.",
-    time: "3 hours ago",
-  },
-  {
-    message: "You completed the 'Meeting with organizers' task.",
-    time: "5 hours ago",
-  },
-]);
 
 // Load event info on mount
 onMounted(async () => {
@@ -352,9 +364,7 @@ const handleResize = () => {
   }
 };
 
-const toggleNotifications = () => {
-  showNotifications.value = !showNotifications.value;
-};
+
 
 const addThing = () => {
   if (newThing.value.trim()) {

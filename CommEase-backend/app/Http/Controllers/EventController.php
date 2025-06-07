@@ -745,7 +745,8 @@ class EventController extends Controller
             'effectiveness_rating' => ['required', 'integer', 'min:1', 'max:5'],
             'organization_rating' => ['required', 'integer', 'min:1', 'max:5'],
             'recommendation_rating' => ['required', 'integer', 'min:1', 'max:5'],
-            'reflection_paper' => ['nullable', 'file', 'max:10240', 'mimes:pdf,doc,docx,txt']
+            'reflection_text' => ['required', 'string', 'min:50'], // Minimum 50 words (roughly 250 characters)
+            'reflection_paper' => ['nullable', 'file', 'max:10240', 'mimes:pdf,doc,docx,txt'] // Keep for backward compatibility
         ]);
 
         if ($validator->fails()) {
@@ -789,7 +790,8 @@ class EventController extends Controller
             'responsiveness_rating' => $request->responsiveness_rating,
             'effectiveness_rating' => $request->effectiveness_rating,
             'organization_rating' => $request->organization_rating,
-            'recommendation_rating' => $request->recommendation_rating
+            'recommendation_rating' => $request->recommendation_rating,
+            'reflection_text' => $request->reflection_text, // Add reflection text
         ], $reflectionData));
 
         // Notify organizer
