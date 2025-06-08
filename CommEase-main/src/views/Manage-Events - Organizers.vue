@@ -118,8 +118,8 @@
     >
 
     <!-- EVENTS TABLE -->
-    <div class="container-table" :class="{ 'sidebar-collapsed': !isOpen }" style="overflow-x: auto;">
-      <table class="users-table" style="min-width: 1200px;">
+    <div class="container-table" :class="{ 'sidebar-collapsed': !isOpen }">
+      <table class="users-table">
         <thead>
           <tr>
             <th>No.</th>
@@ -153,26 +153,44 @@
             <td data-label="Participants" class="participants-cell">
               <div class="participant-info">
                 <div class="participant-numbers">
-                  <span class="registered">{{ event.registered_count || 0 }}</span>
+                  <span class="registered">{{
+                    event.registered_count || 0
+                  }}</span>
                   <span class="separator">/</span>
                   <span class="limit">{{ event.participant_limit || 0 }}</span>
                 </div>
-                <div class="participant-target" v-if="event.target_participants">
+                <div
+                  class="participant-target"
+                  v-if="event.target_participants"
+                >
                   Target: {{ event.target_participants }}
                 </div>
                 <div class="progress-bar" v-if="event.participant_limit">
                   <div
                     class="progress-fill"
                     :style="{
-                      width: `${Math.min((event.registered_count || 0) / event.participant_limit * 100, 100)}%`,
-                      backgroundColor: (event.registered_count || 0) >= (event.target_participants || 0) ? '#81a263' : '#ffc107'
+                      width: `${Math.min(
+                        ((event.registered_count || 0) /
+                          event.participant_limit) *
+                          100,
+                        100
+                      )}%`,
+                      backgroundColor:
+                        (event.registered_count || 0) >=
+                        (event.target_participants || 0)
+                          ? '#81a263'
+                          : '#ffc107',
                     }"
                   ></div>
                 </div>
                 <div class="participant-status">
                   <span v-if="event.is_full" class="status-full">FULL</span>
-                  <span v-else-if="event.target_reached" class="status-target">TARGET REACHED</span>
-                  <span v-else class="status-open">{{ event.available_slots || 0 }} slots left</span>
+                  <span v-else-if="event.target_reached" class="status-target"
+                    >TARGET REACHED</span
+                  >
+                  <span v-else class="status-open"
+                    >{{ event.available_slots || 0 }} slots left</span
+                  >
                 </div>
               </div>
             </td>
@@ -202,7 +220,9 @@
             <td data-label="Event Control" class="event-control">
               <div class="test">
                 <button
-                  v-if="['pending', 'upcoming'].includes(event.status.toLowerCase())"
+                  v-if="
+                    ['pending', 'upcoming'].includes(event.status.toLowerCase())
+                  "
                   class="start-btn"
                   @click="handleStartEvent(event.id)"
                 >

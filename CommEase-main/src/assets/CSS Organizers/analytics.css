@@ -635,3 +635,10 @@ i {
     padding-left: 20px; /* 40PX */
   }
 }
+
+@media (max-width: 562px) {
+  .logout-modal {
+    scale: 0.9;
+    margin-left: 50px;
+  }
+}

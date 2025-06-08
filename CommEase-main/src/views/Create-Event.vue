@@ -258,7 +258,7 @@ const {
   unreadCount,
   showNotifications,
   fetchNotifications,
-  toggleNotifications,
+  /*   toggleNotifications, */
   handleMarkAsRead,
   handleMarkAllAsRead,
   handleDeleteNotification,
@@ -352,7 +352,8 @@ const validateParticipants = () => {
   participantValidationError.value = "";
 
   if (!participantLimit.value || !targetParticipants.value) {
-    participantValidationError.value = "Both participant limit and target participants are required";
+    participantValidationError.value =
+      "Both participant limit and target participants are required";
     return false;
   }
 
@@ -362,7 +363,8 @@ const validateParticipants = () => {
   }
 
   if (targetParticipants.value > participantLimit.value) {
-    participantValidationError.value = "Target participants cannot exceed participant limit";
+    participantValidationError.value =
+      "Target participants cannot exceed participant limit";
     return false;
   }
 

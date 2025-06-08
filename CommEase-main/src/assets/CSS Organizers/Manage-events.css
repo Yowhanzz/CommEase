@@ -290,16 +290,17 @@ i {
   animation-delay: 0s;
   animation-iteration-count: 1;
   margin-bottom: 40px;
+  max-height: unset; /* unset this so container grows normally */
 }
 
 /* Table wrapper to enable internal scroll */
 .users-table {
+  width: 100%;
   border-collapse: collapse;
   border-radius: 8px;
   background-color: #f2f4ec;
   box-shadow: 3px 0px 15px rgba(0, 0, 0, 0.2);
-  width: 100%;
-  display: block;
+  text-align: center;
 }
 
 /* Fixed header */
@@ -320,8 +321,7 @@ i {
 /* Scrollable body */
 .users-table tbody {
   display: block;
-  max-height: 500px; /* adjust height as needed */
-  overflow-y: auto;
+  max-height: 600px; /* adjust scroll height */
   width: 100%;
 }
 
@@ -423,6 +423,75 @@ i {
   background-color: #e7f0dc;
   border-color: #a62c2c; /* Change border color only */
   box-shadow: 0px 3px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Participant Progress Styles */
+.participants-cell {
+  min-width: 150px;
+}
+
+.participant-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: center;
+}
+
+.participant-numbers {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.registered {
+  color: #435739;
+}
+
+.separator {
+  color: #6c757d;
+  margin: 0 2px;
+}
+
+.limit {
+  color: #6c757d;
+}
+
+.participant-target {
+  font-size: 12px;
+  color: #6c757d;
+  font-style: italic;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background-color: #e9ecef;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+  border-radius: 3px;
+}
+
+.participant-status {
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.status-full {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.status-target {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.status-open {
+  color: #6c757d;
 }
 /* NOTIFICATION PANEL */
 .notification-panel {
@@ -529,7 +598,6 @@ i {
   z-index: 999;
 }
 
-/* RESPONSIVE PART */
 /* RESPONSIVE PART */
 
 @media (max-width: 980px) {
@@ -687,4 +755,11 @@ i {
 .entries-edit:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+@media (max-width: 562px) {
+  .logout-modal {
+    scale: 0.9;
+    margin-left: 50px;
+  }
 }

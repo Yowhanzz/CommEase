@@ -1027,3 +1027,10 @@ img {
   margin-top: 5px;
   text-transform: capitalize;
 }
+
+@media (max-width: 562px) {
+  .logout-modal {
+    scale: 0.9;
+    margin-left: 50px;
+  }
+}
