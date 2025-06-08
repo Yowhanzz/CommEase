@@ -10,7 +10,7 @@
           class="mark-all-read-btn"
           title="Mark all as read"
         >
-          Mark all read
+          Mark all as read
         </button>
         <i class="bx bx-x close-btn" @click="closeNotifications"></i>
       </div>
@@ -139,6 +139,26 @@ export default {
   display: flex;
   flex-direction: column;
   transition: transform 0.3s ease-in-out; /* Smooth glide transition */
+  overflow-y: auto;
+  scrollbar-width: thick; /* For Firefox */
+  scrollbar-color: #435739; /* thumb and track for Firefox */
+}
+
+/* WebKit Scrollbar Styling */
+.notification-panel::-webkit-scrollbar {
+  width: 8px;
+}
+.notification-panel::-webkit-scrollbar-thumb:hover {
+  background-color: #2e3e2c;
+}
+.notification-panel::-webkit-scrollbar-track {
+  background: transparent; /* Transparent track */
+}
+
+.notification-panel::-webkit-scrollbar-thumb {
+  background-color: #435739; /* Thumb color */
+  border-radius: 10px;
+  border: 2px solid transparent; /* Keeps spacing */
 }
 
 /* Close button */
@@ -163,9 +183,8 @@ export default {
 }
 
 .notification-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display: grid;
+  grid-template-rows: 1fr;
   margin-top: 25px;
   color: black;
 }
@@ -178,9 +197,11 @@ export default {
 
 .mark-all-read-btn {
   background: #435739;
+  margin-top: 10px;
   color: white;
   border: none;
-  padding: 5px 10px;
+  width: 125px;
+  height: 33px;
   border-radius: 4px;
   font-size: 12px;
   cursor: pointer;
@@ -188,7 +209,9 @@ export default {
 }
 
 .mark-all-read-btn:hover {
-  background: #2d3d26;
+  background: #f2f4ec;
+  color: #435739;
+  border: 2px solid #435739;
 }
 
 .close-btn {
@@ -242,8 +265,8 @@ export default {
 }
 
 .notification-type-badge.new_event {
-  background: #e3f2fd;
-  color: #1976d2;
+  background: #e8f5e9;
+  color: #2e7d32;
 }
 
 .notification-type-badge.event_started {
@@ -252,13 +275,13 @@ export default {
 }
 
 .notification-type-badge.event_ended {
-  background: #fff3e0;
-  color: #f57c00;
+  background: #f3e8e7;
+  color: #e74c3c;
 }
 
 .notification-type-badge.volunteer_time_in {
-  background: #e3f2fd;
-  color: #1976d2;
+  background: #e8f5e9;
+  color: #2e7d32;
 }
 
 .notification-type-badge.volunteer_time_out {
@@ -286,7 +309,7 @@ export default {
 }
 
 .delete-btn:hover {
-  color: #dc3545;
+  color: #e74c3c;
 }
 
 .loading-state,

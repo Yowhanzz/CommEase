@@ -265,7 +265,7 @@ const {
   unreadCount,
   showNotifications,
   fetchNotifications,
-  /*   toggleNotifications, */
+  toggleNotifications,
   handleMarkAsRead,
   handleMarkAllAsRead,
   handleDeleteNotification,
@@ -468,8 +468,6 @@ const confirmLogout = async () => {
     console.error("Logout failed:", error);
   }
 };
-
-
 
 onMounted(() => {
   window.addEventListener("resize", handleResize);

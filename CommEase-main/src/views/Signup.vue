@@ -74,27 +74,26 @@
             errors.program
           }}</span>
         </div>
-
-        <div class="signup-separation">
-          <h5 class="title">Email <span class="required">*</span></h5>
-          <input
-            v-model="email"
-            type="email"
-            class="singup-input"
-            :class="{ error: errors.email }"
-            @input="clearError('email')"
-          />
-          <span v-if="errors.email" class="error-message">{{
-            errors.email
-          }}</span>
-        </div>
+      </div>
+      <div class="signup-separation">
+        <h5 class="title">Email <span class="required">*</span></h5>
+        <input
+          v-model="email"
+          type="email"
+          class="singup-input"
+          :class="{ error: errors.email }"
+          @input="clearError('email')"
+        />
+        <span v-if="errors.email" class="error-message">{{
+          errors.email
+        }}</span>
       </div>
     </div>
   </div>
 
   <div class="footer">
-    <!--     <button class="prev">Previous</button>
- -->
+    <router-link to="/LoginVolunteers" class="prev">Back</router-link>
+
     <button
       class="next"
       :class="{ 'disabled-btn': !isFormValid || isLoading }"

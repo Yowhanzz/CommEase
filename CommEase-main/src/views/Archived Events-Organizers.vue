@@ -280,8 +280,6 @@ export default {
       return filtered;
     });
 
-
-
     const toggleSidebar = () => {
       isSidebarOpen.value = !isSidebarOpen.value;
       isOpen.value = !isOpen.value; // optional if you're toggling extra state
@@ -315,7 +313,7 @@ export default {
           dataType: typeof response.data,
           dataDataType: typeof response.data.data,
           isDataArray: Array.isArray(response.data),
-          isDataDataArray: Array.isArray(response.data.data)
+          isDataDataArray: Array.isArray(response.data.data),
         });
 
         let allEvents = [];
@@ -334,27 +332,39 @@ export default {
 
         // Debug: Log all events and their statuses
         console.log("All events from API:", allEvents);
-        console.log("Event statuses:", allEvents.map(event => ({
-          id: event.id,
-          title: event.event_title,
-          status: event.status,
-          status_type: typeof event.status
-        })));
+        console.log(
+          "Event statuses:",
+          allEvents.map((event) => ({
+            id: event.id,
+            title: event.event_title,
+            status: event.status,
+            status_type: typeof event.status,
+          }))
+        );
 
         // Filter for completed events only
-        const completedEvents = allEvents.filter(event => {
-          const isCompleted = event.status && event.status.toLowerCase() === 'completed';
-          console.log(`Event "${event.event_title}" - Status: "${event.status}" - Is Completed: ${isCompleted}`);
+        const completedEvents = allEvents.filter((event) => {
+          const isCompleted =
+            event.status && event.status.toLowerCase() === "completed";
+          console.log(
+            `Event "${event.event_title}" - Status: "${event.status}" - Is Completed: ${isCompleted}`
+          );
           return isCompleted;
         });
 
         events.value = completedEvents;
-        console.log("Archived events loaded:", events.value.length, "completed events");
+        console.log(
+          "Archived events loaded:",
+          events.value.length,
+          "completed events"
+        );
         console.log("Completed events:", completedEvents);
-
       } catch (err) {
         console.error("Error fetching archived events:", err);
-        error.value = err.response?.data?.message || err.message || "Failed to fetch archived events";
+        error.value =
+          err.response?.data?.message ||
+          err.message ||
+          "Failed to fetch archived events";
         events.value = []; // Ensure events is an array even on error
       } finally {
         loading.value = false;
@@ -486,13 +496,8 @@ export default {
 
 /* Enhanced archived event participants info */
 .archived-event-participants {
-  color: #435739;
   font-size: 14px;
   margin-bottom: 5px;
-}
-
-.archived-event-participants span {
-  font-weight: 600;
 }
 
 /* Delete button enhancement */

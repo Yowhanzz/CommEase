@@ -129,9 +129,9 @@ img {
 
 .signup-container {
   margin-left: 50%;
-  margin-top: -31%;
+  margin-top: 5%;
   width: 630px;
-  height: 470px;
+  height: 500px;
   background-color: #f2f4ec;
   background: linear-gradient(
     135deg,
@@ -162,8 +162,9 @@ img {
 
 .signup-hiwalay {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  column-gap: 30px;
+  grid-template-columns: repeat(2, 1fr);
+  grid-column-gap: 0px;
+  grid-row-gap: 0px;
   margin-top: 5%;
   text-align: left;
   align-items: start;
@@ -229,6 +230,7 @@ img {
   animation-name: slideinTopP;
   animation-duration: 1s;
   animation-timing-function: ease-in-out;
+  text-align: left;
 }
 
 @keyframes slideinTopP {
@@ -244,7 +246,7 @@ img {
 }
 
 .singup-input {
-  width: 90%;
+  width: 100%;
   height: 33px;
   border-radius: 5px;
   border-style: none;
@@ -304,13 +306,16 @@ a {
   background-color: #435739;
   border-radius: 5px;
   font-size: 14px;
-  padding-top: 15px;
   font-weight: 500;
   border: none;
   transition: 0.15s ease-in-out;
   animation-name: slideinTopButton;
   animation-duration: 1s;
   animation-timing-function: ease-in-out;
+}
+
+.next {
+  padding-top: 15px;
 }
 
 @keyframes slideinTopButton {
@@ -326,11 +331,11 @@ a {
 }
 
 .footer {
-  /* margin-top: 1%;
-	margin-left: 88%; */
+  margin-left: 55%;
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   margin-right: 6%;
+  margin-top: 1.5%;
 }
 
 .footer router-link {
@@ -377,7 +382,8 @@ a {
   }
 
   .footer {
-    margin-left: 89%;
+    margin-left: 52%;
+    margin-right: 4%;
   }
 }
 
@@ -441,9 +447,9 @@ a {
   }
 
   .footer {
-    position: fixed;
-    bottom: 18%;
-    left: -26%;
+    margin-left: 21%;
+    margin-right: 23%;
+    margin-top: -3%;
     scale: 0.8;
     animation-name: slideinTopLoinButton;
     animation-duration: 1s;
@@ -461,6 +467,19 @@ a {
       opacity: 1;
       transform: translateY(50px);
     }
+  }
+}
+
+@media (max-width: 901px) {
+  .footer {
+    margin-left: 16%;
+    margin-right: 17%;
+    margin-top: -3%;
+    scale: 0.8;
+    animation-name: slideinTopLoinButton;
+    animation-duration: 1s;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards;
   }
 }
 
@@ -493,10 +512,27 @@ a {
   }
 
   .footer {
-    position: fixed;
-    bottom: 21%;
-    left: -22%;
-    scale: 0.75;
+    margin-left: 16%;
+    margin-right: 17%;
+    margin-top: -7%;
+    scale: 0.8;
+    animation-name: slideinTopLoinButton;
+    animation-duration: 1s;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards;
+  }
+}
+
+@media (max-width: 658px) {
+  .footer {
+    margin-left: 12%;
+    margin-right: 8%;
+    margin-top: -10%;
+    scale: 0.8;
+    animation-name: slideinTopLoinButton;
+    animation-duration: 1s;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards;
   }
 }
 
@@ -514,16 +550,20 @@ a {
   .signup-container {
     position: fixed;
     bottom: 20%;
-    left: -23%;
+    left: -21%;
     transform: translateX(-50%);
     z-index: 1;
     scale: 0.65;
   }
 
   .footer {
-    position: fixed;
-    bottom: 23%;
-    left: -21%;
+    margin-left: -2%;
+    margin-right: 2%;
+    margin-top: -15%;
     scale: 0.75;
+    animation-name: slideinTopLoinButton;
+    animation-duration: 1s;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards;
   }
 }

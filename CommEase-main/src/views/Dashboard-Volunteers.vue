@@ -237,14 +237,21 @@
           </div>
           <div class="button">
             <button
-              v-if="event.status && ['pending', 'upcoming'].includes(event.status.toLowerCase())"
+              v-if="
+                event.status &&
+                ['pending', 'upcoming'].includes(event.status.toLowerCase())
+              "
               @click="registerForEvent(event.id)"
               class="button-enter"
             >
               Register
             </button>
             <span v-else class="button-enter disabled">
-              {{ event.status ? event.status.charAt(0).toUpperCase() + event.status.slice(1) : 'Unknown' }}
+              {{
+                event.status
+                  ? event.status.charAt(0).toUpperCase() + event.status.slice(1)
+                  : "Unknown"
+              }}
             </span>
           </div>
         </div>
@@ -374,14 +381,14 @@ export default {
       // Transform all events for calendar display
       console.log("Computing calendar events from:", this.allEvents);
       const transformed = this.allEvents
-        .map(event => {
+        .map((event) => {
           const formatted = formatEventForCalendar(event);
           if (!formatted) {
             console.warn("Failed to format event:", event);
           }
           return formatted;
         })
-        .filter(event => event !== null);
+        .filter((event) => event !== null);
 
       console.log("Transformed calendar events:", transformed);
       return transformed;
@@ -490,7 +497,9 @@ export default {
     },
     onEventClick(event, e) {
       // Find the original event data from the calendar event
-      const originalEvent = this.allEvents.find(evt => evt.event_title === event.title);
+      const originalEvent = this.allEvents.find(
+        (evt) => evt.event_title === event.title
+      );
       if (originalEvent) {
         this.selectedEvent = originalEvent;
         // You can add more actions here, like showing event details
