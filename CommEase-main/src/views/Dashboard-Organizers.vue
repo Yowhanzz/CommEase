@@ -77,7 +77,11 @@
         type="search"
         placeholder="Search event..."
       />
-      <button @click="openCalendarModal" class="calendar-btn" title="Open Calendar">
+      <button
+        @click="openCalendarModal"
+        class="calendar-btn"
+        title="Open Calendar"
+      >
         <i class="bx bx-calendar"></i>
       </button>
     </div>
@@ -234,7 +238,12 @@
           :alt="weather.description"
           class="weather-icon"
         />
-        <img v-else src="/public/Profile.jpg" alt="weather" class="picture-person" />
+        <img
+          v-else
+          src="/public/Profile.jpg"
+          alt="weather"
+          class="picture-person"
+        />
       </div>
       <div class="glasscard-titles">
         <h1 class="volunteer-name">
@@ -324,7 +333,11 @@
   </div>
 
   <!-- Calendar Modal -->
-  <div v-if="showCalendarModal" class="calendar-modal-overlay" @click="closeCalendarModal">
+  <div
+    v-if="showCalendarModal"
+    class="calendar-modal-overlay"
+    @click="closeCalendarModal"
+  >
     <div class="calendar-modal" @click.stop>
       <div class="calendar-modal-header">
         <h2>Event Calendar</h2>
@@ -502,15 +515,16 @@ export default {
           userData.name,
           userData.full_name,
           // Extract first name from full_name if available
-          userData.full_name?.split(' ')[0],
+          userData.full_name?.split(" ")[0],
           // Extract first name from email if needed
-          userData.email?.split('@')[0]
+          userData.email?.split("@")[0],
         ];
 
         console.log("🔍 Possible name values:", possibleNames);
 
         // Use the first non-undefined value
-        firstName.value = possibleNames.find(name => name !== undefined) || "User";
+        firstName.value =
+          possibleNames.find((name) => name !== undefined) || "User";
 
         console.log("✅ User data loaded:", firstName.value);
       } catch (error) {
@@ -531,7 +545,7 @@ export default {
         );
 
         if (!response.ok) {
-          throw new Error('Weather API request failed');
+          throw new Error("Weather API request failed");
         }
 
         const data = await response.json();
@@ -575,7 +589,7 @@ export default {
       if (timeInterval) {
         clearInterval(timeInterval);
       }
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
     });
 
     // Clean up event listener
@@ -647,14 +661,14 @@ export default {
     // Update live time
     const updateTime = () => {
       const now = new Date();
-      const timeString = now.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hour12: true
+      const timeString = now.toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: true,
       });
       // Ensure there's exactly one space before AM/PM
-      currentTime.value = timeString.replace(/\s+/g, ' ');
+      currentTime.value = timeString.replace(/\s+/g, " ");
     };
 
     // Start time interval
@@ -1244,7 +1258,7 @@ export default {
   padding: 14px 0;
   font-size: 16px;
   font-weight: 700;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   letter-spacing: 0.5px;
   border: none;
   min-width: 130px;
@@ -1268,7 +1282,7 @@ export default {
   border: 2px solid transparent;
   border-radius: 12px;
   background: linear-gradient(white, white) padding-box,
-              linear-gradient(135deg, #e2e8f0, #cbd5e1) border-box;
+    linear-gradient(135deg, #e2e8f0, #cbd5e1) border-box;
   font-size: 14px;
   font-weight: 400;
   color: #1e293b;
@@ -1283,18 +1297,18 @@ export default {
 
 .input-search-event:focus {
   background: linear-gradient(white, white) padding-box,
-              linear-gradient(135deg, #435739, #6b8a4f) border-box;
+    linear-gradient(135deg, #435739, #6b8a4f) border-box;
 }
 
 .input-search-event:hover:not(:focus) {
   background: linear-gradient(white, white) padding-box,
-              linear-gradient(135deg, #94a3b8, #cbd5e1) border-box;
+    linear-gradient(135deg, #94a3b8, #cbd5e1) border-box;
 }
 
 /* Gradient Border Calendar Button */
 .calendar-btn {
   background: linear-gradient(white, white) padding-box,
-              linear-gradient(135deg, #435739, #6b8a4f) border-box;
+    linear-gradient(135deg, #435739, #6b8a4f) border-box;
   color: #435739;
   border: 2px solid transparent;
   width: 46px;
@@ -1310,7 +1324,7 @@ export default {
 
 .calendar-btn:hover {
   background: linear-gradient(135deg, #435739, #6b8a4f) padding-box,
-              linear-gradient(135deg, #435739, #6b8a4f) border-box;
+    linear-gradient(135deg, #435739, #6b8a4f) border-box;
   color: white;
   transform: translateY(-1px);
 }
@@ -1336,8 +1350,12 @@ export default {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .calendar-modal {
