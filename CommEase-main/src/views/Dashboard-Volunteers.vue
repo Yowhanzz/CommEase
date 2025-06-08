@@ -111,6 +111,7 @@
         :time-step="30"
         :snap-to-time="30"
         :show-all-day-events="true"
+        default-view="month"
       />
     </div>
   </div>
@@ -265,8 +266,8 @@
 <script>
 import { QrcodeStream } from "vue-qrcode-reader";
 import VueCal from "vue-cal";
-import VueQrcode from "@chenfengyuan/vue-qrcode";
 import "vue-cal/dist/vuecal.css";
+import VueQrcode from "@chenfengyuan/vue-qrcode";
 import NotificationPanel from "@/components/NotificationPanel.vue"; // Import the notification component
 
 import {
@@ -344,8 +345,8 @@ export default {
       selectedStatus: "",
       events_test: [
         {
-          start: "2025-05-08 6:25",
-          end: "2025-05-08 8:20",
+          start: "2025-05-08T06:25:00",
+          end: "2025-05-08T08:20:00",
           title: "Clean up Drive",
         },
       ],
@@ -379,7 +380,6 @@ export default {
     },
     calendarEvents() {
       // Transform all events for calendar display
-      console.log("Computing calendar events from:", this.allEvents);
       const transformed = this.allEvents
         .map((event) => {
           const formatted = formatEventForCalendar(event);
@@ -389,7 +389,6 @@ export default {
           return formatted;
         })
         .filter((event) => event !== null);
-
       console.log("Transformed calendar events:", transformed);
       return transformed;
     },
@@ -418,16 +417,11 @@ export default {
     },
     async fetchAllEvents() {
       try {
-        console.log("Fetching all events for calendar...");
         const response = await eventService.getAllEvents();
-        console.log("Raw API response:", response);
 
         // Handle both possible response structures
         const eventsData = response.data.data || response.data;
         this.allEvents = Array.isArray(eventsData) ? eventsData : [];
-
-        console.log("Processed events for calendar:", this.allEvents);
-        console.log("Number of events:", this.allEvents.length);
 
         // Log first event for debugging
         if (this.allEvents.length > 0) {
@@ -436,7 +430,6 @@ export default {
       } catch (err) {
         console.error("Error fetching all events for calendar:", err);
         console.error("Error details:", err.response?.data);
-        // Don't show error to user for calendar events, just log it
       }
     },
     async fetchUserData() {

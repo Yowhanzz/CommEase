@@ -12,24 +12,24 @@ const props = defineProps({
   chartData: {
     type: Array,
     required: true,
-    default: () => []
+    default: () => [],
   },
   title: {
     type: String,
-    default: ''
+    default: "",
   },
   xAxisLabel: {
     type: String,
-    default: ''
+    default: "",
   },
   yAxisLabel: {
     type: String,
-    default: ''
+    default: "",
   },
   color: {
     type: String,
-    default: '#435739'
-  }
+    default: "#435739",
+  },
 });
 
 const barChartRef = ref(null);
@@ -37,22 +37,22 @@ let chartInstance = null;
 
 const createChart = () => {
   if (!barChartRef.value || !props.chartData.length) return;
-  
+
   // Destroy existing chart if it exists
   if (chartInstance) {
     chartInstance.destroy();
   }
-  
-  const labels = props.chartData.map(item => item.label);
-  const data = props.chartData.map(item => item.value);
-  
+
+  const labels = props.chartData.map((item) => item.label);
+  const data = props.chartData.map((item) => item.value);
+
   chartInstance = new Chart(barChartRef.value, {
     type: "bar",
     data: {
       labels: labels,
       datasets: [
         {
-          label: props.yAxisLabel || 'Value',
+          label: props.yAxisLabel || "Value",
           data: data,
           backgroundColor: props.color,
           borderColor: props.color,
@@ -65,54 +65,54 @@ const createChart = () => {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { 
-          display: false 
+        legend: {
+          display: false,
         },
         title: {
           display: !!props.title,
           text: props.title,
-          color: '#2c3e50',
+          color: "#2c3e50",
           font: {
             size: 16,
-            weight: 'bold'
-          }
-        }
+            weight: "bold",
+          },
+        },
       },
       scales: {
         x: {
           title: {
             display: !!props.xAxisLabel,
             text: props.xAxisLabel,
-            color: '#2c3e50',
+            color: "#2c3e50",
             font: {
-              weight: 'bold'
-            }
+              weight: "bold",
+            },
           },
           ticks: {
             color: "#2c3e50",
             maxRotation: 45,
-            minRotation: 0
+            minRotation: 0,
           },
           grid: {
-            display: false
-          }
+            display: false,
+          },
         },
         y: {
           title: {
             display: !!props.yAxisLabel,
             text: props.yAxisLabel,
-            color: '#2c3e50',
+            color: "#2c3e50",
             font: {
-              weight: 'bold'
-            }
+              weight: "bold",
+            },
           },
           ticks: {
             color: "#2c3e50",
-            beginAtZero: true
+            beginAtZero: true,
           },
           grid: {
-            color: 'rgba(0,0,0,0.1)'
-          }
+            color: "rgba(0,0,0,0.1)",
+          },
         },
       },
     },
@@ -126,11 +126,15 @@ onMounted(() => {
 });
 
 // Watch for data changes and recreate chart
-watch(() => props.chartData, () => {
-  nextTick(() => {
-    createChart();
-  });
-}, { deep: true });
+watch(
+  () => props.chartData,
+  () => {
+    nextTick(() => {
+      createChart();
+    });
+  },
+  { deep: true }
+);
 </script>
 
 <style scoped>

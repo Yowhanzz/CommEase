@@ -29,14 +29,6 @@
             <span class="nav-item" v-show="isSidebarOpen">Archived Events</span>
           </router-link>
         </li>
-        <li>
-          <router-link to="/ActivityLogOrganizers">
-            <i class="bx bx-file report"></i>
-            <span class="nav-item" v-show="isSidebarOpen"
-              >Attendance Report</span
-            >
-          </router-link>
-        </li>
 
         <li>
           <router-link to="SafetyProtocolsOrganizers">
@@ -357,8 +349,6 @@ const handleResize = () => {
   }
 };
 
-
-
 const addThing = () => {
   if (newThing.value.trim()) {
     thingsNeeded.value.push(newThing.value.trim());
@@ -375,7 +365,8 @@ const validateParticipants = () => {
   participantValidationError.value = "";
 
   if (!participantLimit.value || !targetParticipants.value) {
-    participantValidationError.value = "Both participant limit and target participants are required";
+    participantValidationError.value =
+      "Both participant limit and target participants are required";
     return false;
   }
 
@@ -385,7 +376,8 @@ const validateParticipants = () => {
   }
 
   if (targetParticipants.value > participantLimit.value) {
-    participantValidationError.value = "Target participants cannot exceed participant limit";
+    participantValidationError.value =
+      "Target participants cannot exceed participant limit";
     return false;
   }
 

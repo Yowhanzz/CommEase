@@ -11,6 +11,6 @@
 }
 
 body {
-  background-color: #f2f4ec;
+  background-color: #f0f0f0;
 }
 </style>

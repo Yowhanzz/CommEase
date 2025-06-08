@@ -32,14 +32,6 @@
               >
             </router-link>
           </li>
-          <li>
-            <router-link to="/ActivityLogOrganizers">
-              <i class="bx bx-file report"></i>
-              <span class="nav-item" v-show="isSidebarOpen"
-                >Attendance Report</span
-              >
-            </router-link>
-          </li>
 
           <li>
             <router-link to="SafetyProtocolsOrganizers">
@@ -315,8 +307,6 @@ const filteredEvents = computed(() => {
         .includes(query)
   );
 });
-
-
 
 const toggleSidebar = () => {
   isSidebarOpen.value = !isSidebarOpen.value;

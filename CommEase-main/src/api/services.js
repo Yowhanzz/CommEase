@@ -176,13 +176,11 @@ export const eventService = {
 
   async getEvent(eventId) {
     try {
-      console.log("Fetching event with ID:", eventId);
       const response = await api.get(`/events/${eventId}`, {
         params: {
           include: "organizer,volunteers",
         },
       });
-      console.log("Event API response:", response);
       return response.data;
     } catch (error) {
       console.error("Get event error details:", {
@@ -239,12 +237,7 @@ export const eventService = {
   async updateEvent(eventId, eventData) {
     try {
       await authService.ensureCsrfToken();
-      console.log(
-        "Updating event with data:",
-        JSON.stringify(eventData, null, 2)
-      );
       const response = await api.put(`/events/${eventId}`, eventData);
-      console.log("Update response:", response);
       return response;
     } catch (error) {
       console.error("Update event error details:", {
@@ -337,7 +330,10 @@ export const eventService = {
         reflection_text: evaluationData.reflection_text, // Changed from reflection_paper to reflection_text
       };
 
-      const response = await api.post(`/events/${eventId}/post-evaluation`, payload);
+      const response = await api.post(
+        `/events/${eventId}/post-evaluation`,
+        payload
+      );
       return response;
     } catch (error) {
       console.error("Failed to submit post evaluation:", error);
@@ -358,7 +354,7 @@ export const eventService = {
 
   async getEvaluationQuestions() {
     try {
-      const response = await api.get('/evaluation-questions');
+      const response = await api.get("/evaluation-questions");
       return response;
     } catch (error) {
       console.error("Failed to get evaluation questions:", error);
@@ -417,11 +413,6 @@ export const eventService = {
           include: "organizer,volunteers",
           all: "true", // Request all events regardless of user role (must be string)
         },
-      });
-
-      console.log("getAllEvents API call made with params:", {
-        include: "organizer,volunteers",
-        all: "true"
       });
 
       // Handle both possible response structures
@@ -655,13 +646,29 @@ export const formatCalendarDateTime = (date, time) => {
     let timeString = time;
 
     // If time is already a full datetime string, extract just the time part
-    if (time.includes('T') || time.includes(' ')) {
-      timeString = dayjs(time).format('HH:mm:ss');
+    if (time.includes("T")) {
+      timeString = dayjs(time).format("HH:mm:ss");
+    } else if (time.includes("  ")) {
+      const timePart = time.split(" ")[1];
+      timeString = timePart || time;
     }
 
-    // Combine date and time for calendar display
-    const dateTimeString = `${date} ${timeString}`;
-    return dayjs(dateTimeString).tz("Asia/Manila").format();
+    if (!timeString.match(/^\d{1,2}:\d{2}(:\d{2})?$/)) {
+      console.warn("Invalid time format:", timeString);
+      return "";
+    }
+
+    const dateString = dayjs(date).format("YYYY-MM-DD");
+    const dateTimeString = `${dateString} ${timeString}`;
+
+    const datetime = dayjs(dateTimeString, "YYYY-MM-DD HH:mm:ss");
+    if (!datetime.isValid()) {
+      console.warn("Invalid datetime format:", dateTimeString);
+      return "";
+    }
+
+    const formatted = datetime.toISOString();
+    return formatted;
   } catch (error) {
     console.error("Error formatting calendar datetime:", error, { date, time });
     return "";

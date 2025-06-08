@@ -29,14 +29,6 @@
             <span class="nav-item" v-show="isSidebarOpen">Archived Events</span>
           </router-link>
         </li>
-        <li>
-          <router-link to="/ActivityLogOrganizers">
-            <i class="bx bx-file report"></i>
-            <span class="nav-item" v-show="isSidebarOpen"
-              >Attendance Report</span
-            >
-          </router-link>
-        </li>
 
         <li>
           <router-link to="SafetyProtocolsOrganizers">
@@ -116,12 +108,12 @@
     </div>
 
     <div v-else-if="analyticsData" class="total-analytics-container">
-      <div class="event-header">
+      <!--     <div class="event-header">
         <h2 v-if="eventData">{{ eventData.event_title }} - Analytics</h2>
         <p v-if="eventData" class="event-details">
           {{ formatDate(eventData.date) }} • {{ eventData.barangay }}
         </p>
-      </div>
+      </div> -->
 
       <div class="total-analytics-separation">
         <div class="total-container">
@@ -132,16 +124,22 @@
         <div class="total-container">
           <h5 class="title-total">Attendance Rate</h5>
           <p class="total-no">{{ analyticsData.attendance_rate || 0 }}%</p>
-          <small class="subtitle">{{ analyticsData.attended_count || 0 }}/{{ analyticsData.registered_count || 0 }}</small>
+          <small class="subtitle"
+            >{{ analyticsData.attended_count || 0 }}/{{
+              analyticsData.registered_count || 0
+            }}</small
+          >
         </div>
         <div class="total-container">
           <h5 class="title-total">Event Duration</h5>
-          <p class="total-no">{{ analyticsData.duration || 'N/A' }}</p>
+          <p class="total-no">{{ analyticsData.duration || "N/A" }}</p>
           <small class="subtitle">Actual time</small>
         </div>
         <div class="total-container">
           <h5 class="title-total">Volunteer Hours</h5>
-          <p class="total-no">{{ analyticsData.time_analysis?.total_volunteer_hours || 0 }}h</p>
+          <p class="total-no">
+            {{ analyticsData.time_analysis?.total_volunteer_hours || 0 }}h
+          </p>
           <small class="subtitle">Total contributed</small>
         </div>
       </div>
@@ -155,22 +153,40 @@
             <div class="progress-bar">
               <div
                 class="progress-fill"
-                :style="{ width: analyticsData.participant_progress.progress_percentage + '%' }"
+                :style="{
+                  width:
+                    analyticsData.participant_progress.progress_percentage +
+                    '%',
+                }"
               ></div>
             </div>
-            <p>{{ analyticsData.participant_progress.registered }}/{{ analyticsData.participant_progress.limit }}
-               ({{ analyticsData.participant_progress.progress_percentage }}%)</p>
+            <p>
+              {{ analyticsData.participant_progress.registered }}/{{
+                analyticsData.participant_progress.limit
+              }}
+              ({{ analyticsData.participant_progress.progress_percentage }}%)
+            </p>
           </div>
           <div class="progress-card">
             <h6>Target Achievement</h6>
             <div class="progress-bar">
               <div
                 class="progress-fill target"
-                :style="{ width: Math.min(analyticsData.participant_progress.target_percentage, 100) + '%' }"
+                :style="{
+                  width:
+                    Math.min(
+                      analyticsData.participant_progress.target_percentage,
+                      100
+                    ) + '%',
+                }"
               ></div>
             </div>
-            <p>{{ analyticsData.participant_progress.registered }}/{{ analyticsData.participant_progress.target }}
-               ({{ analyticsData.participant_progress.target_percentage }}%)</p>
+            <p>
+              {{ analyticsData.participant_progress.registered }}/{{
+                analyticsData.participant_progress.target
+              }}
+              ({{ analyticsData.participant_progress.target_percentage }}%)
+            </p>
           </div>
         </div>
       </div>
@@ -189,9 +205,7 @@
             :chartData="volunteerDurationData"
             title="Hours Contributed by Volunteers"
           />
-          <div v-else class="no-data">
-            No volunteer duration data available
-          </div>
+          <div v-else class="no-data">No volunteer duration data available</div>
         </div>
 
         <div class="total-pie-graph-glasscard">
@@ -208,9 +222,15 @@
 
         <div class="total-graph-glasscard">
           <h5 class="title-graph">Time in & out of Volunteers</h5>
-          <div v-if="analyticsData?.volunteer_time_details" class="modern-table-container">
+          <div
+            v-if="analyticsData?.volunteer_time_details"
+            class="modern-table-container"
+          >
             <div class="table-header">
-              <h6>{{ analyticsData.volunteer_time_details.length }} Volunteers Tracked</h6>
+              <h6>
+                {{ analyticsData.volunteer_time_details.length }} Volunteers
+                Tracked
+              </h6>
             </div>
             <div class="modern-table-wrapper">
               <table class="modern-users-table">
@@ -246,7 +266,10 @@
                   <tr
                     v-for="volunteer in analyticsData.volunteer_time_details"
                     :key="volunteer.id"
-                    :class="{ 'incomplete-time': !volunteer.time_in || !volunteer.time_out }"
+                    :class="{
+                      'incomplete-time':
+                        !volunteer.time_in || !volunteer.time_out,
+                    }"
                   >
                     <td class="volunteer-name-cell">
                       <div class="volunteer-info">
@@ -270,7 +293,10 @@
                       </div>
                     </td>
                     <td class="time-cell">
-                      <div class="time-badge time-out" v-if="volunteer.time_out">
+                      <div
+                        class="time-badge time-out"
+                        v-if="volunteer.time_out"
+                      >
                         <i class="bx bx-log-out"></i>
                         <span>{{ volunteer.time_out }}</span>
                       </div>
@@ -280,7 +306,10 @@
                       </div>
                     </td>
                     <td class="duration-cell">
-                      <div class="duration-badge" v-if="volunteer.duration_hours">
+                      <div
+                        class="duration-badge"
+                        v-if="volunteer.duration_hours"
+                      >
                         <i class="bx bx-timer"></i>
                         <span>{{ volunteer.duration_hours }}h</span>
                       </div>
@@ -294,9 +323,7 @@
               </table>
             </div>
           </div>
-          <div v-else class="no-data">
-            No volunteer time data available
-          </div>
+          <div v-else class="no-data">No volunteer time data available</div>
         </div>
 
         <div class="total-pie-graph-glasscard">
@@ -304,15 +331,21 @@
           <div v-if="analyticsData" class="attendance-stats">
             <div class="stat-item">
               <span class="stat-label">Present:</span>
-              <span class="stat-value present">{{ analyticsData.attended_count || 0 }}</span>
+              <span class="stat-value present">{{
+                analyticsData.attended_count || 0
+              }}</span>
             </div>
             <div class="stat-item">
               <span class="stat-label">Absent:</span>
-              <span class="stat-value absent">{{ analyticsData.absent_count || 0 }}</span>
+              <span class="stat-value absent">{{
+                analyticsData.absent_count || 0
+              }}</span>
             </div>
             <div class="stat-item">
               <span class="stat-label">Rate:</span>
-              <span class="stat-value rate">{{ analyticsData.attendance_rate || 0 }}%</span>
+              <span class="stat-value rate"
+                >{{ analyticsData.attendance_rate || 0 }}%</span
+              >
             </div>
           </div>
           <!-- Dynamic Pie Chart for Attendance -->
@@ -340,8 +373,12 @@
                 </div>
                 <div class="right-side">
                   <div class="suggestions-titles">
-                    <h4 class="name">{{ suggestion.volunteer?.full_name || 'Anonymous' }}</h4>
-                    <h6 class="date">{{ formatDate(suggestion.created_at) }}</h6>
+                    <h4 class="name">
+                      {{ suggestion.volunteer?.full_name || "Anonymous" }}
+                    </h4>
+                    <h6 class="date">
+                      {{ formatDate(suggestion.created_at) }}
+                    </h6>
                   </div>
                   <p class="content">
                     {{ suggestion.suggestion }}
@@ -354,9 +391,14 @@
 
         <div class="total-pie-graph-glasscard">
           <h5 class="title-graph">Things Brought Analysis</h5>
-          <div v-if="analyticsData?.things_brought" class="things-brought-stats">
+          <div
+            v-if="analyticsData?.things_brought"
+            class="things-brought-stats"
+          >
             <div class="total-items">
-              <span class="big-number">{{ analyticsData.things_brought_total || 0 }}</span>
+              <span class="big-number">{{
+                analyticsData.things_brought_total || 0
+              }}</span>
               <span class="label">Total Items</span>
             </div>
             <!-- Dynamic Pie Chart for Things Brought -->
@@ -366,12 +408,8 @@
               title="Items Distribution"
             />
           </div>
-          <div v-else class="no-data">
-            No items brought data available
-          </div>
+          <div v-else class="no-data">No items brought data available</div>
         </div>
-
-
       </div>
 
       <!-- Review Analytics -->
@@ -384,55 +422,105 @@
           <div class="rating-item">
             <span>Quality of Service:</span>
             <span class="rating-stars">
-              <span v-for="s in 5" :key="s" :class="s <= Math.round(averageRatings.quality) ? 'filled' : 'empty'">★</span>
+              <span
+                v-for="s in 5"
+                :key="s"
+                :class="
+                  s <= Math.round(averageRatings.quality) ? 'filled' : 'empty'
+                "
+                >★</span
+              >
               ({{ averageRatings.quality }})
             </span>
           </div>
           <div class="rating-item">
             <span>Responsiveness:</span>
             <span class="rating-stars">
-              <span v-for="s in 5" :key="s" :class="s <= Math.round(averageRatings.responsiveness) ? 'filled' : 'empty'">★</span>
+              <span
+                v-for="s in 5"
+                :key="s"
+                :class="
+                  s <= Math.round(averageRatings.responsiveness)
+                    ? 'filled'
+                    : 'empty'
+                "
+                >★</span
+              >
               ({{ averageRatings.responsiveness }})
             </span>
           </div>
           <div class="rating-item">
             <span>Effectiveness:</span>
             <span class="rating-stars">
-              <span v-for="s in 5" :key="s" :class="s <= Math.round(averageRatings.effectiveness) ? 'filled' : 'empty'">★</span>
+              <span
+                v-for="s in 5"
+                :key="s"
+                :class="
+                  s <= Math.round(averageRatings.effectiveness)
+                    ? 'filled'
+                    : 'empty'
+                "
+                >★</span
+              >
               ({{ averageRatings.effectiveness }})
             </span>
           </div>
           <div class="rating-item">
             <span>Organization:</span>
             <span class="rating-stars">
-              <span v-for="s in 5" :key="s" :class="s <= Math.round(averageRatings.organization) ? 'filled' : 'empty'">★</span>
+              <span
+                v-for="s in 5"
+                :key="s"
+                :class="
+                  s <= Math.round(averageRatings.organization)
+                    ? 'filled'
+                    : 'empty'
+                "
+                >★</span
+              >
               ({{ averageRatings.organization }})
             </span>
           </div>
           <div class="rating-item">
             <span>Recommendation:</span>
             <span class="rating-stars">
-              <span v-for="s in 5" :key="s" :class="s <= Math.round(averageRatings.recommendation) ? 'filled' : 'empty'">★</span>
+              <span
+                v-for="s in 5"
+                :key="s"
+                :class="
+                  s <= Math.round(averageRatings.recommendation)
+                    ? 'filled'
+                    : 'empty'
+                "
+                >★</span
+              >
               ({{ averageRatings.recommendation }})
             </span>
           </div>
         </div>
-
-
       </div>
 
       <!-- Reflections Section -->
-      <div v-if="postEvaluations.some(e => e.reflection_text)" class="reflections-list">
+      <div
+        v-if="postEvaluations.some((e) => e.reflection_text)"
+        class="reflections-list"
+      >
         <h3>Volunteer Reflections</h3>
         <div class="reflections-container">
           <div
-            v-for="evaluation in postEvaluations.filter(e => e.reflection_text)"
+            v-for="evaluation in postEvaluations.filter(
+              (e) => e.reflection_text
+            )"
             :key="evaluation.id"
             class="reflection-card"
           >
             <div class="reflection-header">
-              <h4 class="volunteer-name">{{ evaluation.volunteer?.full_name || 'Anonymous' }}</h4>
-              <span class="reflection-date">{{ formatDate(evaluation.created_at) }}</span>
+              <h4 class="volunteer-name">
+                {{ evaluation.volunteer?.full_name || "Anonymous" }}
+              </h4>
+              <span class="reflection-date">{{
+                formatDate(evaluation.created_at)
+              }}</span>
             </div>
             <div class="reflection-content">
               {{ evaluation.reflection_text }}
@@ -459,8 +547,8 @@ import NotificationPanel from "@/components/NotificationPanel.vue";
 const props = defineProps({
   eventId: {
     type: String,
-    required: true
-  }
+    required: true,
+  },
 });
 
 // Sidebar and UI States
@@ -503,15 +591,21 @@ const fetchEventAnalytics = async () => {
     console.log("📊 Fetching analytics for event ID:", props.eventId);
 
     // Fetch basic analytics
-    const analyticsResponse = await eventService.getEventAnalytics(props.eventId);
+    const analyticsResponse = await eventService.getEventAnalytics(
+      props.eventId
+    );
     analyticsData.value = analyticsResponse.data;
 
     // Fetch suggestions
-    const suggestionsResponse = await eventService.getEventSuggestions(props.eventId);
+    const suggestionsResponse = await eventService.getEventSuggestions(
+      props.eventId
+    );
     suggestions.value = suggestionsResponse.data.suggestions || [];
 
     // Fetch post evaluations
-    const evaluationsResponse = await eventService.getPostEvaluations(props.eventId);
+    const evaluationsResponse = await eventService.getPostEvaluations(
+      props.eventId
+    );
     postEvaluations.value = evaluationsResponse.data.evaluations || [];
 
     // Fetch event details
@@ -522,10 +616,10 @@ const fetchEventAnalytics = async () => {
     console.log("📈 Analytics:", analyticsData.value);
     console.log("💡 Suggestions:", suggestions.value);
     console.log("⭐ Evaluations:", postEvaluations.value);
-
   } catch (err) {
     console.error("❌ Failed to fetch analytics:", err);
-    error.value = err.response?.data?.message || "Failed to load analytics data";
+    error.value =
+      err.response?.data?.message || "Failed to load analytics data";
   } finally {
     loading.value = false;
   }
@@ -542,8 +636,6 @@ const handleResize = () => {
     isSidebarOpen.value = false;
   }
 };
-
-
 
 const confirmLogout = async () => {
   try {
@@ -565,10 +657,10 @@ const averageRatings = computed(() => {
     responsiveness: 0,
     effectiveness: 0,
     organization: 0,
-    recommendation: 0
+    recommendation: 0,
   };
 
-  postEvaluations.value.forEach(evaluation => {
+  postEvaluations.value.forEach((evaluation) => {
     totals.quality += evaluation.quality_rating;
     totals.responsiveness += evaluation.responsiveness_rating;
     totals.effectiveness += evaluation.effectiveness_rating;
@@ -583,7 +675,14 @@ const averageRatings = computed(() => {
     effectiveness: (totals.effectiveness / count).toFixed(1),
     organization: (totals.organization / count).toFixed(1),
     recommendation: (totals.recommendation / count).toFixed(1),
-    overall: ((totals.quality + totals.responsiveness + totals.effectiveness + totals.organization + totals.recommendation) / (count * 5)).toFixed(1)
+    overall: (
+      (totals.quality +
+        totals.responsiveness +
+        totals.effectiveness +
+        totals.organization +
+        totals.recommendation) /
+      (count * 5)
+    ).toFixed(1),
   };
 });
 
@@ -599,28 +698,37 @@ const attendanceChartData = computed(() => {
 
   return [
     {
-      label: 'Attended',
+      label: "Attended",
       value: analyticsData.value.attended_count || 0,
-      color: '#435739'
+      color: "#435739",
     },
     {
-      label: 'Absent',
+      label: "Absent",
       value: analyticsData.value.absent_count || 0,
-      color: '#e74c3c'
-    }
+      color: "#e74c3c",
+    },
   ];
 });
 
 const thingsBroughtChartData = computed(() => {
   if (!analyticsData.value?.things_brought) return [];
 
-  const colors = ['#435739', '#81a263', '#6b8a4f', '#9bb86f', '#b5c98a', '#c7d59f'];
+  const colors = [
+    "#435739",
+    "#81a263",
+    "#6b8a4f",
+    "#9bb86f",
+    "#b5c98a",
+    "#c7d59f",
+  ];
 
-  return Object.entries(analyticsData.value.things_brought).map(([item, count], index) => ({
-    label: item,
-    value: count,
-    color: colors[index % colors.length]
-  }));
+  return Object.entries(analyticsData.value.things_brought).map(
+    ([item, count], index) => ({
+      label: item,
+      value: count,
+      color: colors[index % colors.length],
+    })
+  );
 });
 
 // Volunteer duration data for bar chart
@@ -628,12 +736,14 @@ const volunteerDurationData = computed(() => {
   if (!analyticsData.value?.volunteer_time_details) return [];
 
   return analyticsData.value.volunteer_time_details
-    .filter(volunteer => volunteer.duration_hours && volunteer.duration_hours > 0)
+    .filter(
+      (volunteer) => volunteer.duration_hours && volunteer.duration_hours > 0
+    )
     .sort((a, b) => b.duration_hours - a.duration_hours) // Sort by duration descending
     .slice(0, 10) // Show top 10 volunteers
-    .map(volunteer => ({
+    .map((volunteer) => ({
       name: volunteer.name,
-      duration: volunteer.duration_hours
+      duration: volunteer.duration_hours,
     }));
 });
 
@@ -641,20 +751,22 @@ const volunteerDurationData = computed(() => {
 const programDistributionData = computed(() => {
   if (!analyticsData.value?.program_distribution) return [];
 
-  const colors = ['#435739', '#81a263', '#6b8a4f', '#9bb86f', '#b5c98a'];
+  const colors = ["#435739", "#81a263", "#6b8a4f", "#9bb86f", "#b5c98a"];
 
-  return Object.entries(analyticsData.value.program_distribution).map(([program, count], index) => ({
-    label: program,
-    value: count,
-    color: colors[index % colors.length]
-  }));
+  return Object.entries(analyticsData.value.program_distribution).map(
+    ([program, count], index) => ({
+      label: program,
+      value: count,
+      color: colors[index % colors.length],
+    })
+  );
 });
 
 // Initialize data on mount
 onMounted(() => {
   fetchEventAnalytics();
   handleResize();
-  window.addEventListener('resize', handleResize);
+  window.addEventListener("resize", handleResize);
 });
 </script>
 name: "safety", components: { QrcodeStream, VueCal, VueQrcode,
@@ -692,8 +804,6 @@ NotificationPanel, // Register the component },
   border-radius: 10px;
 }
 
-
-
 .reflection {
   font-size: 14px;
   color: #444;
@@ -709,16 +819,16 @@ NotificationPanel, // Register the component },
 
 /* Modern Time Tracking Table Styles */
 .modern-table-container {
-  background: white;
+  background: #f2f4ec;
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
   overflow: hidden;
   margin-top: 20px;
   border: 1px solid #e8ecef;
 }
 
 .table-header {
-  background: linear-gradient(135deg, #435739 0%, #6b8a4f 100%);
+  background-color: #435739;
   padding: 16px 24px;
   color: white;
 }
@@ -865,7 +975,7 @@ NotificationPanel, // Register the component },
   border-radius: 20px;
   font-weight: 500;
   font-size: 13px;
-  font-family: 'Segoe UI', monospace;
+  font-family: "Segoe UI", monospace;
 }
 
 .time-badge.time-in {
@@ -875,8 +985,8 @@ NotificationPanel, // Register the component },
 }
 
 .time-badge.time-out {
-  background: #cce5ff;
-  color: #004085;
+  background: #c74132;
+  color: #f2f4ec;
   border: 1px solid #b3d7ff;
 }
 
@@ -887,7 +997,7 @@ NotificationPanel, // Register the component },
   padding: 8px 12px;
   border-radius: 20px;
   background: #f8d7da;
-  color: #721c24;
+  color: #c74132;
   border: 1px solid #f5c6cb;
   font-weight: 500;
   font-size: 13px;
@@ -904,7 +1014,7 @@ NotificationPanel, // Register the component },
   gap: 6px;
   padding: 8px 12px;
   border-radius: 20px;
-  background: linear-gradient(135deg, #435739, #6b8a4f);
+  background-color: #435739;
   color: white;
   font-weight: 600;
   font-size: 13px;
@@ -924,7 +1034,8 @@ NotificationPanel, // Register the component },
 }
 
 /* Loading and Error States */
-.loading-state, .error-state {
+.loading-state,
+.error-state {
   text-align: center;
   padding: 40px 20px;
   color: #666;
@@ -967,11 +1078,13 @@ NotificationPanel, // Register the component },
 
 /* Ratings Summary */
 .ratings-summary {
-  background: #f8f9fa;
+  background: #f2f4ec;
   padding: 20px;
   border-radius: 8px;
   margin-bottom: 20px;
-  border-left: 4px solid #81a263;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+
+  border-left: 4px solid #435739;
 }
 
 .ratings-summary h4 {
@@ -987,7 +1100,12 @@ NotificationPanel, // Register the component },
   padding: 5px 0;
 }
 
-.rating-item span:first-child {
+.rating-item:first-child {
+  font-weight: 500;
+  color: #2c3e50;
+}
+
+.rating-item span {
   font-weight: 500;
   color: #2c3e50;
 }
@@ -1038,12 +1156,12 @@ NotificationPanel, // Register the component },
 }
 
 .reflection-card {
-  background: white;
+  background: #f2f4ec;
   border-radius: 8px;
   padding: 15px;
   margin-bottom: 15px;
-  border-left: 4px solid #81a263;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-left: 4px solid #435739;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
 }
 
 .reflection-header {
@@ -1082,7 +1200,7 @@ NotificationPanel, // Register the component },
 
 /* Progress Section */
 .progress-section {
-  background: #f8f9fa;
+  background: #f2f4ec;
   padding: 20px;
   border-radius: 12px;
   margin: 20px 0;
@@ -1097,10 +1215,12 @@ NotificationPanel, // Register the component },
 }
 
 .progress-card {
-  background: white;
+  background: #f2f4ec;
   padding: 15px;
   border-radius: 8px;
-  border-left: 4px solid #81a263;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+
+  border-left: 4px solid #435739;
 }
 
 .progress-card h6 {
@@ -1152,7 +1272,7 @@ NotificationPanel, // Register the component },
 }
 
 .stat-value.present {
-  color: #27ae60;
+  color: #6b7c61;
 }
 
 .stat-value.absent {
@@ -1160,7 +1280,7 @@ NotificationPanel, // Register the component },
 }
 
 .stat-value.rate {
-  color: #3498db;
+  color: #6b7c61;
 }
 
 /* Things Brought Stats */
@@ -1207,9 +1327,8 @@ NotificationPanel, // Register the component },
   font-weight: bold;
 }
 
-
-
-.program-stats, .time-stats {
+.program-stats,
+.time-stats {
   margin-top: 15px;
 }
 
@@ -1272,8 +1391,6 @@ NotificationPanel, // Register the component },
   font-weight: bold;
   color: #2c3e50;
 }
-
-
 
 /* Responsive Design */
 @media (max-width: 768px) {

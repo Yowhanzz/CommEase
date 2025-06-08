@@ -30,15 +30,6 @@
           </router-link>
         </li>
         <li>
-          <router-link to="/ActivityLogOrganizers">
-            <i class="bx bx-file report"></i>
-            <span class="nav-item" v-show="isSidebarOpen"
-              >Attendance Report</span
-            >
-          </router-link>
-        </li>
-
-        <li>
           <router-link to="SafetyProtocolsOrganizers">
             <i class="bx bxs-shield-plus"></i>
             <span class="nav-item" v-show="isSidebarOpen"
@@ -317,7 +308,13 @@ import VueCal from "vue-cal";
 import { QrcodeStream } from "vue-qrcode-reader";
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
-import { authService, qrService, eventService, notificationService, formatEventForCalendar } from "@/api/services";
+import {
+  authService,
+  qrService,
+  eventService,
+  notificationService,
+  formatEventForCalendar,
+} from "@/api/services";
 import NotificationPanel from "@/components/NotificationPanel.vue"; // Import the notification component
 
 export default {
@@ -398,7 +395,9 @@ export default {
     const fetchNotifications = async () => {
       try {
         notificationLoading.value = true;
-        console.log("🔔 fetchNotifications called - starting notification fetch");
+        console.log(
+          "🔔 fetchNotifications called - starting notification fetch"
+        );
 
         // Test if notificationService exists
         if (!notificationService) {
@@ -406,14 +405,20 @@ export default {
           return;
         }
 
-        console.log("✅ notificationService exists, calling getNotifications()");
+        console.log(
+          "✅ notificationService exists, calling getNotifications()"
+        );
         const response = await notificationService.getNotifications();
         console.log("✅ Notifications response received:", response);
 
         if (response && response.notifications) {
           notifications.value = response.notifications;
           unreadCount.value = response.unread_count || 0;
-          console.log("✅ Notifications loaded:", notifications.value.length, "notifications");
+          console.log(
+            "✅ Notifications loaded:",
+            notifications.value.length,
+            "notifications"
+          );
           console.log("✅ Unread count:", unreadCount.value);
         } else {
           console.error("❌ Invalid response structure:", response);
@@ -446,12 +451,12 @@ export default {
       fetchAllEvents();
       fetchNotifications();
       handleResize();
-      window.addEventListener('resize', handleResize);
+      window.addEventListener("resize", handleResize);
     });
 
     // Clean up event listener
     onUnmounted(() => {
-      window.removeEventListener('resize', handleResize);
+      window.removeEventListener("resize", handleResize);
     });
 
     const filteredEvents = computed(() => {
@@ -479,14 +484,14 @@ export default {
     const calendarEvents = computed(() => {
       console.log("Computing calendar events from:", allEvents.value);
       const transformed = allEvents.value
-        .map(event => {
+        .map((event) => {
           const formatted = formatEventForCalendar(event);
           if (!formatted) {
             console.warn("Failed to format event:", event);
           }
           return formatted;
         })
-        .filter(event => event !== null);
+        .filter((event) => event !== null);
 
       console.log("Transformed calendar events:", transformed);
       return transformed;
@@ -608,7 +613,9 @@ export default {
 
     const onEventClick = (event, e) => {
       // Find the original event data from the calendar event
-      const originalEvent = allEvents.value.find(evt => evt.event_title === event.title);
+      const originalEvent = allEvents.value.find(
+        (evt) => evt.event_title === event.title
+      );
       if (originalEvent) {
         selectedEvent.value = originalEvent;
         console.log("Selected event:", originalEvent);
@@ -681,7 +688,9 @@ export default {
       try {
         await notificationService.markAsRead(notificationId);
         // Update local state
-        const notification = notifications.value.find(n => n.id === notificationId);
+        const notification = notifications.value.find(
+          (n) => n.id === notificationId
+        );
         if (notification && !notification.read) {
           notification.read = true;
           unreadCount.value = Math.max(0, unreadCount.value - 1);
@@ -695,7 +704,7 @@ export default {
       try {
         await notificationService.markAllAsRead();
         // Update local state
-        notifications.value.forEach(notification => {
+        notifications.value.forEach((notification) => {
           notification.read = true;
         });
         unreadCount.value = 0;
@@ -708,7 +717,9 @@ export default {
       try {
         await notificationService.deleteNotification(notificationId);
         // Remove from local state
-        const index = notifications.value.findIndex(n => n.id === notificationId);
+        const index = notifications.value.findIndex(
+          (n) => n.id === notificationId
+        );
         if (index !== -1) {
           const notification = notifications.value[index];
           if (!notification.read) {

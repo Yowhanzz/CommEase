@@ -16,12 +16,12 @@ const props = defineProps({
       { name: "Volunteer A", duration: 2 },
       { name: "Volunteer B", duration: 3.5 },
       { name: "Volunteer C", duration: 1.75 },
-    ]
+    ],
   },
   title: {
     type: String,
-    default: "Hours Volunteered"
-  }
+    default: "Hours Volunteered",
+  },
 });
 
 const barChartRef = ref(null);
@@ -36,17 +36,15 @@ const createChart = () => {
   }
 
   // Prepare data from props
-  const labels = props.chartData.map(item => {
+  const labels = props.chartData.map((item) => {
     // Truncate long names for better display
-    return item.name.length > 12 ? item.name.substring(0, 12) + '...' : item.name;
+    return item.name.length > 12
+      ? item.name.substring(0, 12) + "..."
+      : item.name;
   });
-  const data = props.chartData.map(item => item.duration);
-
-  // Create gradient
-  const ctx = barChartRef.value.getContext('2d');
-  const gradient = ctx.createLinearGradient(0, 0, 0, 300);
-  gradient.addColorStop(0, '#81a263');
-  gradient.addColorStop(1, '#435739');
+  const data = props.chartData.map((item) => item.duration);
+  const ctx = barChartRef.value.getContext("2d");
+  const barColor = "#435739";
 
   chartInstance = new Chart(barChartRef.value, {
     type: "bar",
@@ -56,8 +54,8 @@ const createChart = () => {
         {
           label: props.title,
           data: data,
-          backgroundColor: gradient,
-          borderColor: '#435739',
+          backgroundColor: "#435739",
+          borderColor: "#435739",
           borderWidth: 2,
           borderRadius: 8,
           borderSkipped: false,
@@ -68,82 +66,82 @@ const createChart = () => {
       responsive: true,
       plugins: {
         legend: {
-          display: false
+          display: false,
         },
         title: {
           display: true,
           text: props.title,
-          color: '#2c3e50',
+          color: "#2c3e50",
           font: {
             size: 16,
-            weight: 'bold'
+            weight: "bold",
           },
           padding: {
             top: 10,
-            bottom: 20
-          }
+            bottom: 20,
+          },
         },
         tooltip: {
-          backgroundColor: 'rgba(67, 87, 57, 0.9)',
-          titleColor: '#fff',
-          bodyColor: '#fff',
-          borderColor: '#435739',
+          backgroundColor: "rgba(67, 87, 57, 0.9)",
+          titleColor: "#fff",
+          bodyColor: "#fff",
+          borderColor: "#435739",
           borderWidth: 1,
           cornerRadius: 8,
           callbacks: {
-            label: function(context) {
+            label: function (context) {
               return `${context.parsed.y} hours`;
-            }
-          }
-        }
+            },
+          },
+        },
       },
       maintainAspectRatio: false,
       scales: {
         x: {
           grid: {
-            display: false
+            display: false,
           },
           ticks: {
             color: "#2c3e50",
             font: {
               size: 12,
-              weight: '500'
+              weight: "500",
             },
             maxRotation: 45,
-            minRotation: 0
-          }
+            minRotation: 0,
+          },
         },
         y: {
           beginAtZero: true,
           grid: {
-            color: 'rgba(0,0,0,0.1)',
-            lineWidth: 1
+            color: "rgba(0,0,0,0.1)",
+            lineWidth: 1,
           },
           ticks: {
             color: "#2c3e50",
             font: {
               size: 12,
-              weight: '500'
+              weight: "500",
             },
-            callback: function(value) {
-              return value + 'h';
-            }
+            callback: function (value) {
+              return value + "h";
+            },
           },
           title: {
             display: true,
-            text: 'Hours',
-            color: '#2c3e50',
+            text: "Hours",
+            color: "#2c3e50",
             font: {
               size: 14,
-              weight: 'bold'
-            }
-          }
+              weight: "bold",
+            },
+          },
         },
       },
       animation: {
         duration: 1000,
-        easing: 'easeInOutQuart'
-      }
+        easing: "easeInOutQuart",
+      },
     },
   });
 };
@@ -155,11 +153,15 @@ onMounted(() => {
 });
 
 // Watch for data changes and recreate chart
-watch(() => props.chartData, () => {
-  nextTick(() => {
-    createChart();
-  });
-}, { deep: true });
+watch(
+  () => props.chartData,
+  () => {
+    nextTick(() => {
+      createChart();
+    });
+  },
+  { deep: true }
+);
 </script>
 
 <style scoped>
@@ -169,22 +171,22 @@ watch(() => props.chartData, () => {
   height: 350px;
   margin: 0 auto;
   padding: 20px;
-  background: white;
+  background: #f2f4ec;
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
   border: 1px solid #e8ecef;
   position: relative;
   overflow: hidden;
 }
 
 .bar-chart-container::before {
-  content: '';
+  content: "";
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   height: 4px;
-  background: linear-gradient(90deg, #435739, #81a263, #6b8a4f);
+  background: #435739;
   border-radius: 16px 16px 0 0;
 }
 
