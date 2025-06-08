@@ -117,8 +117,9 @@
 
     <div v-else-if="analyticsData" class="total-analytics-container">
       <div class="event-header">
-        <h2 v-if="eventData">{{ eventData.event_title }} - Analytics</h2>
-        <p v-if="eventData" class="event-details">
+        <h2 v-if="eventData && eventData.event_title">{{ eventData.event_title }} - Analytics</h2>
+        <h2 v-else>Event Analytics</h2>
+        <p v-if="eventData && eventData.date && eventData.barangay" class="event-details">
           {{ formatDate(eventData.date) }} • {{ eventData.barangay }}
         </p>
       </div>
@@ -304,7 +305,11 @@
           <div v-if="analyticsData" class="attendance-stats">
             <div class="stat-item">
               <span class="stat-label">Present:</span>
-              <span class="stat-value present">{{ analyticsData.attended_count || 0 }}</span>
+              <span class="stat-value present">{{ analyticsData.present_count || 0 }}</span>
+            </div>
+            <div class="stat-item">
+              <span class="stat-label">No Time Out:</span>
+              <span class="stat-value no-time-out">{{ analyticsData.no_time_out_count || 0 }}</span>
             </div>
             <div class="stat-item">
               <span class="stat-label">Absent:</span>
@@ -378,42 +383,44 @@
       <div class="review-list">
         <h3>Post Evaluation Analytics</h3>
 
+
+
         <!-- Average Ratings Summary -->
         <div v-if="averageRatings" class="ratings-summary">
           <h4>Average Ratings per Question</h4>
           <div class="rating-item">
             <span>Quality of Service:</span>
             <span class="rating-stars">
-              <span v-for="s in 5" :key="s" :class="s <= Math.round(averageRatings.quality) ? 'filled' : 'empty'">★</span>
-              ({{ averageRatings.quality }})
+              <span v-for="s in 5" :key="s" :class="s <= Number(averageRatings.quality) ? 'filled' : 'empty'">★</span>
+              ({{ Number(averageRatings.quality).toFixed(1) }})
             </span>
           </div>
           <div class="rating-item">
             <span>Responsiveness:</span>
             <span class="rating-stars">
-              <span v-for="s in 5" :key="s" :class="s <= Math.round(averageRatings.responsiveness) ? 'filled' : 'empty'">★</span>
-              ({{ averageRatings.responsiveness }})
+              <span v-for="s in 5" :key="s" :class="s <= Number(averageRatings.responsiveness) ? 'filled' : 'empty'">★</span>
+              ({{ Number(averageRatings.responsiveness).toFixed(1) }})
             </span>
           </div>
           <div class="rating-item">
             <span>Effectiveness:</span>
             <span class="rating-stars">
-              <span v-for="s in 5" :key="s" :class="s <= Math.round(averageRatings.effectiveness) ? 'filled' : 'empty'">★</span>
-              ({{ averageRatings.effectiveness }})
+              <span v-for="s in 5" :key="s" :class="s <= Number(averageRatings.effectiveness) ? 'filled' : 'empty'">★</span>
+              ({{ Number(averageRatings.effectiveness).toFixed(1) }})
             </span>
           </div>
           <div class="rating-item">
             <span>Organization:</span>
             <span class="rating-stars">
-              <span v-for="s in 5" :key="s" :class="s <= Math.round(averageRatings.organization) ? 'filled' : 'empty'">★</span>
-              ({{ averageRatings.organization }})
+              <span v-for="s in 5" :key="s" :class="s <= Number(averageRatings.organization) ? 'filled' : 'empty'">★</span>
+              ({{ Number(averageRatings.organization).toFixed(1) }})
             </span>
           </div>
           <div class="rating-item">
             <span>Recommendation:</span>
             <span class="rating-stars">
-              <span v-for="s in 5" :key="s" :class="s <= Math.round(averageRatings.recommendation) ? 'filled' : 'empty'">★</span>
-              ({{ averageRatings.recommendation }})
+              <span v-for="s in 5" :key="s" :class="s <= Number(averageRatings.recommendation) ? 'filled' : 'empty'">★</span>
+              ({{ Number(averageRatings.recommendation).toFixed(1) }})
             </span>
           </div>
         </div>
@@ -516,12 +523,9 @@ const fetchEventAnalytics = async () => {
 
     // Fetch event details
     const eventResponse = await eventService.getEvent(props.eventId);
-    eventData.value = eventResponse.data;
+    eventData.value = eventResponse.data || eventResponse;
 
     console.log("✅ Analytics data loaded successfully");
-    console.log("📈 Analytics:", analyticsData.value);
-    console.log("💡 Suggestions:", suggestions.value);
-    console.log("⭐ Evaluations:", postEvaluations.value);
 
   } catch (err) {
     console.error("❌ Failed to fetch analytics:", err);
@@ -593,22 +597,50 @@ const formatDate = (dateString) => {
   return date.toLocaleDateString();
 };
 
+// Helper functions for star rating display
+const getStarClass = (starNumber, rating) => {
+  const numericRating = parseFloat(rating) || 0;
+  return starNumber <= numericRating ? 'filled' : 'empty';
+};
+
+const formatRating = (rating) => {
+  return parseFloat(rating || 0).toFixed(1);
+};
+
 // Chart data computed properties
 const attendanceChartData = computed(() => {
   if (!analyticsData.value) return [];
 
-  return [
-    {
-      label: 'Attended',
-      value: analyticsData.value.attended_count || 0,
+  const chartData = [];
+
+  // Present (completed time in and out)
+  if (analyticsData.value.present_count > 0) {
+    chartData.push({
+      label: 'Present',
+      value: analyticsData.value.present_count,
       color: '#435739'
-    },
-    {
+    });
+  }
+
+  // No time out (has time in but no time out)
+  if (analyticsData.value.no_time_out_count > 0) {
+    chartData.push({
+      label: 'No Time Out',
+      value: analyticsData.value.no_time_out_count,
+      color: '#ff9800'
+    });
+  }
+
+  // Absent (no time in)
+  if (analyticsData.value.absent_count > 0) {
+    chartData.push({
       label: 'Absent',
-      value: analyticsData.value.absent_count || 0,
+      value: analyticsData.value.absent_count,
       color: '#e74c3c'
-    }
-  ];
+    });
+  }
+
+  return chartData;
 });
 
 const thingsBroughtChartData = computed(() => {
@@ -1152,7 +1184,11 @@ NotificationPanel, // Register the component },
 }
 
 .stat-value.present {
-  color: #27ae60;
+  color: #435739;
+}
+
+.stat-value.no-time-out {
+  color: #ff9800;
 }
 
 .stat-value.absent {

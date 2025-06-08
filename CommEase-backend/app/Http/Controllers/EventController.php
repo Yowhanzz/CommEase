@@ -485,10 +485,27 @@ class EventController extends Controller
 
         // Basic event statistics
         $registeredCount = $event->registered_count;
-        $attendedCount = $event->attended_count;
-        $absentCount = $registeredCount - $attendedCount;
 
-        // Attendance rate calculation
+        // Enhanced attendance analysis based on time tracking
+        $allVolunteers = $event->volunteers()->get();
+
+        // Present: Has both time in and time out
+        $presentCount = $allVolunteers->filter(function ($volunteer) {
+            return $volunteer->pivot->time_in && $volunteer->pivot->time_out;
+        })->count();
+
+        // No time out: Has time in but no time out
+        $noTimeOutCount = $allVolunteers->filter(function ($volunteer) {
+            return $volunteer->pivot->time_in && !$volunteer->pivot->time_out;
+        })->count();
+
+        // Absent: No time in (regardless of attendance status)
+        $absentCount = $allVolunteers->filter(function ($volunteer) {
+            return !$volunteer->pivot->time_in;
+        })->count();
+
+        // Attendance rate calculation (present + no time out = attended)
+        $attendedCount = $presentCount + $noTimeOutCount;
         $attendanceRate = $registeredCount > 0 ? round(($attendedCount / $registeredCount) * 100, 2) : 0;
 
         // Things brought analysis
@@ -636,6 +653,11 @@ class EventController extends Controller
             'attended_count' => $attendedCount,
             'absent_count' => $absentCount,
             'attendance_rate' => $attendanceRate,
+
+            // Enhanced attendance breakdown
+            'present_count' => $presentCount,
+            'no_time_out_count' => $noTimeOutCount,
+            'absent_count' => $absentCount,
 
             // Participant progress
             'participant_progress' => $participantProgress,

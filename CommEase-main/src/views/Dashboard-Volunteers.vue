@@ -60,12 +60,20 @@
       </div>
     </div>
 
-    <input
-      v-model="searchQuery"
-      class="input-search-event"
-      type="search"
-      placeholder="Search event..."
-    />
+    <div class="search-input-container">
+      <div class="live-time">
+        {{ currentTime }}
+      </div>
+      <input
+        v-model="searchQuery"
+        class="input-search-event"
+        type="search"
+        placeholder="Search event..."
+      />
+      <button @click="openCalendarModal" class="calendar-btn" title="Open Calendar">
+        <i class="bx bx-calendar"></i>
+      </button>
+    </div>
   </div>
 
   <hr
@@ -253,6 +261,21 @@
   </div>
 
   <div class="overlay" v-if="!isMobile && isSidebarOpen"></div>
+
+  <!-- Calendar Modal -->
+  <div v-if="showCalendarModal" class="calendar-modal-overlay" @click="closeCalendarModal">
+    <div class="calendar-modal" @click.stop>
+      <div class="calendar-modal-header">
+        <h2>Event Calendar</h2>
+        <button @click="closeCalendarModal" class="close-calendar-btn">
+          <i class="bx bx-x"></i>
+        </button>
+      </div>
+      <div class="calendar-modal-content">
+        <CustomCalendar />
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -261,6 +284,7 @@ import VueCal from "vue-cal";
 import VueQrcode from "@chenfengyuan/vue-qrcode";
 import "vue-cal/dist/vuecal.css";
 import NotificationPanel from "@/components/NotificationPanel.vue"; // Import the notification component
+import CustomCalendar from "@/components/CustomCalendar.vue"; // Import the calendar component
 
 import {
   authService,
@@ -281,6 +305,7 @@ export default {
     VueCal,
     VueQrcode,
     NotificationPanel, // Register the component
+    CustomCalendar, // Register the calendar component
   },
   setup() {
     // Use notification composable
@@ -352,6 +377,8 @@ export default {
         description: "",
         icon: "",
       },
+      currentTime: "",
+      showCalendarModal: false,
     };
   },
   computed: {
@@ -392,6 +419,15 @@ export default {
     await this.fetchAllEvents();
     await this.fetchUserData();
     await this.fetchWeather();
+    this.startTimeUpdates();
+    this.handleResize();
+    window.addEventListener('resize', this.handleResize);
+  },
+  beforeUnmount() {
+    if (this.timeInterval) {
+      clearInterval(this.timeInterval);
+    }
+    window.removeEventListener('resize', this.handleResize);
   },
   methods: {
     async fetchEvents() {
@@ -434,10 +470,23 @@ export default {
     },
     async fetchUserData() {
       try {
-        const response = await axios.get("/api/user");
-        this.firstName = response.data.first_name;
+        const userData = await authService.getUser();
+        console.log("🔍 User data from authService:", userData);
+
+        // Try different possible field names
+        const possibleNames = [
+          userData.first_name,
+          userData.firstName,
+          userData.name,
+          userData.full_name?.split(' ')[0],
+          userData.email?.split('@')[0]
+        ];
+
+        this.firstName = possibleNames.find(name => name !== undefined) || "User";
+        console.log("✅ User data loaded:", this.firstName);
       } catch (error) {
-        console.error("Error fetching user data:", error);
+        console.error("❌ Error fetching user data:", error);
+        this.firstName = "User"; // Fallback name
       }
     },
     toggleSidebar() {
@@ -528,6 +577,30 @@ export default {
         console.error("Error fetching weather:", error);
       }
     },
+    // Time update methods
+    updateTime() {
+      const now = new Date();
+      const timeString = now.toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+        hour12: true
+      });
+      // Ensure there's exactly one space before AM/PM
+      this.currentTime = timeString.replace(/\s+/g, ' ');
+    },
+    startTimeUpdates() {
+      this.updateTime(); // Initial update
+      this.timeInterval = setInterval(this.updateTime, 1000); // Update every second
+    },
+    // Calendar modal methods
+    openCalendarModal() {
+      this.showCalendarModal = true;
+      this.showDropdown = false;
+    },
+    closeCalendarModal() {
+      this.showCalendarModal = false;
+    },
   },
 };
 </script>
@@ -535,6 +608,212 @@ export default {
 <style scoped src="/src/assets/CSS Volunteers/dashboard.css"></style>
 
 <style scoped>
+/* Modern Search Input Container */
+.search-input-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-width: 500px;
+}
+
+/* Modern Clean Live Time */
+.live-time {
+  background: transparent;
+  color: #435739;
+  padding: 14px 0;
+  font-size: 16px;
+  font-weight: 700;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  letter-spacing: 0.5px;
+  border: none;
+  min-width: 130px;
+  text-align: left;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.live-time:hover {
+  color: #6b8a4f;
+  transform: scale(1.02);
+}
+
+/* Gradient Border Search Input */
+.input-search-event {
+  width: 300px;
+  max-width: 300px;
+  height: 46px;
+  padding: 0 18px;
+  border: 2px solid transparent;
+  border-radius: 12px;
+  background: linear-gradient(white, white) padding-box,
+              linear-gradient(135deg, #e2e8f0, #cbd5e1) border-box;
+  font-size: 14px;
+  font-weight: 400;
+  color: #1e293b;
+  transition: all 0.2s ease;
+  outline: none;
+}
+
+.input-search-event::placeholder {
+  color: #94a3b8;
+  font-weight: 400;
+}
+
+.input-search-event:focus {
+  background: linear-gradient(white, white) padding-box,
+              linear-gradient(135deg, #435739, #6b8a4f) border-box;
+}
+
+.input-search-event:hover:not(:focus) {
+  background: linear-gradient(white, white) padding-box,
+              linear-gradient(135deg, #94a3b8, #cbd5e1) border-box;
+}
+
+/* Gradient Border Calendar Button */
+.calendar-btn {
+  background: linear-gradient(white, white) padding-box,
+              linear-gradient(135deg, #435739, #6b8a4f) border-box;
+  color: #435739;
+  border: 2px solid transparent;
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-size: 18px;
+}
+
+.calendar-btn:hover {
+  background: linear-gradient(135deg, #435739, #6b8a4f) padding-box,
+              linear-gradient(135deg, #435739, #6b8a4f) border-box;
+  color: white;
+  transform: translateY(-1px);
+}
+
+.calendar-btn:active {
+  transform: translateY(0);
+}
+
+/* Simple Calendar Modal */
+.calendar-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2000;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.calendar-modal {
+  background: white;
+  border-radius: 16px;
+  max-width: 900px;
+  width: 90%;
+  max-height: 80vh;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.calendar-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 28px;
+  background: #435739;
+  color: white;
+}
+
+.calendar-modal-header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.close-calendar-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: white;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 18px;
+}
+
+.close-calendar-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.calendar-modal-content {
+  padding: 20px;
+  max-height: calc(80vh - 80px);
+  overflow-y: auto;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .search-input-container {
+    gap: 12px;
+    max-width: 400px;
+  }
+
+  .live-time {
+    padding: 12px 0;
+    font-size: 14px;
+    min-width: 100px;
+  }
+
+  .input-search-event {
+    width: 220px;
+    max-width: 220px;
+    height: 44px;
+    padding: 0 16px;
+    font-size: 13px;
+  }
+
+  .calendar-btn {
+    width: 44px;
+    height: 44px;
+    font-size: 16px;
+  }
+
+  .calendar-modal {
+    margin: 15px;
+    width: calc(100% - 30px);
+  }
+}
+
 /* Calendar event styling */
 :deep(.vuecal__event) {
   border-radius: 6px;
