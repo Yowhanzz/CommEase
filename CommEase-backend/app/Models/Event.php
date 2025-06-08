@@ -53,7 +53,13 @@ class Event extends Model
     {
         return $this->belongsToMany(User::class, 'event_volunteers', 'event_id', 'user_id')
             ->withPivot(['things_brought', 'time_in', 'time_out', 'attendance_status', 'attendance_notes', 'attendance_marked_at'])
-            ->withTimestamps();
+            ->withTimestamps()
+            ->withCasts([
+                'things_brought' => 'array',
+                'time_in' => 'datetime',
+                'time_out' => 'datetime',
+                'attendance_marked_at' => 'datetime'
+            ]);
     }
 
     public function feedbacks(): HasMany
@@ -109,7 +115,18 @@ class Event extends Model
         }
 
         $totalMinutes = $volunteers->sum(function ($volunteer) {
-            return $volunteer->pivot->time_in->diffInMinutes($volunteer->pivot->time_out);
+            $timeIn = $volunteer->pivot->time_in;
+            $timeOut = $volunteer->pivot->time_out;
+
+            // Ensure we have Carbon instances
+            if (is_string($timeIn)) {
+                $timeIn = \Carbon\Carbon::parse($timeIn);
+            }
+            if (is_string($timeOut)) {
+                $timeOut = \Carbon\Carbon::parse($timeOut);
+            }
+
+            return $timeIn->diffInMinutes($timeOut);
         });
 
         $averageMinutes = $totalMinutes / $volunteers->count();

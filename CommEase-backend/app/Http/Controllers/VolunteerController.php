@@ -216,7 +216,20 @@ class VolunteerController extends Controller
                 'time_in' => $event->pivot->time_in,
                 'time_out' => $event->pivot->time_out,
                 'volunteer_duration' => $event->pivot->time_in && $event->pivot->time_out
-                    ? $event->pivot->time_in->diffForHumans($event->pivot->time_out, true)
+                    ? (function() use ($event) {
+                        $timeIn = $event->pivot->time_in;
+                        $timeOut = $event->pivot->time_out;
+
+                        // Ensure we have Carbon instances
+                        if (is_string($timeIn)) {
+                            $timeIn = \Carbon\Carbon::parse($timeIn);
+                        }
+                        if (is_string($timeOut)) {
+                            $timeOut = \Carbon\Carbon::parse($timeOut);
+                        }
+
+                        return $timeIn->diffForHumans($timeOut, true);
+                    })()
                     : 'N/A'
             ];
         });

@@ -478,26 +478,191 @@ class EventController extends Controller
 
     public function getAnalytics(Event $event)
     {
+        // Check if user is the organizer of this event
+        if ($event->organizer_id !== request()->user()->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        // Basic event statistics
+        $registeredCount = $event->registered_count;
+        $attendedCount = $event->attended_count;
+        $absentCount = $registeredCount - $attendedCount;
+
+        // Attendance rate calculation
+        $attendanceRate = $registeredCount > 0 ? round(($attendedCount / $registeredCount) * 100, 2) : 0;
+
+        // Things brought analysis
+        $rawThingsData = $event->volunteers()
+            ->whereNotNull('things_brought')
+            ->get()
+            ->pluck('pivot.things_brought')
+            ->filter();
+
+        // Debug: Log raw data
+        \Log::info('Raw things brought data:', $rawThingsData->toArray());
+
+        $thingsBroughtData = $rawThingsData
+            ->map(function ($items) {
+                // Ensure we have an array and decode if it's JSON
+                if (is_string($items)) {
+                    $decoded = json_decode($items, true);
+                    return is_array($decoded) ? $decoded : [$items];
+                }
+                return is_array($items) ? $items : [$items];
+            })
+            ->flatten()
+            ->filter(function ($item) {
+                // Remove empty strings and null values
+                return !empty(trim($item));
+            })
+            ->map(function ($item) {
+                // Clean and normalize item names
+                return trim(strtolower($item));
+            })
+            ->countBy()
+            ->map(function ($count, $item) {
+                // Capitalize first letter for display
+                return ['item' => ucfirst($item), 'count' => $count];
+            })
+            ->mapWithKeys(function ($data) {
+                return [$data['item'] => $data['count']];
+            })
+            ->toArray();
+
+        // Debug: Log processed data
+        \Log::info('Processed things brought data:', $thingsBroughtData);
+
+        // Volunteer time analysis
+        $volunteersWithTime = $event->volunteers()
+            ->whereNotNull('time_in')
+            ->whereNotNull('time_out')
+            ->get();
+
+        $timeAnalysis = [
+            'total_volunteers_with_time' => $volunteersWithTime->count(),
+            'average_time_minutes' => 0,
+            'total_volunteer_hours' => 0,
+            'longest_session_minutes' => 0,
+            'shortest_session_minutes' => 0
+        ];
+
+        if ($volunteersWithTime->isNotEmpty()) {
+            $times = $volunteersWithTime->map(function ($volunteer) {
+                $timeIn = $volunteer->pivot->time_in;
+                $timeOut = $volunteer->pivot->time_out;
+
+                // Ensure we have Carbon instances
+                if (is_string($timeIn)) {
+                    $timeIn = \Carbon\Carbon::parse($timeIn);
+                }
+                if (is_string($timeOut)) {
+                    $timeOut = \Carbon\Carbon::parse($timeOut);
+                }
+
+                return $timeIn->diffInMinutes($timeOut);
+            });
+
+            $timeAnalysis['average_time_minutes'] = round($times->avg());
+            $timeAnalysis['total_volunteer_hours'] = round($times->sum() / 60, 2);
+            $timeAnalysis['longest_session_minutes'] = $times->max();
+            $timeAnalysis['shortest_session_minutes'] = $times->min();
+        }
+
+        // Absentees list
+        $absentees = $event->volunteers()
+            ->wherePivot('attendance_status', '!=', 'present')
+            ->orWherePivot('attendance_status', null)
+            ->get()
+            ->map(function ($volunteer) {
+                return [
+                    'id' => $volunteer->id,
+                    'name' => $volunteer->full_name, // This will use the accessor
+                    'email' => $volunteer->email,
+                    'program' => $volunteer->program,
+                    'attendance_status' => $volunteer->pivot->attendance_status ?? 'not_marked'
+                ];
+            });
+
+        // Program distribution
+        $programDistribution = $event->volunteers()
+            ->get()
+            ->groupBy('program')
+            ->map(function ($volunteers) {
+                return $volunteers->count();
+            })
+            ->toArray();
+
+        // Volunteer time tracking details
+        $volunteerTimeDetails = $event->volunteers()
+            ->get()
+            ->map(function ($volunteer) {
+                $timeIn = $volunteer->pivot->time_in;
+                $timeOut = $volunteer->pivot->time_out;
+                $duration = null;
+
+                if ($timeIn && $timeOut) {
+                    // Ensure we have Carbon instances
+                    if (is_string($timeIn)) {
+                        $timeIn = \Carbon\Carbon::parse($timeIn);
+                    }
+                    if (is_string($timeOut)) {
+                        $timeOut = \Carbon\Carbon::parse($timeOut);
+                    }
+
+                    $duration = $timeIn->diffInMinutes($timeOut);
+                }
+
+                return [
+                    'id' => $volunteer->id,
+                    'name' => $volunteer->full_name,
+                    'program' => $volunteer->program,
+                    'time_in' => $timeIn ? (is_string($timeIn) ? $timeIn : $timeIn->format('H:i:s')) : null,
+                    'time_out' => $timeOut ? (is_string($timeOut) ? $timeOut : $timeOut->format('H:i:s')) : null,
+                    'duration_minutes' => $duration,
+                    'duration_hours' => $duration ? round($duration / 60, 2) : null,
+                    'attendance_status' => $volunteer->pivot->attendance_status,
+                    'things_brought' => $volunteer->pivot->things_brought
+                ];
+            })
+            ->sortByDesc('duration_minutes');
+
+        // Participant progress
+        $participantProgress = $event->participant_progress;
+
         return response()->json([
+            // Basic metrics
             'duration' => $event->duration,
-            'registered_count' => $event->registered_count,
-            'attended_count' => $event->attended_count,
+            'registered_count' => $registeredCount,
+            'attended_count' => $attendedCount,
+            'absent_count' => $absentCount,
+            'attendance_rate' => $attendanceRate,
+
+            // Participant progress
+            'participant_progress' => $participantProgress,
+
+            // Time analysis
+            'time_analysis' => $timeAnalysis,
             'average_volunteer_time' => $event->average_volunteer_time,
-            'things_brought' => $event->volunteers()
-                ->whereNotNull('things_brought')
-                ->pluck('things_brought')
-                ->flatten()
-                ->countBy(),
-            'absentees' => $event->volunteers()
-                ->whereNull('time_in')
-                ->get()
-                ->map(function ($volunteer) {
-                    return [
-                        'id' => $volunteer->id,
-                        'name' => $volunteer->full_name,
-                        'email' => $volunteer->email,
-                    ];
-                }),
+
+            // Things brought
+            'things_brought' => $thingsBroughtData,
+            'things_brought_total' => array_sum($thingsBroughtData),
+
+            // Program distribution
+            'program_distribution' => $programDistribution,
+
+            // Volunteer time tracking
+            'volunteer_time_details' => $volunteerTimeDetails->values(),
+
+            // Detailed lists
+            'absentees' => $absentees,
+
+            // Event details
+            'event_status' => $event->status,
+            'started_at' => $event->started_at,
+            'ended_at' => $event->ended_at,
+            'planned_start' => $event->start_time,
+            'planned_end' => $event->end_time,
         ]);
     }
 
@@ -547,7 +712,7 @@ class EventController extends Controller
         }
 
         $feedback = $event->feedbacks()
-            ->with('volunteer:id,full_name')
+            ->with('volunteer:id,first_name,last_name')
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -860,6 +1025,24 @@ class EventController extends Controller
             'evaluations' => $evaluations,
             'stats' => $stats,
             'questions' => PostEvaluation::getQuestions()
+        ]);
+    }
+
+    public function getSuggestions(Request $request, Event $event)
+    {
+        // Check if user is the organizer of this event
+        if ($event->organizer_id !== $request->user()->id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $suggestions = $event->suggestions()
+            ->with('volunteer:id,first_name,last_name')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json([
+            'suggestions' => $suggestions,
+            'total_suggestions' => $suggestions->count()
         ]);
     }
 

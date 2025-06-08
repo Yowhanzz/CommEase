@@ -49,14 +49,7 @@
               >
             </router-link>
           </li>
-          <li>
-            <router-link to="/PostEvaluationAnalytics">
-              <i class="bx bx-bar-chart-alt-2"></i>
-              <span class="nav-item" v-show="isSidebarOpen"
-                >Post Evaluations</span
-              >
-            </router-link>
-          </li>
+
           <li @click="toggleNotifications">
             <a>
               <i class="bx bxs-bell"></i>
@@ -193,12 +186,22 @@
             </div>
           </div>
 
-          <i
-            class="bx bx-trash"
-            id="delete-button"
-            @click="deleteEvent(event.id, index)"
-            title="Delete archived event"
-          ></i>
+          <div class="archived-event-actions">
+            <button
+              class="enter-analytics-btn"
+              @click="viewEventAnalytics(event.id)"
+              title="View event analytics"
+            >
+              <i class="bx bx-bar-chart-alt-2"></i>
+              Enter
+            </button>
+            <i
+              class="bx bx-trash"
+              id="delete-button"
+              @click="deleteEvent(event.id, index)"
+              title="Delete archived event"
+            ></i>
+          </div>
         </div>
       </div>
     </div>
@@ -361,6 +364,12 @@ export default {
       }
     };
 
+    /* VIEW EVENT ANALYTICS */
+    const viewEventAnalytics = (eventId) => {
+      console.log("🔍 Navigating to analytics for archived event ID:", eventId);
+      router.push(`/AnalyticsOrganizers/${eventId}`);
+    };
+
     /* DELETE ARCHIVED EVENT */
     const deleteEvent = async (eventId, index) => {
       const confirmed = confirm(
@@ -369,10 +378,13 @@ export default {
       if (confirmed) {
         try {
           loading.value = true;
+          console.log("🗑️ Attempting to delete event ID:", eventId);
           await eventService.deleteEvent(eventId);
           events.value.splice(index, 1);
+          console.log("✅ Event deleted successfully!");
           alert("Event deleted successfully!");
         } catch (err) {
+          console.error("❌ Failed to delete event:", err);
           error.value =
             err.response?.data?.message ||
             err.message ||
@@ -422,6 +434,7 @@ export default {
       filteredEvents,
       toggleSidebar,
       fetchArchivedEvents,
+      viewEventAnalytics, // view event analytics
       deleteEvent, //delete archived event
       confirmLogout,
       formatTime,
@@ -495,13 +508,79 @@ export default {
   font-weight: 600;
 }
 
+/* Action buttons container */
+.archived-event-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+/* Enter Analytics Button */
+.enter-analytics-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, #435739, #6b8a4f);
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(67, 87, 57, 0.3);
+}
+
+.enter-analytics-btn:hover {
+  background: linear-gradient(135deg, #6b8a4f, #81a263);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(67, 87, 57, 0.4);
+}
+
+.enter-analytics-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(67, 87, 57, 0.3);
+}
+
+.enter-analytics-btn i {
+  font-size: 16px;
+}
+
 /* Delete button enhancement */
 #delete-button {
-  transition: color 0.3s ease, transform 0.2s ease;
+  font-size: 20px;
+  color: #6c757d;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  padding: 8px;
+  border-radius: 50%;
 }
 
 #delete-button:hover {
   color: #dc3545;
+  background: rgba(220, 53, 69, 0.1);
   transform: scale(1.1);
+}
+
+/* Responsive design for action buttons */
+@media (max-width: 768px) {
+  .archived-event-actions {
+    flex-direction: column;
+    gap: 8px;
+    align-items: stretch;
+  }
+
+  .enter-analytics-btn {
+    justify-content: center;
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+
+  #delete-button {
+    align-self: center;
+    font-size: 18px;
+  }
 }
 </style>

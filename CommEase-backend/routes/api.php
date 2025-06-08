@@ -57,6 +57,9 @@ Route::middleware(['web', 'auth', CheckRole::class.':organizer'])->group(functio
 
     // Post-evaluation routes for organizers
     Route::get('events/{event}/post-evaluations', [EventController::class, 'getPostEvaluations'])->middleware(CheckEventProgram::class);
+
+    // Suggestions route for organizers
+    Route::get('events/{event}/suggestions', [EventController::class, 'getSuggestions'])->middleware(CheckEventProgram::class);
 });
 
 // Public Event Routes (require authentication since controller uses $request->user())

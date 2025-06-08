@@ -366,6 +366,29 @@ export const eventService = {
     }
   },
 
+  // Analytics Methods
+  async getEventAnalytics(eventId) {
+    try {
+      await authService.ensureCsrfToken();
+      const response = await api.get(`/events/${eventId}/analytics`);
+      return response;
+    } catch (error) {
+      console.error("Failed to get event analytics:", error);
+      throw error;
+    }
+  },
+
+  async getEventSuggestions(eventId) {
+    try {
+      await authService.ensureCsrfToken();
+      const response = await api.get(`/events/${eventId}/suggestions`);
+      return response;
+    } catch (error) {
+      console.error("Failed to get event suggestions:", error);
+      throw error;
+    }
+  },
+
   async getArchivedEvents(params = {}) {
     try {
       // Simple request for archived events - no extra parameters needed
