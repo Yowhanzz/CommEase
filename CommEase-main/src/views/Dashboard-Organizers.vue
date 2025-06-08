@@ -46,14 +46,7 @@
             >
           </router-link>
         </li>
-        <li>
-          <router-link to="/PostEvaluationAnalytics">
-            <i class="bx bx-bar-chart-alt-2"></i>
-            <span class="nav-item" v-show="isSidebarOpen"
-              >Post Evaluations</span
-            >
-          </router-link>
-        </li>
+
         <li @click="toggleNotifications">
           <a>
             <i class="bx bxs-bell"></i>
@@ -303,9 +296,12 @@
             </h6>
           </div>
           <div class="button">
-            <router-link to="/AnalyticsOrganizers" class="button-enter"
-              >Enter</router-link
+            <router-link
+              :to="`/AnalyticsOrganizers/${event.id}`"
+              class="button-enter"
             >
+              Enter
+            </router-link>
           </div>
         </div>
       </div>

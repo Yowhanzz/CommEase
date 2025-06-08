@@ -79,7 +79,13 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Event::class, 'event_volunteers', 'user_id', 'event_id')
             ->withPivot(['things_brought', 'time_in', 'time_out', 'attendance_status', 'attendance_notes', 'attendance_marked_at'])
-            ->withTimestamps();
+            ->withTimestamps()
+            ->withCasts([
+                'things_brought' => 'array',
+                'time_in' => 'datetime',
+                'time_out' => 'datetime',
+                'attendance_marked_at' => 'datetime'
+            ]);
     }
 
     public function suggestions()
