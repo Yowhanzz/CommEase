@@ -268,6 +268,98 @@ img {
 .qr-code {
   margin-left: 20%;
 }
+
+/* QR SCANNER  */
+/* Overlay background */
+.qr-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  background-color: rgba(0, 0, 0, 0.6);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Modal content */
+.qr-modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 12px;
+  position: relative;
+  max-width: 600px;
+  width: 90%;
+  scale: 0.85;
+}
+
+.or {
+  text-align: center;
+  font-size: 19px;
+  font-weight: 600;
+  padding-top: 10px;
+}
+
+.input-attendance-volunteer {
+  display: grid;
+  place-items: center;
+  padding-top: 15px;
+}
+
+.input-attendance {
+  width: 90%;
+  border-radius: 5px;
+  border: 1px solid #12372a;
+  height: 30px;
+  padding-left: 15px;
+  margin-bottom: 10px;
+  transition: all 0.15s ease-in-out;
+}
+
+.input-attendance:focus {
+  border: 2px solid #12372a; /* lighter green border for focus */
+  outline: none;
+  border-color: #12372a; /* optional: light background on focus */
+}
+
+.input-submit {
+  width: 90%;
+  padding: 10px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  border: none;
+  background-color: #12372a;
+  color: #daf1de;
+  height: 40px;
+  font-weight: 500;
+  transition: all 0.15s ease-in-out;
+}
+
+.input-submit::-webkit-inner-spin-button,
+.input-submit::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.input-submit:hover {
+  background-color: #daf1de;
+  color: #12372a;
+  border: 1px solid #12372a;
+}
+
+.input-submit:active {
+  opacity: 0.7;
+}
+
+.qr-modal-content h3 {
+  padding-bottom: 20px;
+}
+
+::v-deep(.scanner-box video) {
+  border-radius: 10px;
+}
 /* LIST OF EVENTS SECTIONS */
 
 .list-events-wrapper {
@@ -304,9 +396,8 @@ img {
   padding-right: 5px;
   border-radius: 6px;
   color: #daf1de;
-  border: 2px solid #051f20;
-  box-shadow: 0px 3px 5px rgba(168, 213, 186, 0.8);
-  background-color: #436850;
+  border: 2px solid #f2f4ec;
+  background-color: #435739;
   margin-bottom: 1rem;
   margin-top: 30px;
   cursor: pointer;
@@ -317,7 +408,7 @@ img {
 
 .program-filter-dropdown:focus {
   color: #daf1de;
-  border: 2px solid #051f20;
+  border: 2px solid #f2f4ec;
   box-shadow: 0px 3px 5px rgba(168, 213, 186, 0.8);
   background-color: #235347;
   cursor: pointer;
@@ -446,9 +537,11 @@ img {
   color: white;
   font-weight: 550;
   border: none;
+  padding-left: 15px;
   width: 75px;
   height: 40px;
   border-radius: 4px;
+  padding-left: 0px;
   cursor: pointer;
   transition: background-color 0.2s;
 }
@@ -615,7 +708,9 @@ img {
 .close-btn {
   background: transparent;
   border: none;
+  float: right;
   font-size: 1.5rem;
+  margin-bottom: 10px;
   cursor: pointer;
   color: #444;
 }
@@ -690,6 +785,9 @@ img {
 .dropdown {
   position: relative;
   left: 2%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 10px;
 }
 
 .dropbtn {
@@ -746,12 +844,6 @@ img {
     grid-template-rows: 1fr 1fr;
   }
 
-  .test-grid {
-    display: grid;
-    width: 100%;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    gap: 20px;
-  }
   .search-options-container {
     /* REVISED */
     align-items: center;
@@ -772,7 +864,6 @@ img {
   .overlay {
     display: block;
   }
-
   .container {
     padding-left: 90px;
   }
@@ -812,16 +903,16 @@ img {
 }
 
 @media (max-width: 979px) {
-  .calendar-modal-overlay {
-    margin-left: 30px;
-  }
-
   .calendar-modal {
-    scale: 0.9;
+    scale: 0.8;
+    margin-left: 30px;
   }
 
   .notification-panel {
     z-index: 2000;
+  }
+  .overlay {
+    display: block;
   }
 }
 
@@ -846,7 +937,37 @@ img {
   }
 }
 
-@media (max-width: 578px) {
+@media (max-width: 760px) {
+  .calendar-modal {
+    scale: 0.7;
+  }
+
+  .calendar-modal-content {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .calendar-modal-content table {
+    min-width: 600px; /* or whatever minimum width you want */
+  }
+  .calendar-modal-content td,
+  .calendar-modal-content th,
+  .calendar-modal-content tr {
+    min-width: 600px; /* or whatever minimum width you want */
+  }
+}
+
+@media (max-width: 635px) {
+  .sidebar {
+    z-index: 5000 !important;
+  }
+
+  .qr-modal-content {
+    scale: 0.85;
+  }
+}
+
+@media (max-width: 602px) {
   .calendar-modal {
     scale: 0.75;
   }
@@ -876,10 +997,46 @@ img {
   }
 }
 
-@media (max-width: 562px) {
-  .logout-modal {
-    scale: 0.9;
-    margin-left: 50px;
+@media (max-width: 582px) {
+  .search-options-container {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 578px) {
+  .calendar-modal {
+    scale: 0.75;
+  }
+
+  .modal-content {
+    scale: 0.85;
+    margin-left: 60px;
+  }
+
+  .notification-panel {
+    z-index: 2000;
+  }
+  .picture-person {
+    /* REVISED */
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+  }
+
+  .volunteer-name {
+    font-size: 20px;
+  }
+
+  .service-type {
+    font-size: 19px;
+  }
+
+  .glasscard-container,
+  .glasscard-container-1 {
+    scale: 0.95;
   }
 }
 
@@ -896,6 +1053,12 @@ img {
   }
   .notification-panel {
     z-index: 2000;
+  }
+}
+
+@media (max-width: 501px) {
+  .glasscard-container {
+    height: auto;
   }
 }
 
@@ -935,4 +1098,34 @@ img {
   color: #666;
   margin-top: 5px;
   text-transform: capitalize;
+}
+
+@media (max-width: 562px) {
+  .logout-modal {
+    scale: 0.9;
+    margin-left: 50px;
+  }
+}
+
+.icon-button {
+  background-color: #435739;
+  color: #f2f4ec;
+  border: 2px solid transparent;
+
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-size: 18px;
+}
+
+.icon-button:hover {
+  background-color: #f2f4ec;
+  color: #435739;
+  border: 2px solid #435739;
+  transform: translateY(-1px);
 }

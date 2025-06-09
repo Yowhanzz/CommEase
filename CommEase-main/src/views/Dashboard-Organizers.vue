@@ -60,23 +60,10 @@
     :class="{ 'sidebar-collapsed': !isOpen }"
   >
     <div class="dropdown">
-      <button class="dropbtn" @click="toggleDropdown">Menu ▼</button>
-      <div class="dropdown-content" :class="{ active: showDropdown }">
-        <a @click="showQRCode = true">Show My QR Scanner</a>
-        <a @click="toggleCalendar">Calendar</a>
-      </div>
-    </div>
+      <button @click="showQRCode = true" class="icon-button">
+        <i class="bx bx-qr"></i>
+      </button>
 
-    <div class="search-input-container">
-      <div class="live-time">
-        {{ currentTime }}
-      </div>
-      <input
-        v-model="searchQuery"
-        class="input-search-event"
-        type="search"
-        placeholder="Search event..."
-      />
       <button
         @click="openCalendarModal"
         class="calendar-btn"
@@ -84,6 +71,19 @@
       >
         <i class="bx bx-calendar"></i>
       </button>
+    </div>
+
+    <div class="search-input-container">
+      <input
+        v-model="searchQuery"
+        class="input-search-event"
+        type="search"
+        placeholder="Search event..."
+      />
+
+      <div class="live-time">
+        {{ currentTime }}
+      </div>
     </div>
   </div>
 
@@ -173,18 +173,6 @@
         <h3>Event Calendar</h3>
         <button class="close-btn" @click="calendarVisible = false">✕</button>
       </div>
-      <vue-cal
-        style="height: 500px"
-        :events="calendarEvents"
-        @cell-click="onDateClick"
-        @event-click="onEventClick"
-        :disable-views="['years', 'year']"
-        :time-from="5 * 60"
-        :time-to="22 * 60"
-        :time-step="30"
-        :snap-to-time="30"
-        :show-all-day-events="false"
-      />
     </div>
   </div>
 
@@ -1258,7 +1246,6 @@ export default {
   padding: 14px 0;
   font-size: 16px;
   font-weight: 700;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   letter-spacing: 0.5px;
   border: none;
   min-width: 130px;
@@ -1266,11 +1253,6 @@ export default {
   transition: all 0.2s ease;
   white-space: nowrap;
   overflow: hidden;
-}
-
-.live-time:hover {
-  color: #6b8a4f;
-  transform: scale(1.02);
 }
 
 /* Gradient Border Search Input */
@@ -1307,9 +1289,8 @@ export default {
 
 /* Gradient Border Calendar Button */
 .calendar-btn {
-  background: linear-gradient(white, white) padding-box,
-    linear-gradient(135deg, #435739, #6b8a4f) border-box;
-  color: #435739;
+  background-color: #435739;
+  color: #f2f4ec;
   border: 2px solid transparent;
   width: 46px;
   height: 46px;
@@ -1323,9 +1304,9 @@ export default {
 }
 
 .calendar-btn:hover {
-  background: linear-gradient(135deg, #435739, #6b8a4f) padding-box,
-    linear-gradient(135deg, #435739, #6b8a4f) border-box;
-  color: white;
+  background-color: #f2f4ec;
+  color: #435739;
+  border: 2px solid #435739;
   transform: translateY(-1px);
 }
 
@@ -1359,10 +1340,10 @@ export default {
 }
 
 .calendar-modal {
-  background: white;
+  background: #f2f4ec;
   border-radius: 16px;
   max-width: 900px;
-  width: 90%;
+  width: 100%;
   max-height: 80vh;
   overflow: hidden;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
@@ -1385,8 +1366,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 24px 28px;
-  background: #435739;
-  color: white;
+  color: black;
 }
 
 .calendar-modal-header h2 {
@@ -1396,9 +1376,9 @@ export default {
 }
 
 .close-calendar-btn {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(27, 27, 27, 0.1);
   border: none;
-  color: white;
+  color: black;
   width: 36px;
   height: 36px;
   border-radius: 8px;
@@ -1411,7 +1391,7 @@ export default {
 }
 
 .close-calendar-btn:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(175, 175, 175, 0.2);
 }
 
 .calendar-modal-content {
@@ -1440,38 +1420,6 @@ export default {
     padding: 0 16px;
     font-size: 13px;
   }
-
-  .calendar-btn {
-    width: 44px;
-    height: 44px;
-    font-size: 16px;
-  }
-
-  .calendar-modal {
-    margin: 15px;
-    max-height: 85vh;
-    width: calc(100% - 30px);
-    border-radius: 20px;
-  }
-
-  .calendar-modal-header {
-    padding: 20px 24px;
-  }
-
-  .calendar-modal-header h2 {
-    font-size: 1.4rem;
-  }
-
-  .close-calendar-btn {
-    width: 40px;
-    height: 40px;
-    font-size: 18px;
-  }
-
-  .calendar-modal-content {
-    padding: 16px;
-    max-height: calc(85vh - 80px);
-  }
 }
 
 @media (max-width: 480px) {
@@ -1492,25 +1440,6 @@ export default {
     height: 40px;
     padding: 0 12px;
     font-size: 12px;
-  }
-
-  .calendar-btn {
-    width: 40px;
-    height: 40px;
-    font-size: 16px;
-  }
-
-  .calendar-modal {
-    margin: 10px;
-    width: calc(100% - 20px);
-  }
-
-  .calendar-modal-header {
-    padding: 16px 20px;
-  }
-
-  .calendar-modal-content {
-    padding: 12px;
   }
 }
 </style>

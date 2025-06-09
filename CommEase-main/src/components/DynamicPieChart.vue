@@ -3,13 +3,9 @@
     <canvas ref="pieChartRef" class="pie-chart"></canvas>
     <!-- Dynamic Labels section below the pie chart -->
     <div class="labels-container">
-      <div 
-        v-for="(item, index) in chartData" 
-        :key="index"
-        class="label-item"
-      >
-        <span 
-          class="label-color" 
+      <div v-for="(item, index) in chartData" :key="index" class="label-item">
+        <span
+          class="label-color"
           :style="{ backgroundColor: item.color }"
         ></span>
         {{ item.label }}: {{ item.value }}
@@ -26,12 +22,12 @@ const props = defineProps({
   chartData: {
     type: Array,
     required: true,
-    default: () => []
+    default: () => [],
   },
   title: {
     type: String,
-    default: ''
-  }
+    default: "",
+  },
 });
 
 const pieChartRef = ref(null);
@@ -39,16 +35,16 @@ let chartInstance = null;
 
 const createChart = () => {
   if (!pieChartRef.value || !props.chartData.length) return;
-  
+
   // Destroy existing chart if it exists
   if (chartInstance) {
     chartInstance.destroy();
   }
-  
-  const labels = props.chartData.map(item => item.label);
-  const data = props.chartData.map(item => item.value);
-  const colors = props.chartData.map(item => item.color);
-  
+
+  const labels = props.chartData.map((item) => item.label);
+  const data = props.chartData.map((item) => item.value);
+  const colors = props.chartData.map((item) => item.color);
+
   chartInstance = new Chart(pieChartRef.value, {
     type: "pie",
     data: {
@@ -58,7 +54,7 @@ const createChart = () => {
           data: data,
           backgroundColor: colors,
           borderWidth: 2,
-          borderColor: '#fff'
+          borderColor: "#fff",
         },
       ],
     },
@@ -66,17 +62,17 @@ const createChart = () => {
       responsive: false,
       plugins: {
         legend: {
-          display: false // We'll use custom labels below
+          display: false, // We'll use custom labels below
         },
         title: {
           display: !!props.title,
           text: props.title,
-          color: '#2c3e50',
+          color: "#2c3e50",
           font: {
             size: 16,
-            weight: 'bold'
-          }
-        }
+            weight: "bold",
+          },
+        },
       },
     },
   });
@@ -89,11 +85,15 @@ onMounted(() => {
 });
 
 // Watch for data changes and recreate chart
-watch(() => props.chartData, () => {
-  nextTick(() => {
-    createChart();
-  });
-}, { deep: true });
+watch(
+  () => props.chartData,
+  () => {
+    nextTick(() => {
+      createChart();
+    });
+  },
+  { deep: true }
+);
 </script>
 
 <style scoped>
@@ -132,7 +132,7 @@ watch(() => props.chartData, () => {
   height: 16px;
   margin-right: 8px;
   border-radius: 50%;
-  border: 1px solid rgba(0,0,0,0.1);
+  border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 @media (max-width: 768px) {
@@ -140,7 +140,7 @@ watch(() => props.chartData, () => {
     width: 150px;
     height: 150px;
   }
-  
+
   .labels-container {
     align-items: center;
   }

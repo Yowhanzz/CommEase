@@ -27,9 +27,9 @@
           'calendar-date',
           {
             'other-month': !date.isCurrentMonth,
-            'today': date.isToday,
-            'has-events': date.events.length > 0
-          }
+            today: date.isToday,
+            'has-events': date.events.length > 0,
+          },
         ]"
         @click="selectDate(date)"
       >
@@ -51,7 +51,11 @@
     </div>
 
     <!-- Event Details Modal -->
-    <div v-if="selectedDate && selectedDate.events.length > 0" class="event-modal-overlay" @click="closeModal">
+    <div
+      v-if="selectedDate && selectedDate.events.length > 0"
+      class="event-modal-overlay"
+      @click="closeModal"
+    >
       <div class="event-modal" @click.stop>
         <div class="modal-header">
           <h3>Events on {{ formatSelectedDate }}</h3>
@@ -72,10 +76,19 @@
               </span>
             </div>
             <div class="event-details">
-              <p><i class="bx bx-time"></i> {{ formatTime(event.start_time) }} - {{ formatTime(event.end_time) }}</p>
+              <p>
+                <i class="bx bx-time"></i> {{ formatTime(event.start_time) }} -
+                {{ formatTime(event.end_time) }}
+              </p>
               <p><i class="bx bx-map"></i> Barangay {{ event.barangay }}</p>
-              <p><i class="bx bx-group"></i> {{ (event.programs || []).join(', ') }}</p>
-              <p><i class="bx bx-user"></i> {{ event.organizer?.first_name }} {{ event.organizer?.last_name }}</p>
+              <p>
+                <i class="bx bx-group"></i>
+                {{ (event.programs || []).join(", ") }}
+              </p>
+              <p>
+                <i class="bx bx-user"></i> {{ event.organizer?.first_name }}
+                {{ event.organizer?.last_name }}
+              </p>
             </div>
           </div>
         </div>
@@ -91,74 +104,74 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue';
-import { eventService } from '@/api/services';
+import { ref, computed, onMounted } from "vue";
+import { eventService } from "@/api/services";
 
 export default {
-  name: 'CustomCalendar',
+  name: "CustomCalendar",
   setup() {
     const currentDate = ref(new Date());
     const events = ref([]);
     const loading = ref(false);
     const selectedDate = ref(null);
 
-    const daysOfWeek = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const daysOfWeek = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
     // Computed properties
     const currentMonthYear = computed(() => {
-      return currentDate.value.toLocaleDateString('en-US', {
-        month: 'long',
-        year: 'numeric'
+      return currentDate.value.toLocaleDateString("en-US", {
+        month: "long",
+        year: "numeric",
       });
     });
 
     const formatSelectedDate = computed(() => {
-      if (!selectedDate.value) return '';
-      return selectedDate.value.date.toLocaleDateString('en-US', {
-        weekday: 'long',
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric'
+      if (!selectedDate.value) return "";
+      return selectedDate.value.date.toLocaleDateString("en-US", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
       });
     });
 
     const calendarDates = computed(() => {
       const year = currentDate.value.getFullYear();
       const month = currentDate.value.getMonth();
-      
+
       // Get first day of month and how many days in month
       const firstDay = new Date(year, month, 1);
       const lastDay = new Date(year, month + 1, 0);
       const daysInMonth = lastDay.getDate();
       const startingDayOfWeek = firstDay.getDay();
-      
+
       // Get days from previous month to fill the grid
       const daysFromPrevMonth = startingDayOfWeek;
       const prevMonth = new Date(year, month - 1, 0);
       const daysInPrevMonth = prevMonth.getDate();
-      
+
       const dates = [];
-      
+
       // Previous month days
       for (let i = daysFromPrevMonth - 1; i >= 0; i--) {
         const day = daysInPrevMonth - i;
         const date = new Date(year, month - 1, day);
         dates.push(createDateObject(date, false));
       }
-      
+
       // Current month days
       for (let day = 1; day <= daysInMonth; day++) {
         const date = new Date(year, month, day);
         dates.push(createDateObject(date, true));
       }
-      
+
       // Next month days to fill remaining slots
       const remainingSlots = 42 - dates.length; // 6 rows × 7 days
       for (let day = 1; day <= remainingSlots; day++) {
         const date = new Date(year, month + 1, day);
         dates.push(createDateObject(date, false));
       }
-      
+
       return dates;
     });
 
@@ -166,7 +179,7 @@ export default {
     const createDateObject = (date, isCurrentMonth) => {
       const today = new Date();
       const dateString = date.toDateString();
-      const dayEvents = events.value.filter(event => {
+      const dayEvents = events.value.filter((event) => {
         const eventDate = new Date(event.date);
         return eventDate.toDateString() === dateString;
       });
@@ -177,14 +190,14 @@ export default {
         isCurrentMonth,
         isToday: dateString === today.toDateString(),
         events: dayEvents,
-        key: `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`
+        key: `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`,
       };
     };
 
     const formatTime = (datetime) => {
       return new Date(datetime).toLocaleTimeString([], {
-        hour: '2-digit',
-        minute: '2-digit'
+        hour: "2-digit",
+        minute: "2-digit",
       });
     };
 
@@ -221,9 +234,9 @@ export default {
         loading.value = true;
         const response = await eventService.getAllEvents();
         events.value = response.data || [];
-        console.log('📅 Calendar events loaded:', events.value.length);
+        console.log("📅 Calendar events loaded:", events.value.length);
       } catch (error) {
-        console.error('❌ Failed to fetch calendar events:', error);
+        console.error("❌ Failed to fetch calendar events:", error);
         events.value = [];
       } finally {
         loading.value = false;
@@ -249,9 +262,9 @@ export default {
       nextMonth,
       selectDate,
       closeModal,
-      fetchEvents
+      fetchEvents,
     };
-  }
+  },
 };
 </script>
 
@@ -270,7 +283,7 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  background: linear-gradient(135deg, #435739 0%, #6b8a4f 100%);
+  background-color: #435739;
   color: white;
 }
 
@@ -387,8 +400,8 @@ export default {
 }
 
 .event-dot.status-ongoing {
-  background: #34d399;
-  color: #065f46;
+  background: #d9dfcc;
+  color: #4e653d;
 }
 
 .event-dot.status-completed {
@@ -488,7 +501,7 @@ export default {
 }
 
 .event-card.status-ongoing {
-  border-left-color: #34d399;
+  border-left-color: #435739;
 }
 
 .event-card.status-completed {
@@ -496,7 +509,7 @@ export default {
 }
 
 .event-card.status-cancelled {
-  border-left-color: #f87171;
+  border-left-color: #e74c3c;
 }
 
 .event-header {
@@ -583,8 +596,12 @@ export default {
 }
 
 @keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 /* Responsive Design */

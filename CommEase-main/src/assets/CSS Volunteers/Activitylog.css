@@ -381,7 +381,7 @@ i {
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(32, 32, 32, 0.321);
   display: grid;
   place-items: center;
   z-index: 1000;
@@ -503,6 +503,10 @@ h2 {
 .submit-btn {
   background-color: #435739;
   color: #f2f4ec;
+}
+
+.submit-eval {
+  font-size: 15px;
 }
 .submit-btn:hover {
   background-color: #f2f4ec;

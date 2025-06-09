@@ -108,7 +108,6 @@
     </div>
 
     <div v-else-if="analyticsData" class="total-analytics-container">
-<<<<<<< HEAD
       <!--     <div class="event-header">
         <h2 v-if="eventData">{{ eventData.event_title }} - Analytics</h2>
         <p v-if="eventData" class="event-details">
@@ -338,17 +337,18 @@
           <div v-if="analyticsData" class="attendance-stats">
             <div class="stat-item">
               <span class="stat-label">Present:</span>
-<<<<<<< HEAD
               <span class="stat-value present">{{
                 analyticsData.attended_count || 0
               }}</span>
-=======
-              <span class="stat-value present">{{ analyticsData.present_count || 0 }}</span>
+              <span class="stat-value present">{{
+                analyticsData.present_count || 0
+              }}</span>
             </div>
             <div class="stat-item">
               <span class="stat-label">No Time Out:</span>
-              <span class="stat-value no-time-out">{{ analyticsData.no_time_out_count || 0 }}</span>
->>>>>>> 71bff5e1b2c49db968d756e499a3a2b0d0a59554
+              <span class="stat-value no-time-out">{{
+                analyticsData.no_time_out_count || 0
+              }}</span>
             </div>
             <div class="stat-item">
               <span class="stat-label">Absent:</span>
@@ -431,15 +431,12 @@
       <div class="review-list">
         <h3>Post Evaluation Analytics</h3>
 
-
-
         <!-- Average Ratings Summary -->
         <div v-if="averageRatings" class="ratings-summary">
           <h4>Average Ratings per Question</h4>
           <div class="rating-item">
             <span>Quality of Service:</span>
             <span class="rating-stars">
-<<<<<<< HEAD
               <span
                 v-for="s in 5"
                 :key="s"
@@ -449,16 +446,11 @@
                 >★</span
               >
               ({{ averageRatings.quality }})
-=======
-              <span v-for="s in 5" :key="s" :class="s <= Number(averageRatings.quality) ? 'filled' : 'empty'">★</span>
-              ({{ Number(averageRatings.quality).toFixed(1) }})
->>>>>>> 71bff5e1b2c49db968d756e499a3a2b0d0a59554
             </span>
           </div>
           <div class="rating-item">
             <span>Responsiveness:</span>
             <span class="rating-stars">
-<<<<<<< HEAD
               <span
                 v-for="s in 5"
                 :key="s"
@@ -470,16 +462,11 @@
                 >★</span
               >
               ({{ averageRatings.responsiveness }})
-=======
-              <span v-for="s in 5" :key="s" :class="s <= Number(averageRatings.responsiveness) ? 'filled' : 'empty'">★</span>
-              ({{ Number(averageRatings.responsiveness).toFixed(1) }})
->>>>>>> 71bff5e1b2c49db968d756e499a3a2b0d0a59554
             </span>
           </div>
           <div class="rating-item">
             <span>Effectiveness:</span>
             <span class="rating-stars">
-<<<<<<< HEAD
               <span
                 v-for="s in 5"
                 :key="s"
@@ -491,16 +478,11 @@
                 >★</span
               >
               ({{ averageRatings.effectiveness }})
-=======
-              <span v-for="s in 5" :key="s" :class="s <= Number(averageRatings.effectiveness) ? 'filled' : 'empty'">★</span>
-              ({{ Number(averageRatings.effectiveness).toFixed(1) }})
->>>>>>> 71bff5e1b2c49db968d756e499a3a2b0d0a59554
             </span>
           </div>
           <div class="rating-item">
             <span>Organization:</span>
             <span class="rating-stars">
-<<<<<<< HEAD
               <span
                 v-for="s in 5"
                 :key="s"
@@ -512,16 +494,11 @@
                 >★</span
               >
               ({{ averageRatings.organization }})
-=======
-              <span v-for="s in 5" :key="s" :class="s <= Number(averageRatings.organization) ? 'filled' : 'empty'">★</span>
-              ({{ Number(averageRatings.organization).toFixed(1) }})
->>>>>>> 71bff5e1b2c49db968d756e499a3a2b0d0a59554
             </span>
           </div>
           <div class="rating-item">
             <span>Recommendation:</span>
             <span class="rating-stars">
-<<<<<<< HEAD
               <span
                 v-for="s in 5"
                 :key="s"
@@ -533,10 +510,6 @@
                 >★</span
               >
               ({{ averageRatings.recommendation }})
-=======
-              <span v-for="s in 5" :key="s" :class="s <= Number(averageRatings.recommendation) ? 'filled' : 'empty'">★</span>
-              ({{ Number(averageRatings.recommendation).toFixed(1) }})
->>>>>>> 71bff5e1b2c49db968d756e499a3a2b0d0a59554
             </span>
           </div>
         </div>
@@ -655,13 +628,6 @@ const fetchEventAnalytics = async () => {
     eventData.value = eventResponse.data || eventResponse;
 
     console.log("✅ Analytics data loaded successfully");
-<<<<<<< HEAD
-    console.log("📈 Analytics:", analyticsData.value);
-    console.log("💡 Suggestions:", suggestions.value);
-    console.log("⭐ Evaluations:", postEvaluations.value);
-=======
-
->>>>>>> 71bff5e1b2c49db968d756e499a3a2b0d0a59554
   } catch (err) {
     console.error("❌ Failed to fetch analytics:", err);
     error.value =
@@ -741,7 +707,7 @@ const formatDate = (dateString) => {
 // Helper functions for star rating display
 const getStarClass = (starNumber, rating) => {
   const numericRating = parseFloat(rating) || 0;
-  return starNumber <= numericRating ? 'filled' : 'empty';
+  return starNumber <= numericRating ? "filled" : "empty";
 };
 
 const formatRating = (rating) => {
@@ -752,51 +718,36 @@ const formatRating = (rating) => {
 const attendanceChartData = computed(() => {
   if (!analyticsData.value) return [];
 
-<<<<<<< HEAD
-  return [
-    {
-      label: "Attended",
-      value: analyticsData.value.attended_count || 0,
-      color: "#435739",
-    },
-    {
-      label: "Absent",
-      value: analyticsData.value.absent_count || 0,
-      color: "#e74c3c",
-    },
-  ];
-=======
   const chartData = [];
 
   // Present (completed time in and out)
   if (analyticsData.value.present_count > 0) {
     chartData.push({
-      label: 'Present',
+      label: "Present",
       value: analyticsData.value.present_count,
-      color: '#435739'
+      color: "#435739",
     });
   }
 
   // No time out (has time in but no time out)
   if (analyticsData.value.no_time_out_count > 0) {
     chartData.push({
-      label: 'No Time Out',
+      label: "No Time Out",
       value: analyticsData.value.no_time_out_count,
-      color: '#ff9800'
+      color: "#ff9800",
     });
   }
 
   // Absent (no time in)
   if (analyticsData.value.absent_count > 0) {
     chartData.push({
-      label: 'Absent',
+      label: "Absent",
       value: analyticsData.value.absent_count,
-      color: '#e74c3c'
+      color: "#e74c3c",
     });
   }
 
   return chartData;
->>>>>>> 71bff5e1b2c49db968d756e499a3a2b0d0a59554
 });
 
 const thingsBroughtChartData = computed(() => {
@@ -1334,14 +1285,14 @@ NotificationPanel, // Register the component },
 }
 
 .progress-fill.target {
-  background: #f39c12;
+  background: #81a263;
 }
 
 /* Attendance Stats */
 .attendance-stats {
   display: flex;
   justify-content: space-around;
-  margin: 15px 0;
+  padding-top: 10%;
 }
 
 .stat-item {
@@ -1361,15 +1312,11 @@ NotificationPanel, // Register the component },
 }
 
 .stat-value.present {
-<<<<<<< HEAD
-  color: #6b7c61;
-=======
   color: #435739;
 }
 
 .stat-value.no-time-out {
   color: #ff9800;
->>>>>>> 71bff5e1b2c49db968d756e499a3a2b0d0a59554
 }
 
 .stat-value.absent {

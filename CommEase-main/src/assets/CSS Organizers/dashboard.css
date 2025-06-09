@@ -784,6 +784,9 @@ img {
 .dropdown {
   position: relative;
   left: 2%;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 10px;
 }
 
 .dropbtn {
@@ -899,16 +902,16 @@ img {
 }
 
 @media (max-width: 979px) {
-  .calendar-modal-overlay {
-    margin-left: 30px;
-  }
-
   .calendar-modal {
-    scale: 0.9;
+    scale: 0.8;
+    margin-left: 30px;
   }
 
   .notification-panel {
     z-index: 2000;
+  }
+  .overlay {
+    display: block;
   }
 }
 
@@ -933,6 +936,26 @@ img {
   }
 }
 
+@media (max-width: 760px) {
+  .calendar-modal {
+    scale: 0.7;
+  }
+
+  .calendar-modal-content {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .calendar-modal-content table {
+    min-width: 600px; /* or whatever minimum width you want */
+  }
+  .calendar-modal-content td,
+  .calendar-modal-content th,
+  .calendar-modal-content tr {
+    min-width: 600px; /* or whatever minimum width you want */
+  }
+}
+
 @media (max-width: 635px) {
   .sidebar {
     z-index: 5000 !important;
@@ -943,7 +966,7 @@ img {
   }
 }
 
-@media (max-width: 578px) {
+@media (max-width: 602px) {
   .calendar-modal {
     scale: 0.75;
   }
@@ -973,6 +996,49 @@ img {
   }
 }
 
+@media (max-width: 582px) {
+  .search-options-container {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 578px) {
+  .calendar-modal {
+    scale: 0.75;
+  }
+
+  .modal-content {
+    scale: 0.85;
+    margin-left: 60px;
+  }
+
+  .notification-panel {
+    z-index: 2000;
+  }
+  .picture-person {
+    /* REVISED */
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+  }
+
+  .volunteer-name {
+    font-size: 20px;
+  }
+
+  .service-type {
+    font-size: 19px;
+  }
+
+  .glasscard-container,
+  .glasscard-container-1 {
+    scale: 0.95;
+  }
+}
+
 @media (max-width: 506px) {
   /* DAPAT WALANG HORIZONTAL SCROLL */
   .container-inputs {
@@ -986,6 +1052,12 @@ img {
   }
   .notification-panel {
     z-index: 2000;
+  }
+}
+
+@media (max-width: 501px) {
+  .glasscard-container {
+    height: auto;
   }
 }
 
@@ -1032,4 +1104,27 @@ img {
     scale: 0.9;
     margin-left: 50px;
   }
+}
+
+.icon-button {
+  background-color: #435739;
+  color: #f2f4ec;
+  border: 2px solid transparent;
+
+  width: 46px;
+  height: 46px;
+  border-radius: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  font-size: 18px;
+}
+
+.icon-button:hover {
+  background-color: #f2f4ec;
+  color: #435739;
+  border: 2px solid #435739;
+  transform: translateY(-1px);
 }

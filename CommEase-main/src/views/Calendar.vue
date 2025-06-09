@@ -41,13 +41,13 @@
 </template>
 
 <script>
-import CustomCalendar from '@/components/CustomCalendar.vue';
+import CustomCalendar from "@/components/CustomCalendar.vue";
 
 export default {
-  name: 'Calendar',
+  name: "Calendar",
   components: {
-    CustomCalendar
-  }
+    CustomCalendar,
+  },
 };
 </script>
 
@@ -57,7 +57,7 @@ export default {
   max-width: 1200px;
   margin: 0 auto;
   min-height: 100vh;
-  background: #f8f9fa;
+  background: #f2f4ec;
 }
 
 .page-header {
@@ -148,11 +148,11 @@ export default {
   .calendar-page {
     padding: 10px;
   }
-  
+
   .page-header h1 {
     font-size: 2rem;
   }
-  
+
   .legend-items {
     justify-content: center;
   }

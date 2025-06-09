@@ -438,14 +438,16 @@ textarea {
   font-size: 13px;
   resize: none;
   margin-top: 5%;
-  background-color: #435739;
+  background-color: #f2f4ec;
+  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
   color: #daf1de;
+  transition: all ease-in-out 0.15s;
 }
 
 textarea:focus {
   outline: none;
   border: 2px solid black;
-  box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.3);
 }
 
 .button-ideas-submit {

@@ -141,7 +141,9 @@
               <div v-if="showModal" class="modal-overlay">
                 <div class="modal-content">
                   <h2>Event Evaluation Form</h2>
-                  <p v-if="selectedEvent" class="event-title">{{ selectedEvent.event_title }}</p>
+                  <p v-if="selectedEvent" class="event-title">
+                    {{ selectedEvent.event_title }}
+                  </p>
 
                   <!-- Error Message -->
                   <div v-if="evaluationError" class="error-message">
@@ -157,7 +159,9 @@
                         :key="index"
                         class="form-group"
                       >
-                        <label class="question">{{ index + 1 }}. {{ question }}</label>
+                        <label class="question"
+                          >{{ index + 1 }}. {{ question }}</label
+                        >
                         <div class="star-rating">
                           <span
                             v-for="star in 5"
@@ -184,7 +188,10 @@
                           rows="6"
                           required
                         ></textarea>
-                        <div class="word-count" :class="{ 'insufficient': reflectionWordCount < 50 }">
+                        <div
+                          class="word-count"
+                          :class="{ insufficient: reflectionWordCount < 50 }"
+                        >
                           {{ reflectionWordCount }} words (minimum 50 required)
                         </div>
                       </div>
@@ -206,7 +213,7 @@
                         :disabled="submittingEvaluation"
                       >
                         <span v-if="submittingEvaluation">Submitting...</span>
-                        <span v-else>Submit Evaluation</span>
+                        <span v-else class="submit-eval">Submit</span>
                       </button>
                     </div>
                   </form>
@@ -307,8 +314,6 @@ async function unregisterFromEvent(eventId) {
   }
 }
 
-
-
 function handleResize() {
   isMobile.value = window.innerWidth <= 928;
   if (isMobile.value) {
@@ -394,8 +399,6 @@ function openEvaluationModal(event) {
   console.log("🔍 Opening evaluation modal for event:", event.event_title);
 }
 
-
-
 // Submit evaluation to backend
 const submitEvaluation = async () => {
   try {
@@ -412,7 +415,8 @@ const submitEvaluation = async () => {
     // Validate reflection text (minimum 50 words)
     const wordCount = reflectionText.value.trim().split(/\s+/).length;
     if (reflectionText.value.trim() === "") {
-      evaluationError.value = "Please write a reflection about your experience.";
+      evaluationError.value =
+        "Please write a reflection about your experience.";
       return;
     }
 
@@ -426,9 +430,15 @@ const submitEvaluation = async () => {
       return;
     }
 
-    console.log("📤 Submitting evaluation for event:", selectedEvent.value.event_title);
+    console.log(
+      "📤 Submitting evaluation for event:",
+      selectedEvent.value.event_title
+    );
     console.log("📊 Ratings:", ratings.value);
-    console.log("📝 Reflection text:", reflectionText.value.substring(0, 100) + "...");
+    console.log(
+      "📝 Reflection text:",
+      reflectionText.value.substring(0, 100) + "..."
+    );
     console.log("📊 Word count:", wordCount);
 
     // Prepare evaluation data
@@ -442,14 +452,17 @@ const submitEvaluation = async () => {
     };
 
     // Submit to backend
-    const response = await eventService.submitPostEvaluation(selectedEvent.value.id, evaluationData);
+    const response = await eventService.submitPostEvaluation(
+      selectedEvent.value.id,
+      evaluationData
+    );
 
     console.log("✅ Evaluation submitted successfully:", response.data);
 
     // Add notification for immediate feedback
     addLocalNotification(
       `Post-evaluation submitted for ${selectedEvent.value.event_title}`,
-      'new_post_evaluation'
+      "new_post_evaluation"
     );
 
     alert("Evaluation submitted successfully! Thank you for your feedback.");
@@ -463,16 +476,20 @@ const submitEvaluation = async () => {
 
     // Refresh event history to update UI
     await fetchEventHistory();
-
   } catch (error) {
     console.error("❌ Failed to submit evaluation:", error);
 
     if (error.response?.status === 422) {
-      evaluationError.value = error.response.data.message || "You have already submitted an evaluation for this event.";
+      evaluationError.value =
+        error.response.data.message ||
+        "You have already submitted an evaluation for this event.";
     } else if (error.response?.status === 403) {
-      evaluationError.value = "You don't have permission to evaluate this event.";
+      evaluationError.value =
+        "You don't have permission to evaluate this event.";
     } else {
-      evaluationError.value = error.response?.data?.message || "Failed to submit evaluation. Please try again.";
+      evaluationError.value =
+        error.response?.data?.message ||
+        "Failed to submit evaluation. Please try again.";
     }
   } finally {
     submittingEvaluation.value = false;

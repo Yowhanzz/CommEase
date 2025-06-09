@@ -122,11 +122,6 @@
                 <span>Location: </span>Barangay {{ registration.location }}
               </p>
 
-              <p class="p-location">
-                <span>Slots left: </span>Only 25 Volunteers left
-                <!-- registration.slots -->
-              </p>
-
               <p class="p-programs">
                 <span>Programs: </span
                 >{{ (registration.programs || []).join(", ") }}

@@ -505,10 +505,6 @@ export default {
   margin-bottom: 5px;
 }
 
-.archived-event-participants span {
-  font-weight: 600;
-}
-
 /* Action buttons container */
 .archived-event-actions {
   display: flex;
